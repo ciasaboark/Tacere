@@ -119,8 +119,10 @@ public class PollService extends IntentService {
 		//Using the RTC clock _should_ keep the service from waking the device every time a
 		//+ pending intent should fire. The pending intents should not trigger until some other
 		//+ process wakes the device
-		//alarm.set(AlarmManager.RTC, System.currentTimeMillis() + DateUtils.MINUTE_IN_MILLIS * 5, pintent);
-		alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 20, pintent);
+		alarm.set(AlarmManager.RTC, System.currentTimeMillis() + DateUtils.MINUTE_IN_MILLIS * 5, pintent);
+		
+		//Test alarm for every 20 seconds
+		//alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 20, pintent);
 		
 		//Creating a toast from within an IntentService can leave toast visible indefinitely.  Posting the
 		//+ toast to a new thread solves this problem.
