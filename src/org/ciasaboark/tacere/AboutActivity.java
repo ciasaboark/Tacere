@@ -1,3 +1,11 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 import android.app.Activity;
@@ -24,7 +32,8 @@ public class AboutActivity extends Activity {
         
         //All links should open in the default browser, not this WebView
         wv.setWebViewClient(new WebViewClient() {
-        	public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        	@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
         		view.getContext().startActivity(
         			new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         		return true;
