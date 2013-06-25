@@ -7,31 +7,27 @@
         android:id="@+id/serviceCheckBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable Service" />
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/enable_service" />
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <Button
-            android:id="@+id/calendarsButton"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/refreshTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose Calendars" />
+            android:text="@string/refresh_interval" 
+            android:layout_alignParentLeft="true"/>
 
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/defaultStateButton"
-            android:layout_width="match_parent"
+        <NumberPicker
+            android:id="@+id/refresh_interval"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Default State" />
+            android:layout_alignParentRight="true" />
 
-    </FrameLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
@@ -22,19 +22,23 @@
                 android:id="@+id/serviceStateTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:layout_alignParentLeft="true" />
 
             <ImageView
                 android:id="@+id/serviceStateImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_gravity="center"
                 android:contentDescription="Service Running"
                 android:maxHeight="16dp"
                 android:maxWidth="16dp"
+                android:minHeight="16dp"
+                android:minWidth="16dp"
                 android:src="@android:drawable/btn_radio" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -44,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/quick_silence" />
+        android:text="@string/quick_silence"
+        android:onClick="onClickQuickSilence" />
 
 </RelativeLayout>

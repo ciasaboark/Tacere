@@ -18,6 +18,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
@@ -31,15 +32,15 @@ public class PollService extends IntentService {
 	
 	//Values that should be read from the settings
 	//TODO find out a good way to handle default values here
-	private boolean activated = true;
+	private boolean isActivated = true;
 	private boolean silenceFreeTime;
 	private int ringerType;
 	private boolean adjustMedia;
-	private float mediaVolume;
+	private int mediaVolume;
 	private boolean adjustAlarm;
-	private float alarmVolume;
+	private int alarmVolume;
 	private int quickSilenceMinutes;
-	private long refreshInterval;
+	private int refreshInterval;
 	
 	private Handler handler = new Handler();
 	
@@ -51,7 +52,7 @@ public class PollService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.i(TAG, "Received an intent: " + intent);
 		readSettings();
-		if (activated) {
+		if (isActivated) {
 			final String[] INSTANCE_PROJECTION = new String[] {
 			    Instances.EVENT_ID,      // 0
 			    Instances.BEGIN,         // 1
@@ -127,13 +128,10 @@ public class PollService extends IntentService {
 		//Using the RTC clock _should_ keep the service from waking the device every time a
 		//+ pending intent should fire. The pending intents should not trigger until some other
 		//+ process wakes the device
-		alarm.set(AlarmManager.RTC, System.currentTimeMillis() + DateUtils.MINUTE_IN_MILLIS * 5, pintent);
-		
-		//Test alarm for every 20 seconds
-		//alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 20, pintent);
+		alarm.set(AlarmManager.RTC, System.currentTimeMillis() + DateUtils.MINUTE_IN_MILLIS * refreshInterval, pintent);
 		
 		//Creating a toast from within an IntentService can leave toast visible indefinitely.  Posting the
-		//+ toast to a new thread solves this problem.
+		//+ toast from a new thread solves this problem.
 		handler.post(new Runnable() {
 						
 						@Override
@@ -152,7 +150,6 @@ public class PollService extends IntentService {
 	}
 	
 	private void stopService() {
-		//TODO cancel the update, restore settings, shutdown service
 		Log.d(TAG, "PollService:stopService() called");
 		cancelAlarm();
 		restoreVolumes();
@@ -160,8 +157,16 @@ public class PollService extends IntentService {
 	}
 	
 	private void readSettings() {
-		//TODO read settings here first
-		//get a list of calenders
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
+		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
+		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
+		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
+		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
+		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
+		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
+		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
+		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		
 		Log.d(TAG, "PollService:readSettings() called");
 	}

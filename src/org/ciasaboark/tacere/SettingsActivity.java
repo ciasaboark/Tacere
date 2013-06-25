@@ -9,25 +9,30 @@
 package org.ciasaboark.tacere;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.NumberPicker;
+import android.widget.Toast;
 
 public class SettingsActivity extends Activity {
-	private static final String TAG = "Shutdown";
+	private static final String TAG = "Settings";
 	
-	private boolean isActivated = true;
+	private boolean isActivated;
 	private boolean silenceFreeTime;
 	private int ringerType;
 	private boolean adjustMedia;
-	private float mediaVolume;
+	private int mediaVolume;
 	private boolean adjustAlarm;
-	private float alarmVolume;
+	private int alarmVolume;
 	private int quickSilenceMinutes;
-	private long refreshInterval;
+	private int refreshInterval;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +42,28 @@ public class SettingsActivity extends Activity {
 		setupActionBar();
 		
 		//read the saved preferences
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", this.MODE_PRIVATE);
-		isActivated = preferences.getBoolean("isActivated", false);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime", true);
-		ringerType = preferences.getInt("ringerType", 3);
-		adjustMedia = preferences.getBoolean("adjustMedia", false);
-		mediaVolume = preferences.getFloat("mediaVolume", (float) 1.0);
-		adjustAlarm = preferences.getBoolean("adjustAlarm", false);
-		alarmVolume = preferences.getFloat("alarmVolume", (float) 1.0);
-		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", 5);
-		refreshInterval = preferences.getLong("refreshInterval", 5);
+		readSettings();
 		
+		//Log the results
+		Log.d(TAG, "isActivated: " + String.valueOf(isActivated));
+		Log.d(TAG, "silenceFreeTime: " + String.valueOf(silenceFreeTime));
+		Log.d(TAG, "ringerType: " + String.valueOf(ringerType));
+		Log.d(TAG, "adjustMedia: " + String.valueOf(adjustMedia));
+		Log.d(TAG, "mediaVolume: " + String.valueOf(mediaVolume));
+		Log.d(TAG, "adjustAlarm: " + String.valueOf(adjustAlarm));
+		Log.d(TAG, "alarmVolume: " + String.valueOf(alarmVolume));
+		Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
+		Log.d(TAG, "refreshInterval: " + String.valueOf(refreshInterval));
+		
+		//the refresh interval picker
+		NumberPicker refreshPicker = (NumberPicker)findViewById(R.id.refresh_interval);
+		refreshPicker.setMaxValue(30);
+		refreshPicker.setMinValue(1);
+		refreshPicker.setValue(refreshInterval);
+		
+		//the service activated toggle
+		CheckBox serviceCheckBox = (CheckBox)findViewById(R.id.serviceCheckBox);
+		serviceCheckBox.setChecked(isActivated);
 		
 		
 	}
@@ -71,6 +87,22 @@ public class SettingsActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.action_settings_restore:
+            //restore settings to default values then navigate to the main activity
+			isActivated = DefPrefs.isActivated;
+			silenceFreeTime = DefPrefs.silenceFreeTime;
+			ringerType = DefPrefs.ringerType;
+			adjustMedia = DefPrefs.adjustMedia;
+			mediaVolume = DefPrefs.mediaVolume;
+			adjustAlarm = DefPrefs.adjustAlarm;
+			alarmVolume = DefPrefs.alarmVolume;
+			quickSilenceMinutes = DefPrefs.quickSilenceMinutes;
+			refreshInterval = DefPrefs.refreshInterval;
+			
+			//settings will be saved when onPause() fires
+			Toast.makeText(getApplicationContext(),"Settings have been restore to defaults", Toast.LENGTH_SHORT).show();
+			NavUtils.navigateUpFromSameTask(this);
+            return true;
 		case android.R.id.home:
 			// This ID represents the Home or Up button. In the case of this
 			// activity, the Up button is shown. Use NavUtils to allow users
@@ -79,6 +111,7 @@ public class SettingsActivity extends Activity {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
+			saveSettings();
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
@@ -89,18 +122,77 @@ public class SettingsActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		Log.d(TAG, "Settings:onDestroy() called");
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", this.MODE_PRIVATE);
+	
+	}
+	
+	private void readSettings() {
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
+		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
+		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
+		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
+		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
+		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
+		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
+		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
+		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
+		
+		Log.d(TAG, "readSettings() called");
+	}
+	
+	private void saveSettings() {
+		Log.d(TAG, "saveSettings() called");
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("isActivated", isActivated);
 		editor.putBoolean("silenceFreeTime", silenceFreeTime);
 		editor.putInt("ringerType", 3);
 		editor.putBoolean("adjustMedia", adjustMedia);
 		editor.putBoolean("adjustAlarm", adjustAlarm);
-		editor.putFloat("mediaVolume", mediaVolume);
-		editor.putFloat("alarmVolume", alarmVolume);
+		editor.putInt("mediaVolume", mediaVolume);
+		editor.putInt("alarmVolume", alarmVolume);
 		editor.putInt("quickSilenceMinutes", quickSilenceMinutes);
-		editor.putLong("refreshInterval", refreshInterval);
+		editor.putInt("refreshInterval", refreshInterval);
 		editor.commit();
+	}
+	
+	public void onCheckBoxClicked(View v) {
+		boolean checked = ((CheckBox) v).isChecked();
+		
+		//which checkbox was clicked?
+		switch (v.getId()) {
+			case R.id.serviceCheckBox:
+				if (checked) {
+					isActivated = true;
+				} else {
+					isActivated = false;
+				}
+				break;
+		}
+	}
+	
+	
+	public void onRestart() {
+		Log.d(TAG, "onRestart() called");
+		super.onRestart();
+	}
+	
+	public void onResume() {
+		Log.d(TAG, "onResume() called");
+		super.onResume();
+	}
+
+	public void onPause() {
+		Log.d(TAG, "onPause() called");
+		
+		//save all changes to the preferences
+		saveSettings();
+		super.onPause();
+	}
+	
+	public void onStop() {
+		Log.d(TAG, "onStop() called");
+		super.onStop();
 	}
 
 }

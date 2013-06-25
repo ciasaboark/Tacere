@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +29,16 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	
 	private static final String TAG = "MainActivity";
+	
+	private boolean isActivated = true;
+	private boolean silenceFreeTime;
+	private int ringerType;
+	private boolean adjustMedia;
+	private int mediaVolume;
+	private boolean adjustAlarm;
+	private int alarmVolume;
+	private int quickSilenceMinutes;
+	private int refreshInterval;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +46,38 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		//TODO
-		//read settings for quick silence
-		int quickSilenceMinutes = 5;
+		
+		
+		//the text and image for the state of pollservice can only be set up after the service has
+		//+ started in onStart()
+		
+		
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	public void onClickQuickSilence(View v) {
+		Log.d(TAG, "onClickQuickSilence() called");
+		Intent i = new Intent(this, PollService.class);
+		i.putExtra("quickSilence", 5);
+		startService(i);
+	}
+	
+	public void onStart() {
+		Log.d(TAG, "MainActivity onStart() called");
+		super.onStart();
+		
+		//start the background service
+		startService(new Intent(this, PollService.class));
+		
+		readSettings();
+		
+		//set up quick silence button
 		Button quickSettingsButton = (Button)findViewById(R.id.quickSilenceButton);
 		quickSettingsButton.setText("Quick Silence " + quickSilenceMinutes + " minutes");
 		quickSettingsButton.setOnClickListener(new View.OnClickListener() {
@@ -53,37 +95,21 @@ public class MainActivity extends Activity {
 			Drawable greenButton = Drawable.createFromStream(inStreamGreen, null);
 			InputStream inStreamRed = getAssets().open("button_red.png");
 			Drawable redButton = Drawable.createFromStream(inStreamRed, null);
+			TextView ssText = (TextView) findViewById(R.id.serviceStateTextView);
 			
-			ssImage.setImageDrawable(redButton);
+			//since the pollservice only runs intermittently we have to check whether there
+			//+ is a pending intent scheduled to determine whether or not the service is
+			//+ considered active
+			if (PendingIntent.getBroadcast(this, 0, new Intent("org.ciasaboark.tacere.PollService"), PendingIntent.FLAG_NO_CREATE) != null) {
+				ssImage.setImageDrawable(greenButton);
+				ssText.setText("Service Active");
+			} else {
+				ssImage.setImageDrawable(redButton);
+				ssText.setText("Service Not Active");
+			}
 		} catch (IOException e) {
 			Log.e(TAG, "Error loading drawable icon");
-		}
-		
-		TextView ssText = (TextView) findViewById(R.id.serviceStateTextView);
-		ssText.setText("Service Active");
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-	
-	public void onClickSettings(View view) {
-		startActivity(new Intent("org.ciasaboark.tacere.SettingsActivity"));
-	}
-	
-	public void onClickAbout(View view) {
-		startActivity(new Intent("org.ciasaboark.tacere.AboutActivity"));
-	}
-	
-	public void onStart() {
-		Log.d(TAG, "MainActivity onStart() called");
-		super.onStart();
-		
-		//start the background service
-		startService(new Intent(this, PollService.class));
+			}
 	}
 	
 	public void onRestart() {
@@ -127,5 +153,24 @@ public class MainActivity extends Activity {
 	        default:
 	            return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	private void readSettings() {
+		//read the saved preferences
+		Log.d(TAG, "readSettings() called");
+		try {
+			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+			isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
+			silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
+			ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
+			adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
+			mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
+			adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
+			alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
+			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
+			refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}	
 	}
 }
