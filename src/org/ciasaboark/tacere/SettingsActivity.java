@@ -18,7 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SettingsActivity extends Activity {
@@ -55,15 +55,30 @@ public class SettingsActivity extends Activity {
 		Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
 		Log.d(TAG, "refreshInterval: " + String.valueOf(refreshInterval));
 		
-		//the refresh interval picker
-		NumberPicker refreshPicker = (NumberPicker)findViewById(R.id.refresh_interval);
-		refreshPicker.setMaxValue(30);
-		refreshPicker.setMinValue(1);
-		refreshPicker.setValue(refreshInterval);
+//		//the refresh interval picker
+//		NumberPicker refreshPicker = (NumberPicker)findViewById(R.id.refresh_interval);
+//		refreshPicker.setMaxValue(30);
+//		refreshPicker.setMinValue(1);
+//		refreshPicker.setValue(refreshInterval);
 		
 		//the service activated toggle
 		CheckBox serviceCheckBox = (CheckBox)findViewById(R.id.serviceCheckBox);
 		serviceCheckBox.setChecked(isActivated);
+		
+		//the silence free time toggle
+		CheckBox freeCheckBox = (CheckBox)findViewById(R.id.freeTimeCheckBox);
+		freeCheckBox.setChecked(silenceFreeTime);
+		
+		//the adjust media toggle
+		CheckBox mediaCheckBox = (CheckBox)findViewById(R.id.mediaCheckBox);
+		mediaCheckBox.setChecked(adjustMedia);
+		
+		//the adjust alarm toggle
+		CheckBox alarmCheckBox = (CheckBox)findViewById(R.id.alarmCheckBox);
+		alarmCheckBox.setChecked(adjustAlarm);
+		
+		TextView refreshMinutes = (TextView)findViewById(R.id.refresh_minutes);
+		refreshMinutes.setText("every " + refreshInterval + " minutes");
 		
 		
 	}
@@ -168,7 +183,32 @@ public class SettingsActivity extends Activity {
 					isActivated = false;
 				}
 				break;
+			case R.id.mediaCheckBox:
+				if (checked) {
+					adjustMedia = true;
+				} else {
+					adjustMedia = false;
+				}
+				break;
+			case R.id.alarmCheckBox:
+				if (checked) {
+					adjustAlarm = true;
+				} else {
+					adjustAlarm = false;
+				}
+				break;
+			case R.id.freeTimeCheckBox:
+				if (checked) {
+					silenceFreeTime = true;
+				} else {
+					silenceFreeTime = false;
+				}
+				break;
 		}
+	}
+	
+	public void onClickRefreshInterval(View v) {
+		Log.d(TAG, "onClickRefreshInterval() called");
 	}
 	
 	

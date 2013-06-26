@@ -1,7 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="4dp" >
 
     <CheckBox
         android:id="@+id/serviceCheckBox"
@@ -10,25 +11,60 @@
         android:onClick="onCheckBoxClicked"
         android:text="@string/enable_service" />
 
+    <CheckBox
+        android:id="@+id/freeTimeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/silence_freeTime" />
+
+	<View
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginTop="4dp"
+	    android:layout_marginBottom="4dp"
+	    android:layout_marginRight="10dp"
+	    android:layout_marginLeft="10dp" />
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="10dp"
+	    android:onClick="onClickRefreshInterval"
+	    android:orientation="vertical" >
+
+		<TextView
+		    android:id="@+id/refreshTextView"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/refresh_interval"
+		    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+		<TextView
+		    android:id="@+id/refresh_minutes"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="20dp"
+		    android:text="@string/refresh_interval_minutes"
+		    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	</LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/refreshTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refresh_interval" 
-            android:layout_alignParentLeft="true"/>
-
-        <NumberPicker
-            android:id="@+id/refresh_interval"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true" />
-
     </RelativeLayout>
-
+	
+	<View
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginTop="4dp"
+	    android:layout_marginBottom="4dp"
+	    android:layout_marginRight="10dp"
+	    android:layout_marginLeft="10dp" />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,6 +82,7 @@
                 android:id="@+id/mediaCheckBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onCheckBoxClicked"
                 android:text="Change Media Volume" />
 
             <SeekBar
@@ -57,6 +94,7 @@
                 android:id="@+id/alarmCheckBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onCheckBoxClicked"
                 android:text="Change Alarm Volume" />
 
             <SeekBar
