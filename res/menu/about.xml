@@ -1,3 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+  <item
+        android:id="@+id/action_about_license"
+        android:orderInCategory="100"
+        android:showAsAction="always|withText"
+       	android:icon="@drawable/copyright_icon"
+        android:title="@string/action_about_license" />
 </menu>

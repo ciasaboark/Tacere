@@ -5,35 +5,49 @@
     <string name="action_settings">Settings</string>
     <string name="action_settings_restore">Restore Defaults</string>
     <string name="action_about">About</string>
+    <string name="action_about_license">License</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">About</string>
     <string name="quick_silence">Quick Silence</string>
     <string name="enable_service">Enable Automatic Silencing</string>
-    <string name="refresh_interval">Refresh Interval :</string>
+    <string name="pref_refresh_interval_title">Refresh Interval</string>
+    <string name="pref_silence_all_day_title">All Day Events</string>
+    <string name="pref_silence_free_time_title">Free Time Events</string>
     <string name="refresh_interval_minutes">every XXX minutes(s)</string>
     <string name="silence_freeTime">Silence During Free Time</string>
-    
-    
-    <!-- Default preferences
-    <string name="pref_isActivatedDefault">false</string>
-	<string name="pref_silenceFreeTimeDefault">true</string>     
-	<string name="pref_ringerTypeDefault">3</string>
-	<string name="pref_adjustMediaDefault">false</string>
-	<string name="pref_mediaVolumeDefault">100</string>
-	<string name="pref_adjustAlarmDefault">false</string>
-	<string name="pref_alarmVolumeDefault">100</string>
-	<string name="pref_quickSilenceMinutesDefault">5</string>
-	<string name="pref_refreshIntervalDefault">5</string>
-    
-    <string name="pref_isActivated">isActivated</string>
-	<string name="pref_silenceFreeTime">silenceFreeTime</string>     
-	<string name="pref_ringerType">ringerType</string>
-	<string name="pref_adjustMedia">adjustMedia</string>
-	<string name="pref_mediaVolume">mediaVolume</string>
-	<string name="pref_adjustAlarm">adjustAlarm</string>
-	<string name="pref_alarmVolume">alarmVolume</string>
-	<string name="pref_quickSilenceMinutes">quickSilenceMinutes</string>
-	<string name="pref_refreshInterval">refreshInterval</string>
-	-->
+    <string name="pref_general_header">GENERAL</string>
+    <string name="pref_advance_header">ADVANCED</string>
+    <string name="pref_quick_silence_header">INTERVALS</string>
+    <string name="pref_refresh_section">REFRESH</string>
+    <string name="pref_events_section">EVENTS</string>
+    <string name="pref_ringer_type_title">Ringer Type</string>
+    <string name="pref_wake_device_title">Wake Device</string>
+    <string name="pref_buffer_minutes_title">Event Buffer</string>
+    <string name="pref_battery_section">BATTERY</string>
+    <string name="pref_ringer_type_normal">Phone will ring as normal</string>
+    <string name="pref_ringer_type_vibrate">Phone will vibrate</string>
+    <string name="pref_ringer_type_silent">Phone will silence</string>
+    <string name="pref_service">Service</string>
+    <string name="pref_service_enabled">Service will run periodically</string>
+    <string name="pref_alarm_volume">Alarm Volume</string>
+    <string name="pref_alarm_volume_enabled">Alarm volume will be adjusted</string>
+    <string name="pref_alarm_volume_disabled">Alarm volume will not be adjusted</string>
+    <string name="pref_silence_free_time">Silence Free Time</string>
+    <string name="pref_silence_free_time_enabled">Phone will silence during events marked as free time</string>
+    <string name="pref_silence_free_time_disabled">Phone will ring during events marked as free time</string>
+    <string name="pref_quick_silence">Quick Silence</string>
+    <string name="pref_volumes_header">VOLUMES</string>
+    <string name="pref_adjust_media">Adjust Media Volume</string>
+    <string name="pref_adjust_media_enabled">Media volume will not be adjusted</string>
+    <string name="pref_adjust_media_disabled">Media volume will not be adjusted</string>
+    <string name="pref_refresh_interval">Refresh Interval</string>
+    <string name="pref_advanced_title">Advanced Settings</string>
+    <string name="pref_advanced_sub">Proceed at your own risk</string>
+    <string name="placeholder">Placeholder String</string>
+    <string name="title_activity_about_activity_license">License/Credits</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="title_activity_advanced_settings">Advanced Settings</string>
 
 </resources>

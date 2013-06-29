@@ -5,11 +5,12 @@
     android:versionName="20130622" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="16"
         android:targetSdkVersion="17" />
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -48,26 +49,47 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere2.MainActivity" />
         </activity>
+
         <service
-            android:name="org.ciasaboark.tacere.PollService">
+            android:name="org.ciasaboark.tacere.PollService"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.PollService" />
             </intent-filter>
         </service>
+
         <receiver
             android:name="org.ciasaboark.tacere.PollServiceReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        
+
+        <activity
+            android:name="org.ciasaboark.tacere.AboutActivityLicense"
+            android:label="@string/title_activity_about_activity_license"
+            android:parentActivityName="org.ciasaboark.tacere.AboutActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.AboutActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.AdvancedSettingsActivity"
+            android:label="@string/title_activity_advanced_settings"
+            android:parentActivityName="org.ciasaboark.tacere.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.SettingsActivity" />
+        </activity>
     </application>
 
 </manifest>

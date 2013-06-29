@@ -11,6 +11,6 @@
         android:id="@+id/action_about"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/social_person"
+        android:icon="@drawable/info_icon"
         android:title="@string/action_about" />
 </menu>

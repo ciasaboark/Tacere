@@ -9,15 +9,22 @@
 package org.ciasaboark.tacere;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.NumberPicker;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,14 +32,13 @@ public class SettingsActivity extends Activity {
 	private static final String TAG = "Settings";
 	
 	private boolean isActivated;
-	private boolean silenceFreeTime;
 	private int ringerType;
 	private boolean adjustMedia;
 	private int mediaVolume;
 	private boolean adjustAlarm;
 	private int alarmVolume;
 	private int quickSilenceMinutes;
-	private int refreshInterval;
+	private int quickSilenceHours;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,41 +52,15 @@ public class SettingsActivity extends Activity {
 		
 		//Log the results
 		Log.d(TAG, "isActivated: " + String.valueOf(isActivated));
-		Log.d(TAG, "silenceFreeTime: " + String.valueOf(silenceFreeTime));
 		Log.d(TAG, "ringerType: " + String.valueOf(ringerType));
 		Log.d(TAG, "adjustMedia: " + String.valueOf(adjustMedia));
 		Log.d(TAG, "mediaVolume: " + String.valueOf(mediaVolume));
 		Log.d(TAG, "adjustAlarm: " + String.valueOf(adjustAlarm));
 		Log.d(TAG, "alarmVolume: " + String.valueOf(alarmVolume));
 		Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
-		Log.d(TAG, "refreshInterval: " + String.valueOf(refreshInterval));
+		Log.d(TAG, "quickSilenceHours: " + String.valueOf(quickSilenceHours));
 		
-//		//the refresh interval picker
-//		NumberPicker refreshPicker = (NumberPicker)findViewById(R.id.refresh_interval);
-//		refreshPicker.setMaxValue(30);
-//		refreshPicker.setMinValue(1);
-//		refreshPicker.setValue(refreshInterval);
-		
-		//the service activated toggle
-		CheckBox serviceCheckBox = (CheckBox)findViewById(R.id.serviceCheckBox);
-		serviceCheckBox.setChecked(isActivated);
-		
-		//the silence free time toggle
-		CheckBox freeCheckBox = (CheckBox)findViewById(R.id.freeTimeCheckBox);
-		freeCheckBox.setChecked(silenceFreeTime);
-		
-		//the adjust media toggle
-		CheckBox mediaCheckBox = (CheckBox)findViewById(R.id.mediaCheckBox);
-		mediaCheckBox.setChecked(adjustMedia);
-		
-		//the adjust alarm toggle
-		CheckBox alarmCheckBox = (CheckBox)findViewById(R.id.alarmCheckBox);
-		alarmCheckBox.setChecked(adjustAlarm);
-		
-		TextView refreshMinutes = (TextView)findViewById(R.id.refresh_minutes);
-		refreshMinutes.setText("every " + refreshInterval + " minutes");
-		
-		
+		refreshDisplay();
 	}
 
 	/**
@@ -104,18 +84,10 @@ public class SettingsActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.action_settings_restore:
             //restore settings to default values then navigate to the main activity
-			isActivated = DefPrefs.isActivated;
-			silenceFreeTime = DefPrefs.silenceFreeTime;
-			ringerType = DefPrefs.ringerType;
-			adjustMedia = DefPrefs.adjustMedia;
-			mediaVolume = DefPrefs.mediaVolume;
-			adjustAlarm = DefPrefs.adjustAlarm;
-			alarmVolume = DefPrefs.alarmVolume;
-			quickSilenceMinutes = DefPrefs.quickSilenceMinutes;
-			refreshInterval = DefPrefs.refreshInterval;
-			
-			//settings will be saved when onPause() fires
-			Toast.makeText(getApplicationContext(),"Settings have been restore to defaults", Toast.LENGTH_SHORT).show();
+			restoreDefaults();
+
+			//navigate back to the main screen
+			Toast.makeText(getApplicationContext(),"Settings have been restored to defaults", Toast.LENGTH_SHORT).show();
 			NavUtils.navigateUpFromSameTask(this);
             return true;
 		case android.R.id.home:
@@ -133,93 +105,170 @@ public class SettingsActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "Settings:onDestroy() called");
-	
+	private void refreshDisplay() {
+		//the service state toggle
+		CheckBox serviceCB = (CheckBox)findViewById(R.id.activateServiceCheckBox);
+		TextView serviceTV = (TextView)findViewById(R.id.activateServiceDescription);
+		if (isActivated) {
+			serviceCB.setChecked(true);
+			serviceTV.setText("Service will run periodically");
+		} else {
+			serviceCB.setChecked(false);
+			serviceTV.setText("Service is disabled");
+		}
+		
+		//the ringer type description
+		TextView ringerTV = (TextView)findViewById(R.id.ringerTypeDescription);
+		switch (ringerType) {
+			case 1:
+				ringerTV.setText(R.string.pref_ringer_type_normal);
+				break;
+			case 2:
+				ringerTV.setText(R.string.pref_ringer_type_vibrate);
+				break;
+			case 3:
+				ringerTV.setText(R.string.pref_ringer_type_silent);
+				break;
+			default :
+				ringerTV.setText(R.string.pref_ringer_type_silent);
+		}
+		
+
+		
+		//the media volumes toggle
+		CheckBox mediaCB = (CheckBox)findViewById(R.id.adjustMediaCheckBox);
+		TextView mediaTV = (TextView)findViewById(R.id.adjustMediaDescription);
+		if (adjustMedia) {
+			mediaCB.setChecked(true);
+			mediaTV.setText("Media volume will be adjusted");
+		} else {
+			mediaCB.setChecked(false);
+			mediaTV.setText("Media volume will not be adjusted");
+		}
+		
+		//the media volumes slider
+		SeekBar mediaSB = (SeekBar)findViewById(R.id.mediaSeekBar);
+		mediaSB.setMax(DefPrefs.mediaVolumeMax);
+		mediaSB.setProgress(mediaVolume);
+		if (!adjustMedia) {
+			mediaSB.setEnabled(false);
+		} else {
+			mediaSB.setEnabled(true);
+		}
+		mediaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				mediaVolume = progress;
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+                //required stub
+			}
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+                //required stub
+			}
+		});
+
+		
+		//the alarm volumes toggle
+		CheckBox alarmCB = (CheckBox)findViewById(R.id.adjustAlarmCheckBox);
+		TextView alarmTV = (TextView)findViewById(R.id.adjustAlarmDescription);
+		if (adjustAlarm) {
+			alarmCB.setChecked(true);
+			alarmTV.setText("Alarm volume will be adjusted");
+		} else {
+			alarmCB.setChecked(false);
+			alarmTV.setText("Alarm volume will not be adjusted");
+		}
+		
+		//the alarm volumes slider
+		SeekBar alarmSB = (SeekBar)findViewById(R.id.alarmSeekBar);
+		alarmSB.setMax(DefPrefs.alarmVolumeMax);
+		alarmSB.setProgress(alarmVolume);
+		if (!adjustAlarm) {
+			alarmSB.setEnabled(false);
+		} else {
+			alarmSB.setEnabled(true);
+		}
+		alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				alarmVolume = progress;
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+                //required stub
+			}
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+                //required stub
+			}
+		});
+		
+		//the quick silence button
+		StringBuilder sb = new StringBuilder("Silence for ");
+	   if (quickSilenceHours != 0) {
+		   sb.append(quickSilenceHours + " hours, ");
+		}
+		sb.append(quickSilenceMinutes + " minutes");
+		TextView quickTV = (TextView)findViewById(R.id.quickSilenceDescription);
+		quickTV.setText(sb.toString());
 	}
 	
 	private void readSettings() {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
 		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
 		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
 		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
 		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
 		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
 		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
-		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
+		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
 		
 		Log.d(TAG, "readSettings() called");
 	}
+	
+	private void restoreDefaults() {
+		Log.d(TAG, "restoreDefaults() called");
+		//these settings will be saved when onPause() is called
+		isActivated = DefPrefs.isActivated;
+		ringerType = DefPrefs.ringerType;
+		adjustMedia = DefPrefs.adjustMedia;
+		adjustAlarm = DefPrefs.adjustAlarm;
+		mediaVolume = DefPrefs.mediaVolume;
+		alarmVolume = DefPrefs.alarmVolume;
+		quickSilenceMinutes = DefPrefs.quickSilenceMinutes;
+		quickSilenceHours = DefPrefs.quickSilenceHours;
+		
+		//these settings are part of the advanced settings preferences and need to be saved explicity here
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putInt("refreshInterval", DefPrefs.refreshInterval);
+		editor.putInt("bufferMinutes", DefPrefs.bufferMinutes);
+		editor.putBoolean("wakeDevice", DefPrefs.wakeDevice);
+		editor.commit();
+	}
+
 	
 	private void saveSettings() {
 		Log.d(TAG, "saveSettings() called");
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("isActivated", isActivated);
-		editor.putBoolean("silenceFreeTime", silenceFreeTime);
 		editor.putInt("ringerType", 3);
 		editor.putBoolean("adjustMedia", adjustMedia);
 		editor.putBoolean("adjustAlarm", adjustAlarm);
 		editor.putInt("mediaVolume", mediaVolume);
 		editor.putInt("alarmVolume", alarmVolume);
 		editor.putInt("quickSilenceMinutes", quickSilenceMinutes);
-		editor.putInt("refreshInterval", refreshInterval);
+		editor.putInt("quickSilenceHours", quickSilenceHours);
 		editor.commit();
-	}
-	
-	public void onCheckBoxClicked(View v) {
-		boolean checked = ((CheckBox) v).isChecked();
-		
-		//which checkbox was clicked?
-		switch (v.getId()) {
-			case R.id.serviceCheckBox:
-				if (checked) {
-					isActivated = true;
-				} else {
-					isActivated = false;
-				}
-				break;
-			case R.id.mediaCheckBox:
-				if (checked) {
-					adjustMedia = true;
-				} else {
-					adjustMedia = false;
-				}
-				break;
-			case R.id.alarmCheckBox:
-				if (checked) {
-					adjustAlarm = true;
-				} else {
-					adjustAlarm = false;
-				}
-				break;
-			case R.id.freeTimeCheckBox:
-				if (checked) {
-					silenceFreeTime = true;
-				} else {
-					silenceFreeTime = false;
-				}
-				break;
-		}
-	}
-	
-	public void onClickRefreshInterval(View v) {
-		Log.d(TAG, "onClickRefreshInterval() called");
-	}
-	
-	
-	public void onRestart() {
-		Log.d(TAG, "onRestart() called");
-		super.onRestart();
-	}
-	
-	public void onResume() {
-		Log.d(TAG, "onResume() called");
-		super.onResume();
 	}
 
 	public void onPause() {
@@ -229,10 +278,96 @@ public class SettingsActivity extends Activity {
 		saveSettings();
 		super.onPause();
 	}
-	
-	public void onStop() {
-		Log.d(TAG, "onStop() called");
-		super.onStop();
+
+
+	public void onClickActivateService(View v) {
+		isActivated = !isActivated;
+		refreshDisplay();
 	}
 
+	public void onClickRingerType(View v) {
+		Log.d(TAG, "onClickRingerType() called");
+		//TODO show alert with ringer types to select
+	}
+	
+	public void onClickAdjustMedia(View v) {
+		adjustMedia = !adjustMedia;
+		refreshDisplay();
+	}
+	
+	public void onClickAdjustAlarm(View v) {
+		adjustAlarm = !adjustAlarm;
+		refreshDisplay();
+	}
+	
+	public void onClickQuickSilence(View v) {
+		Log.d(TAG, "onClickQuickSilence() called");
+		
+		LayoutInflater inflator = LayoutInflater.from(this);
+		View view = inflator.inflate(R.layout.dialog_quicksilent, null);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Quick Silence");
+		builder.setView(view);
+	
+		final NumberPicker hourP = (NumberPicker)view.findViewById(R.id.hourPicker);
+		final NumberPicker minP = (NumberPicker)view.findViewById(R.id.minutePicker);
+		
+		String[] hours = new String[25];
+		String[] minutes = new String[61];
+		
+		for(int i = 0; i < hours.length; i++) {
+            hours[i] = Integer.toString(i);
+		}
+		
+		for(int i = 0; i < minutes.length; i++) {
+			 StringBuilder sb = new StringBuilder(Integer.toString(i));
+			    if (i < 10) {
+			    	sb.insert(0, "0");
+			}
+            minutes[i] = sb.toString();
+		}
+		
+		hourP.setMinValue(1);
+		hourP.setMaxValue(hours.length - 1);
+		hourP.setWrapSelectorWheel(false);
+		hourP.setDisplayedValues(hours);
+		hourP.setValue(quickSilenceHours + 1);
+		
+		minP.setMinValue(1);
+		minP.setMaxValue(minutes.length - 1);
+		minP.setWrapSelectorWheel(false);
+		minP.setDisplayedValues(minutes);
+		minP.setValue(quickSilenceMinutes + 1);
+		
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				Log.d(TAG, "Selected hours: " + hourP.getValue());
+				Log.d(TAG, "Selected minutes: " + minP.getValue());
+				quickSilenceHours = hourP.getValue() - 1;
+				quickSilenceMinutes = minP.getValue() - 1;
+				saveSettings();
+				refreshDisplay();
+			}
+		});
+	           
+	    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	    	public void onClick(DialogInterface dialog, int id) {
+	    		//do nothing
+	    	}
+	    });
+	    
+	    builder.show();
+	}
+	
+
+	
+	public void onClickAdvancedSettings(View v) {
+		Log.d(TAG, "onClickAdvancedSettings() called");
+		
+		Intent i = new Intent(this, AdvancedSettingsActivity.class);
+		startActivity(i);
+		
+	}
+	
 }
