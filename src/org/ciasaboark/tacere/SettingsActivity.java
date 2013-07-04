@@ -85,10 +85,8 @@ public class SettingsActivity extends Activity {
 		case R.id.action_settings_restore:
             //restore settings to default values then navigate to the main activity
 			restoreDefaults();
-
 			//navigate back to the main screen
 			Toast.makeText(getApplicationContext(),"Settings have been restored to defaults", Toast.LENGTH_SHORT).show();
-			NavUtils.navigateUpFromSameTask(this);
             return true;
 		case android.R.id.home:
 			// This ID represents the Home or Up button. In the case of this
@@ -236,23 +234,26 @@ public class SettingsActivity extends Activity {
 	
 	private void restoreDefaults() {
 		Log.d(TAG, "restoreDefaults() called");
-		//these settings will be saved when onPause() is called
-		isActivated = DefPrefs.isActivated;
-		ringerType = DefPrefs.ringerType;
-		adjustMedia = DefPrefs.adjustMedia;
-		adjustAlarm = DefPrefs.adjustAlarm;
-		mediaVolume = DefPrefs.mediaVolume;
-		alarmVolume = DefPrefs.alarmVolume;
-		quickSilenceMinutes = DefPrefs.quickSilenceMinutes;
-		quickSilenceHours = DefPrefs.quickSilenceHours;
 		
-		//these settings are part of the advanced settings preferences and need to be saved explicity here
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
+		
+		editor.putBoolean("isActivated", DefPrefs.isActivated);
+		editor.putBoolean("silenceFreeTime", DefPrefs.silenceFreeTime);
+		editor.putBoolean("silenceAllDay", DefPrefs.silenceAllDay);
+		editor.putInt("ringerType", DefPrefs.ringerType);
+		editor.putBoolean("adjustMedia", DefPrefs.adjustMedia);
+		editor.putBoolean("adjustAlarm", DefPrefs.adjustAlarm);
+		editor.putInt("mediaVolume", DefPrefs.mediaVolume);
+		editor.putInt("alarmVolume", DefPrefs.alarmVolume);
+		editor.putInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
+		editor.putInt("quickSilenceHours", DefPrefs.quickSilenceHours);
 		editor.putInt("refreshInterval", DefPrefs.refreshInterval);
 		editor.putInt("bufferMinutes", DefPrefs.bufferMinutes);
 		editor.putBoolean("wakeDevice", DefPrefs.wakeDevice);
 		editor.commit();
+		readSettings();
+		refreshDisplay();
 	}
 
 	
@@ -282,6 +283,12 @@ public class SettingsActivity extends Activity {
 
 	public void onClickActivateService(View v) {
 		isActivated = !isActivated;
+		//if the service has been reactivated then we should restart it
+		if (isActivated) {
+			Intent i = new Intent(this, PollService.class);
+			i.putExtra("type", "activityRestart");
+			startService(i);
+		}
 		refreshDisplay();
 	}
 
