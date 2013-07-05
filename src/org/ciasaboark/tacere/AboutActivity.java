@@ -34,9 +34,13 @@ public class AboutActivity extends Activity {
         wv.setWebViewClient(new WebViewClient() {
         	@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        		view.getContext().startActivity(
-        			new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        		Intent i = new Intent(Intent.ACTION_VIEW);
+        		i.setData(Uri.parse(url));
+        		startActivity(i);
         		return true;
+//        		view.getContext().startActivity(
+//        			new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+//        		return true;
         	}
         });
 	}

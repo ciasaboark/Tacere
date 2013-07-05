@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ciasaboark.tacere"
-    android:versionCode="20130622"
-    android:versionName="20130622" >
+    android:versionCode="20130704"
+    android:versionName="20130704" >
 
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="15"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
