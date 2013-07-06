@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,7 +60,6 @@ public class SettingsActivity extends Activity {
 		Log.d(TAG, "alarmVolume: " + String.valueOf(alarmVolume));
 		Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
 		Log.d(TAG, "quickSilenceHours: " + String.valueOf(quickSilenceHours));
-		
 		refreshDisplay();
 	}
 
@@ -262,7 +262,7 @@ public class SettingsActivity extends Activity {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("isActivated", isActivated);
-		editor.putInt("ringerType", 3);
+		editor.putInt("ringerType", ringerType);
 		editor.putBoolean("adjustMedia", adjustMedia);
 		editor.putBoolean("adjustAlarm", adjustAlarm);
 		editor.putInt("mediaVolume", mediaVolume);
@@ -294,7 +294,38 @@ public class SettingsActivity extends Activity {
 
 	public void onClickRingerType(View v) {
 		Log.d(TAG, "onClickRingerType() called");
-		//TODO show alert with ringer types to select
+		AlertDialog alert = new AlertDialog.Builder(this)
+				.setTitle("Ringer Type")
+				.setSingleChoiceItems(R.array.ringer_types, ringerType - 1, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Log.d(TAG, "item " + which + " clicked");
+						ringerType = which + 1;
+						saveSettings();
+						refreshDisplay();
+						
+					}
+				})
+				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						//do nothing
+						
+					}
+				})
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						//do nothing
+						
+					}
+				})
+				.create();
+				
+		alert.show();
 	}
 	
 	public void onClickAdjustMedia(View v) {
