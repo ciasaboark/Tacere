@@ -1,18 +1,29 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
+import android.util.Log;
 
 public class CalEvent {
 	private String title;
-	private long begin;		//in ms, time since Epoch
-	private long end;		//dito
-	private long duration;
+	private long end;		//in milliseconds from epoch
+	private static final String TAG = "CalEvent";
+
 	
 	public CalEvent() {
 		super();
 		this.title = null;
-		this.begin = 0;
 		this.end = 0;
 	}
 	
@@ -24,14 +35,6 @@ public class CalEvent {
 		this.title = title;
 	}
 	
-	public long getBegin() {
-		return begin;
-	}
-	
-	public void setBegin(long begin) {
-		this.begin = begin;
-	}
-	
 	public long getEnd() {
 		return end;
 	}
@@ -41,17 +44,28 @@ public class CalEvent {
 	}
 	
 	public String toString() {
-		//DateFormat dateFormatter = new SimpleDateFormat("MM/dd/yy h:mm a");
-		DateFormat dateFormatter = DateFormat.getDateTimeInstance();
+		String locale = Locale.getDefault().toString();
+		DateFormat dateFormatter;
+		Log.d(TAG, "Locale detected: " + locale);
+		if (locale.equals("en_US")) {
+			//this works well for the US local, and produces a more concise notification
+			//+ but may not be desirable for users in other locales
+			dateFormatter = new SimpleDateFormat("MM/dd/yy h:mm a", Locale.US);		
+		} else {
+			//the fallback should generate a date/time format specific to the
+			//+ users locale
+			dateFormatter = DateFormat.getDateTimeInstance();
+		}
+		
 		Date date = new Date(end);
 		String fdate = dateFormatter.format(date);
-		return new String("\"" + title + "\", ends " + fdate);
+		return new String(title + ", ends " + fdate);
 	}
 	
 	//return true if this CalEvent only holds default values
 	public boolean isBlank() {
 		boolean result = true;
-		if (title != null && begin != 0 && end != 0) {
+		if (title != null && end != 0) {
 			result = false;
 		}
 		return result;

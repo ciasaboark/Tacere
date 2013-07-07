@@ -1,3 +1,11 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 import android.app.Activity;
@@ -7,7 +15,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
+//import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,12 +24,10 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 public class AdvancedSettingsActivity extends Activity {
-	private static final String TAG = "AdvancedSettingsActivity";
+//	private static final String TAG = "AdvancedSettingsActivity";
 	
-//	private boolean isActivated;
 	private boolean silenceFreeTime;
 	private boolean silenceAllDay;
-	private int ringerType;
 	private int refreshInterval;
 	private int bufferMinutes;
 	private boolean wakeDevice;
@@ -36,16 +42,7 @@ public class AdvancedSettingsActivity extends Activity {
 		//read the saved preferences
 		readSettings();
 		
-		//Log the results
-		Log.d(TAG, "silenceFreeTime: " + String.valueOf(silenceFreeTime));
-		Log.d(TAG, "silenceAllDay: " + String.valueOf(silenceAllDay));
-		Log.d(TAG, "ringerType: " + String.valueOf(ringerType));
-		Log.d(TAG, "refreshInterval: " + String.valueOf(refreshInterval));
-		Log.d(TAG, "bufferMinutes: " + String.valueOf(bufferMinutes));
-		Log.d(TAG, "wakeDevice: " + String.valueOf(wakeDevice));
-		
-		refreshDisplay();
-				
+		refreshDisplay();	
 	}
 
 	/**
@@ -82,8 +79,6 @@ public class AdvancedSettingsActivity extends Activity {
 	}
 
 	public void onPause() {
-		Log.d(TAG, "onPause() called");
-		
 		//save all changes to the preferences
 		saveSettings();
 		super.onPause();
@@ -95,10 +90,10 @@ public class AdvancedSettingsActivity extends Activity {
 		TextView freeTV = (TextView)findViewById(R.id.silenceFreeTimeDescription);
 		if (silenceFreeTime) {
 			freeCB.setChecked(true);
-			freeTV.setText("Will silence during events marked as free");
+			freeTV.setText(R.string.pref_silence_free_enabled);
 		} else {
 			freeCB.setChecked(false);
-			freeTV.setText("Will not silence during events marked as free");
+			freeTV.setText(R.string.pref_silence_free_disabled);
 		}
 		
 		//the silence all day state toggle
@@ -106,29 +101,32 @@ public class AdvancedSettingsActivity extends Activity {
 		TextView dayTV = (TextView)findViewById(R.id.silenceAllDayDescription);
 		if (silenceAllDay) {
 			dayCB.setChecked(true);
-			dayTV.setText("Will silence during all day events");
+			dayTV.setText(R.string.pref_all_day_enabled);
 		} else {
 			dayCB.setChecked(false);
-			dayTV.setText("Will not silence during all day events");
+			dayTV.setText(R.string.pref_all_day_disabled);
 		}
 		
 		//the refresh interval button
 		TextView refreshTV = (TextView)findViewById(R.id.refreshIntervalDescription);
-		refreshTV.setText("Service will refresh every " + refreshInterval + " minutes");
+		String refreshText = getResources().getString(R.string.pref_refresh_interval_length);
+		refreshTV.setText(String.format(refreshText, refreshInterval));
 		
 		//the event buffer button
 		TextView bufferTV = (TextView)findViewById(R.id.bufferMinutesDescription);
-		bufferTV.setText("Events will trigger " + bufferMinutes + " minutes before starting and last " + bufferMinutes + " minutes after the event ends");
+		String bufferText = getResources().getString(R.string.pref_buffer_minutes);
+		bufferTV.setText(String.format(bufferText, bufferMinutes, bufferMinutes));
 		
 		//the wake device toggle
 		CheckBox wakeCB = (CheckBox)findViewById(R.id.wakeDeviceCheckBox);
 		TextView wakeTV = (TextView)findViewById(R.id.wakeDeviceDescription);
 		if (wakeDevice) {
 			wakeCB.setChecked(true);
-			wakeTV.setText("Tacere will force a wakeup every " + refreshInterval + " minutes. This may cause battery drain");
+			String wakeText = getResources().getString(R.string.pref_wakeup_enabled);
+			wakeTV.setText(String.format(wakeText, refreshInterval));
 		} else {
 			wakeCB.setChecked(false);
-			wakeTV.setText("Tacere will wait for the device to wake normally before performing checks.");
+			wakeTV.setText(R.string.pref_wakeup_disabled);
 			
 		}
 	}
@@ -137,16 +135,12 @@ public class AdvancedSettingsActivity extends Activity {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
 		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.silenceAllDay);
-		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
 		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
 		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
-		
-		Log.d(TAG, "readSettings() called");
 	}
 	
 	private void saveSettings() {
-		Log.d(TAG, "saveSettings() called");
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("silenceFreeTime", silenceFreeTime);
@@ -171,26 +165,23 @@ public class AdvancedSettingsActivity extends Activity {
 	}
 	
 	public void onClickRefreshInterval(View v) {
-		Log.d(TAG, "onClickRefreshInterval() called");
-		
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Refresh Interval");
 		final NumberPicker number = new NumberPicker(this);
 		String[] nums = new String[120];
-		Log.d(TAG, "nums length " + nums.length);
+		
 		for(int i = 0; i < nums.length; i++) {
             nums[i] = Integer.toString(i + 1);
 		}
 
-	     number.setMinValue(1);
-	     number.setMaxValue(nums.length-1);
-	     number.setWrapSelectorWheel(false);
-	     number.setDisplayedValues(nums);
-	     number.setValue(refreshInterval);
+		number.setMinValue(1);
+		number.setMaxValue(nums.length-1);
+		number.setWrapSelectorWheel(false);
+		number.setDisplayedValues(nums);
+		number.setValue(refreshInterval);
 		
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
-	          	Log.d(TAG, "New refresh interval is " + number.getValue() + " minutes");
 	          	refreshInterval = number.getValue();
 	          	saveSettings();
 	 	        refreshDisplay();
@@ -208,13 +199,11 @@ public class AdvancedSettingsActivity extends Activity {
 	}
 	
 	public void onClickBufferMinutes(View v) {
-		Log.d(TAG, "onClickBufferMinues() called");
-		
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Buffer Minutes");
 		final NumberPicker number = new NumberPicker(this);
 		String[] nums = new String[32];
-		Log.d(TAG, "nums length " + nums.length);
+		
 		for(int i = 0; i < nums.length; i++) {
             nums[i] = Integer.toString(i);
 		}
@@ -225,23 +214,22 @@ public class AdvancedSettingsActivity extends Activity {
 	     number.setDisplayedValues(nums);
 	     number.setValue(bufferMinutes + 1);
 		
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
-	          	Log.d(TAG, "New buffer minutes is " + number.getValue() + " minutes");
-	          	bufferMinutes = number.getValue() - 1;
-	          	saveSettings();
-	          	refreshDisplay();
-	 	      }
-	        });
+	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	    	 public void onClick(DialogInterface dialog, int whichButton) {
+	    		 bufferMinutes = number.getValue() - 1;
+	    		 saveSettings();
+	    		 refreshDisplay();
+	    	 }
+	     });
 
-	        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	          public void onClick(DialogInterface dialog, int whichButton) {
-	            // Do nothing
-	          }
-	        });
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int whichButton) {
+        		// Do nothing
+        	}
+        });
 	        
-	        alert.setView(number);
-	        alert.show();       
+        alert.setView(number);
+        alert.show();       
 	}
 	
 	public void onClickWakeDevice(View v) {

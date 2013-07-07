@@ -18,11 +18,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.provider.CalendarContract.Instances;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 public class PollService extends IntentService {
 	private static final String TAG = "PollService";
@@ -40,8 +38,7 @@ public class PollService extends IntentService {
 	private int bufferMinutes;
 	private boolean wakeDevice;
 	private boolean ongoing;
-	
-	private Handler handler = new Handler();
+	private static final int MILLISECONDS_IN_MINUTE = 60000;
 	
 	public PollService () {
 		super(TAG);
@@ -49,33 +46,15 @@ public class PollService extends IntentService {
 	
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		/*
-		 * -read settings
-		 * -pull extra info from incoming intent
-		 * if quick silent
-		 * 		schedule a new alarm
-		 * 		update/create notification
-		 * 		silence ringer
-		 * 		schedule a quick silent wakeup request for the duration
-		 * else if this is a quick silent cancel request
-		 * 		change the ringer type to the user preference
-		 * 		issue an immediate wakeup request
-		 * 		remove the notification
-		 * else if this is an activity wakeup request
-		 * 		if there is no pending intent
-		 * 			schedue a new immediate wakeup request
-		 * else
-		 * 		remove the notification
-		 * 		check for a current event
-		 * 		if an event is current
-		 * 			change phone ringer to user pref
-		 * 			schedule a wakeup request for user pref duration
-		 * 		else
-		 * 			restore ringer volume
-		 * 			schedule a wakeup request for the pref duration
+		/* PollService looks for four different types of intents, one to start a
+		 * quick silence request, one to stop an ongoing quick silence request,
+		 * one to start the service (if not already started), and a normal request
+		 * to check for active events.  The type of intent is determined by mapping
+		 * the extra info "type" to one of "quickSilent", "cancelQuickSilence",
+		 * "activityRestart".  Normal request either have no extra info, or are tagged
+		 * "normal"
 		 */
 		
-		Log.i(TAG, "Received an intent: " + intent);
 		readSettings();
 		Context context = getApplicationContext();
 		
@@ -92,14 +71,15 @@ public class PollService extends IntentService {
 		}
 		
 		if (requestType.equals("quickSilent")) {
-			Log.d(TAG, "quickSilent intent received");
-			
+			//This is a bit of a hack. The state of the service is stored in the shared preferences.
+			//+ This will help the logic later on during the normal requests
 			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = preferences.edit();
 			editor.putBoolean("ongoing", false);
 			editor.commit();
 			
-			//when the quick silence duration is over the device should wake
+			//when the quick silence duration is over the device should wake regardless
+			//+ of the user settings
 			scheduleAlarm(duration, true, "cancel");
 			
 			AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -115,15 +95,15 @@ public class PollService extends IntentService {
 			int min = duration % 60;
 			StringBuilder sb = new StringBuilder("Silencing for ");
 			if (hrs > 0) {
-				sb.append(hrs + " hours, ");
+				sb.append(hrs + " hr ");
 			}
 			
-			sb.append(min + " minutes. Touch to cancel");
+			sb.append(min + " min. Touch to cancel");
 			
 			//FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new pending intent
 			PendingIntent pendIntent = PendingIntent.getService(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(getApplicationContext())
-				.setContentTitle("Quick Silence")
+				.setContentTitle("Tacere")
 				.setContentText(sb.toString())
 				.setTicker("Quick Silence activating")
 				.setSmallIcon(R.drawable.small_mono)
@@ -131,36 +111,20 @@ public class PollService extends IntentService {
 				.setContentIntent(pendIntent);
 
 			NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-			nm.cancel(DefPrefs.QUICK_N_ID);
-			nm.notify(DefPrefs.QUICK_N_ID, notBuilder.build());
+			nm.cancel(DefPrefs.NOTIFICATION_ID);
+			nm.notify(DefPrefs.NOTIFICATION_ID, notBuilder.build());
 		} else if (requestType.equals("cancelQuickSilence")) {
-			Log.d(TAG, "cancelQuickSilence intent received");
-			AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-			switch (ringerType) {
-				case 1:
-					audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-					break;
-				case 2:
-					audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-					break;
-				case 3:
-					audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-					break;
-			}
-			
-			NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-			nm.cancel(DefPrefs.QUICK_N_ID);
-			
+			restoreVolumes();
+			cancelNotification();			
 			vibrate();
-			
 			//schedule an immediate normal wakeup
 			scheduleAlarm(0, true, "normal");
 		} else if (requestType.equals("activityRestart")) {
-			Log.d(TAG, "activityRestart intent received");
+			//we can check whether the service is considered active based on whether a pending intent
+			//+ already exists
 			Intent i = new Intent(context, PollService.class);
 			PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
 			if (pi == null) {
-				Log.d(TAG, "no pending intent was found, scheduling a wakeup");
 				scheduleAlarm(0, true, "normal");
 			}
 		} else  if (isActivated) {  //this is a normal request and the service is marked to be active
@@ -192,15 +156,11 @@ public class PollService extends IntentService {
 					//+ not on each update
 					notBuilder.setTicker("Tacere Silencing for " + event.toString());
 					
-					SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-					SharedPreferences.Editor editor = preferences.edit();
-					editor.putBoolean("ongoing", true);
-					editor.commit();
+					setOngoing(true);
 				}
 
 				NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-				//nm.cancel(DefPrefs.QUICK_N_ID);
-				nm.notify(DefPrefs.QUICK_N_ID, notBuilder.build());
+				nm.notify(DefPrefs.NOTIFICATION_ID, notBuilder.build());
 				
 				scheduleAlarm(refreshInterval, wakeDevice, "normal");
 			} else { //there was no active event
@@ -210,11 +170,7 @@ public class PollService extends IntentService {
 					vibrate();
 				}
 				
-				SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putBoolean("ongoing", false);
-				editor.commit();
-				
+				setOngoing(false);				
 				cancelNotification();
 				restoreVolumes();
 				scheduleAlarm(refreshInterval, wakeDevice, "normal");
@@ -227,21 +183,23 @@ public class PollService extends IntentService {
 				vibrate();
 			}
 			
-			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putBoolean("ongoing", false);
-			editor.commit();
-			
+			setOngoing(false);
 			restoreVolumes();
 			cancelNotification();
-			
 			stopService();
 		}
+	}
+	
+	private void setOngoing(boolean state) {
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putBoolean("ongoing", state);
+		editor.commit();
 	}
 
 	private void cancelNotification() {
 		NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.cancel(DefPrefs.QUICK_N_ID);
+		nm.cancel(DefPrefs.NOTIFICATION_ID);
 	}
 	
 	private void scheduleAlarm(final int duration, boolean wakeOnAlarm, String type) {
@@ -259,20 +217,10 @@ public class PollService extends IntentService {
 		//+ process wakes the device.  RTC_WAKEUP is needed to restore from the quick silence
 		//+ feature.
 		if (wakeOnAlarm) {
-			alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * 60 * duration, pintent);
+			alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * duration, pintent);
 		} else {
-			alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 60 * duration, pintent);
+			alarm.set(AlarmManager.RTC, System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * duration, pintent);
 		}
-		
-		//Creating a toast from within an IntentService can leave toast visible indefinitely.  Posting the
-		//+ toast from a new thread solves this problem.
-		handler.post(new Runnable() {
-						
-						@Override
-						public void run() {
-							//Toast.makeText(getApplicationContext(),"PollService scheduling for restart in " + duration + " min", Toast.LENGTH_SHORT).show();
-						}
-					});
 	}
 	
 	private void vibrate() {
@@ -282,36 +230,26 @@ public class PollService extends IntentService {
 	}
 	
 	private CalEvent activeEvent() {
-		Log.d(TAG, "activeEvent() called");
 		CalEvent result = new CalEvent();
 
-		long begin = System.currentTimeMillis() - 1000 * 60 * bufferMinutes;
-		long end = System.currentTimeMillis() + 1000 * 60 * bufferMinutes;
+		long begin = System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * bufferMinutes;
+		long end = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * bufferMinutes;
+		
     
-    	String[] projection = new String[]{"title", "begin", "end", "allDay", "availability", "duration"};
+    	String[] projection = new String[]{"title", "end", "allDay", "availability"};
     	Cursor cursor = Instances.query(getContentResolver(), projection, begin, end);
     	
     	if (cursor.moveToFirst()) {
-    		int eventNum = 0;
-    		
     		int col_title = cursor.getColumnIndex(projection[0]);
-    		int col_begin = cursor.getColumnIndex(projection[1]);
-    		int col_end = cursor.getColumnIndex(projection[2]);
-    		int col_allDay = cursor.getColumnIndex(projection[3]);
-    		int col_availability = cursor.getColumnIndex(projection[4]);
-    		int col_duration = cursor.getColumnIndex(projection[5]);
+    		int col_end = cursor.getColumnIndex(projection[1]);
+    		int col_allDay = cursor.getColumnIndex(projection[2]);
+    		int col_availability = cursor.getColumnIndex(projection[3]);
     		
     		do {
     			String event_title = cursor.getString(col_title);
-    			String event_begin = cursor.getString(col_begin);
     			String event_end = cursor.getString(col_end);
     			String event_isAllDay = cursor.getString(col_allDay);
     			String event_availability = cursor.getString(col_availability);
-    			String event_duration = cursor.getString(col_duration);
-    			
-    			Log.d(TAG, "Event:" + eventNum + ", title: '" + event_title + "', begin:" +
-    						event_begin + ", end:" + event_end + ", allDay:" + event_isAllDay +
-    						", availability:" + event_availability + ", duration:" + event_duration);
     			
     			//if the event is marked as busy (but is not an all day event)
     			//+ then we need no further tests
@@ -334,28 +272,8 @@ public class PollService extends IntentService {
     			
     			if (busy_notAllDay || allDay || free_notAllDay) {
     				result.setTitle(event_title);
-    				result.setBegin(Long.valueOf(event_begin));
-    				
-    				//recurring events can sometimes have null values for the end time
-    				//+ We might be able to salvage a proper end time from the duration info
-    				if (event_end == null) {
-    					//duration is stored as RFC2445 format, this block only matches against
-    					//+ values such as 'PXXXXS' where XXXX is the seconds of the duration
-    					if (event_duration.startsWith("P") && event_duration.endsWith("S")) {
-    						String dur_seconds = event_duration.substring(1, event_duration.length() - 1);
-    						long endTime = Long.valueOf(event_begin) + 1000 * 60 * Long.valueOf(dur_seconds);
-    						result.setEnd(endTime);
-    					} else {
-    						Log.e(TAG, "could not generate a proper end time for event " + event_title + " setting end time to 5 minutes from now");
-    						result.setEnd(Long.valueOf(event_begin) + 1000 * 60 * 5);
-    					}
-    				} else {
-    					result.setEnd(Long.valueOf(event_end));
-    				}
-    				break;
+    				result.setEnd(Long.valueOf(event_end));
     			}
-
-    			eventNum++;
     		} while (cursor.moveToNext());
     	}
 	
@@ -363,7 +281,6 @@ public class PollService extends IntentService {
 	}
 	
 	private void cancelAlarm() {
-		Log.d(TAG, "PollService:cancelAlarm() called");
 		Intent i = new Intent(this, PollService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, i, 0);
 		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -371,7 +288,6 @@ public class PollService extends IntentService {
 	}
 	
 	private void stopService() {
-		Log.d(TAG, "PollService:stopService() called");
 		cancelAlarm();
 		restoreVolumes();
 		shutdown();
@@ -392,12 +308,9 @@ public class PollService extends IntentService {
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
 		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
 		ongoing = preferences.getBoolean("ongoing", false);
-		
-		Log.d(TAG, "PollService:readSettings() called");
 	}
 	
 	private void restoreVolumes() {
-		Log.d(TAG, "PollService:restoreVolumes() called");
 		AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 		audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 		
@@ -412,7 +325,6 @@ public class PollService extends IntentService {
 	
 	private void silenceVolumes() {
 		//change ringer state, media volume, and alarm volume
-		Log.d(TAG, "silenceVolumes() called");
 		AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 		switch (ringerType) {
 			case 1:
@@ -436,7 +348,6 @@ public class PollService extends IntentService {
 
 	}
 	private void shutdown() {
-		Log.d(TAG, "PollService:shutdown() called");
 		stopSelf();
 	}
 

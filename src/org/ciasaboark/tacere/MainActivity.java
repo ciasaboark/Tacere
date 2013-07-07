@@ -18,7 +18,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,25 +25,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	
-	private boolean isActivated = true;
-	private boolean silenceFreeTime;
-	private int ringerType;
-	private boolean adjustMedia;
-	private int mediaVolume;
-	private boolean adjustAlarm;
-	private int alarmVolume;
 	private int quickSilenceMinutes;
 	private int quickSilenceHours;
-	private int refreshInterval;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG, "MainActivity onCreate() called");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
@@ -63,15 +52,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void onClickQuickSilence(View v) {
-		Log.d(TAG, "onClickQuickSilence() called");
-		Intent i = new Intent(this, PollService.class);
-		i.putExtra("quickSilence", 5);
-		startService(i);
-	}
-	
 	public void onStart() {
-		Log.d(TAG, "MainActivity onStart() called");
 		super.onStart();
 	
 		//start the background service
@@ -136,31 +117,6 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	public void onRestart() {
-		Log.d(TAG, "MainActivity onRestart() called");
-		super.onRestart();
-	}
-	
-	public void onResume() {
-		Log.d(TAG, "MainActivity onResume() called");
-		super.onResume();
-	}
-
-	public void onPause() {
-		Log.d(TAG, "MainActivity onPause() called");
-		super.onPause();
-	}
-	
-	public void onStop() {
-		Log.d(TAG, "MainActivity onStop() called");
-		super.onStop();
-	}
-	
-	public void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "MainActivity onDestroy() called");
-	}
-	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 	        case R.id.action_settings:
@@ -181,32 +137,10 @@ public class MainActivity extends Activity {
 	
 	private void readSettings() {
 		//read the saved preferences
-		Log.d(TAG, "readSettings() called");
 		try {
 			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
-			silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
-			ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
-			adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
-			mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
-			adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
-			alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
 			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
 			quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
-			refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
-			
-			//Log the results
-			Log.d(TAG, "isActivated: " + String.valueOf(isActivated));
-			Log.d(TAG, "silenceFreeTime: " + String.valueOf(silenceFreeTime));
-			Log.d(TAG, "ringerType: " + String.valueOf(ringerType));
-			Log.d(TAG, "adjustMedia: " + String.valueOf(adjustMedia));
-			Log.d(TAG, "mediaVolume: " + String.valueOf(mediaVolume));
-			Log.d(TAG, "adjustAlarm: " + String.valueOf(adjustAlarm));
-			Log.d(TAG, "alarmVolume: " + String.valueOf(alarmVolume));
-			Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
-			Log.d(TAG, "quickSilenceHours: " + String.valueOf(quickSilenceHours));
-			Log.d(TAG, "refreshInterval: " + String.valueOf(refreshInterval));
-			
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}	

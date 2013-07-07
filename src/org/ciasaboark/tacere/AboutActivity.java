@@ -38,9 +38,6 @@ public class AboutActivity extends Activity {
         		i.setData(Uri.parse(url));
         		startActivity(i);
         		return true;
-//        		view.getContext().startActivity(
-//        			new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-//        		return true;
         	}
         });
 	}

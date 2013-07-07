@@ -44,7 +44,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/quick_silence"
-        android:onClick="onClickQuickSilence" />
+        android:text="@string/placeholder" />
 
 </RelativeLayout>

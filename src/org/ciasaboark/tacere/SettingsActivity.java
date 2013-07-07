@@ -16,8 +16,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,8 +27,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 public class SettingsActivity extends Activity {
-	private static final String TAG = "Settings";
+//	private static final String TAG = "Settings";
 	
 	private boolean isActivated;
 	private int ringerType;
@@ -48,18 +47,7 @@ public class SettingsActivity extends Activity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
-		//read the saved preferences
 		readSettings();
-		
-		//Log the results
-		Log.d(TAG, "isActivated: " + String.valueOf(isActivated));
-		Log.d(TAG, "ringerType: " + String.valueOf(ringerType));
-		Log.d(TAG, "adjustMedia: " + String.valueOf(adjustMedia));
-		Log.d(TAG, "mediaVolume: " + String.valueOf(mediaVolume));
-		Log.d(TAG, "adjustAlarm: " + String.valueOf(adjustAlarm));
-		Log.d(TAG, "alarmVolume: " + String.valueOf(alarmVolume));
-		Log.d(TAG, "quickSilenceMinutes: " + String.valueOf(quickSilenceMinutes));
-		Log.d(TAG, "quickSilenceHours: " + String.valueOf(quickSilenceHours));
 		refreshDisplay();
 	}
 
@@ -109,10 +97,10 @@ public class SettingsActivity extends Activity {
 		TextView serviceTV = (TextView)findViewById(R.id.activateServiceDescription);
 		if (isActivated) {
 			serviceCB.setChecked(true);
-			serviceTV.setText("Service will run periodically");
+			serviceTV.setText(R.string.pref_service_enabled);
 		} else {
 			serviceCB.setChecked(false);
-			serviceTV.setText("Service is disabled");
+			serviceTV.setText(R.string.pref_service_disabled);
 		}
 		
 		//the ringer type description
@@ -138,10 +126,10 @@ public class SettingsActivity extends Activity {
 		TextView mediaTV = (TextView)findViewById(R.id.adjustMediaDescription);
 		if (adjustMedia) {
 			mediaCB.setChecked(true);
-			mediaTV.setText("Media volume will be adjusted");
+			mediaTV.setText(R.string.pref_media_enabled);
 		} else {
 			mediaCB.setChecked(false);
-			mediaTV.setText("Media volume will not be adjusted");
+			mediaTV.setText(R.string.pref_media_disabled);
 		}
 		
 		//the media volumes slider
@@ -176,10 +164,10 @@ public class SettingsActivity extends Activity {
 		TextView alarmTV = (TextView)findViewById(R.id.adjustAlarmDescription);
 		if (adjustAlarm) {
 			alarmCB.setChecked(true);
-			alarmTV.setText("Alarm volume will be adjusted");
+			alarmTV.setText(R.string.pref_alarm_enabled);
 		} else {
 			alarmCB.setChecked(false);
-			alarmTV.setText("Alarm volume will not be adjusted");
+			alarmTV.setText(R.string.pref_alarm_disabled);
 		}
 		
 		//the alarm volumes slider
@@ -209,13 +197,13 @@ public class SettingsActivity extends Activity {
 		});
 		
 		//the quick silence button
-		StringBuilder sb = new StringBuilder("Silence for ");
-	   if (quickSilenceHours != 0) {
-		   sb.append(quickSilenceHours + " hours, ");
-		}
-		sb.append(quickSilenceMinutes + " minutes");
 		TextView quickTV = (TextView)findViewById(R.id.quickSilenceDescription);
-		quickTV.setText(sb.toString());
+		String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
+		String hrs = "";
+		if (quickSilenceHours > 0) {
+			hrs = String.valueOf(quickSilenceHours) + " hours "; 
+		}
+		quickTV.setText(String.format(quicksilenceText, hrs, quickSilenceMinutes));
 	}
 	
 	private void readSettings() {
@@ -228,16 +216,11 @@ public class SettingsActivity extends Activity {
 		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
 		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
 		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
-		
-		Log.d(TAG, "readSettings() called");
 	}
 	
 	private void restoreDefaults() {
-		Log.d(TAG, "restoreDefaults() called");
-		
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
-		
 		editor.putBoolean("isActivated", DefPrefs.isActivated);
 		editor.putBoolean("silenceFreeTime", DefPrefs.silenceFreeTime);
 		editor.putBoolean("silenceAllDay", DefPrefs.silenceAllDay);
@@ -256,9 +239,7 @@ public class SettingsActivity extends Activity {
 		refreshDisplay();
 	}
 
-	
 	private void saveSettings() {
-		Log.d(TAG, "saveSettings() called");
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("isActivated", isActivated);
@@ -273,13 +254,11 @@ public class SettingsActivity extends Activity {
 	}
 
 	public void onPause() {
-		Log.d(TAG, "onPause() called");
-		
-		//save all changes to the preferences
+		//onDestroy might not be called before the next activities onCreate
+		//+ so settings should be saved here
 		saveSettings();
 		super.onPause();
 	}
-
 
 	public void onClickActivateService(View v) {
 		isActivated = !isActivated;
@@ -293,14 +272,11 @@ public class SettingsActivity extends Activity {
 	}
 
 	public void onClickRingerType(View v) {
-		Log.d(TAG, "onClickRingerType() called");
 		AlertDialog alert = new AlertDialog.Builder(this)
 				.setTitle("Ringer Type")
 				.setSingleChoiceItems(R.array.ringer_types, ringerType - 1, new DialogInterface.OnClickListener() {
-					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Log.d(TAG, "item " + which + " clicked");
 						ringerType = which + 1;
 						saveSettings();
 						refreshDisplay();
@@ -308,7 +284,6 @@ public class SettingsActivity extends Activity {
 					}
 				})
 				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						//do nothing
@@ -316,7 +291,6 @@ public class SettingsActivity extends Activity {
 					}
 				})
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						//do nothing
@@ -339,8 +313,6 @@ public class SettingsActivity extends Activity {
 	}
 	
 	public void onClickQuickSilence(View v) {
-		Log.d(TAG, "onClickQuickSilence() called");
-		
 		LayoutInflater inflator = LayoutInflater.from(this);
 		View view = inflator.inflate(R.layout.dialog_quicksilent, null);
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -380,8 +352,6 @@ public class SettingsActivity extends Activity {
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				Log.d(TAG, "Selected hours: " + hourP.getValue());
-				Log.d(TAG, "Selected minutes: " + minP.getValue());
 				quickSilenceHours = hourP.getValue() - 1;
 				quickSilenceMinutes = minP.getValue() - 1;
 				saveSettings();
@@ -398,14 +368,8 @@ public class SettingsActivity extends Activity {
 	    builder.show();
 	}
 	
-
-	
 	public void onClickAdvancedSettings(View v) {
-		Log.d(TAG, "onClickAdvancedSettings() called");
-		
 		Intent i = new Intent(this, AdvancedSettingsActivity.class);
 		startActivity(i);
-		
 	}
-	
 }

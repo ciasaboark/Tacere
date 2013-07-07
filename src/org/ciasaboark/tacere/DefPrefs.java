@@ -1,3 +1,11 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 public class DefPrefs {
@@ -16,5 +24,5 @@ public class DefPrefs {
 	public static final int 	refreshInterval = 5;
 	public static final int 	bufferMinutes = 5;
 	public static final Boolean wakeDevice = false;
-	public static final int 	QUICK_N_ID = 1;			//an id to reference the quick silence notification
+	public static final int 	NOTIFICATION_ID = 1;			//an id to reference all notifications
 }

@@ -16,7 +16,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pref_events_section"
+            android:text="@string/pref_events_header"
             android:textStyle="bold" />
 
         <View
@@ -183,7 +183,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/pref_battery_section"
+            android:text="@string/pref_battery_header"
             android:textStyle="bold" />
 
         <View

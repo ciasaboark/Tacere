@@ -129,7 +129,7 @@
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/pref_adjust_media"
+                    android:text="@string/pref_media_volume"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
@@ -137,7 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
-                    android:text="@string/pref_adjust_media_enabled"
+                    android:text="@string/placeholder"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
 
@@ -188,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
-                    android:text="@string/pref_alarm_volume_enabled"
+                    android:text="@string/placeholder"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
 
