@@ -12,14 +12,15 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content" android:id="@+id/relativeLayout1">
 
             <TextView
                 android:id="@+id/serviceStateTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
                 android:text="@string/placeholder"
-                android:layout_alignParentLeft="true" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageView
                 android:id="@+id/serviceStateImageView"
