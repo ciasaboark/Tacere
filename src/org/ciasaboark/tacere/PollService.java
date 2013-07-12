@@ -108,6 +108,7 @@ public class PollService extends IntentService {
 				.setTicker("Quick Silence activating")
 				.setSmallIcon(R.drawable.small_mono)
 				.setAutoCancel(true)
+				.setOngoing(true)
 				.setContentIntent(pendIntent);
 
 			NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -129,7 +130,7 @@ public class PollService extends IntentService {
 			}
 		} else  if (isActivated) {  //this is a normal request and the service is marked to be active
 			CalEvent event = activeEvent();
-			if (!event.isBlank()) {
+			if (event != null) {
 				//an event matched
 				silenceVolumes();
 				
@@ -230,13 +231,13 @@ public class PollService extends IntentService {
 	}
 	
 	private CalEvent activeEvent() {
-		CalEvent result = new CalEvent();
+		CalEvent result = null;
 
 		long begin = System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * bufferMinutes;
 		long end = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * bufferMinutes;
 		
     
-    	String[] projection = new String[]{"title", "end", "allDay", "availability"};
+    	String[] projection = new String[]{"title", "end", "allDay", "availability", "begin", "_id"};
     	Cursor cursor = Instances.query(getContentResolver(), projection, begin, end);
     	
     	if (cursor.moveToFirst()) {
@@ -244,12 +245,16 @@ public class PollService extends IntentService {
     		int col_end = cursor.getColumnIndex(projection[1]);
     		int col_allDay = cursor.getColumnIndex(projection[2]);
     		int col_availability = cursor.getColumnIndex(projection[3]);
+    		int col_begin = cursor.getColumnIndex(projection[4]);
+    		int col_id = cursor.getColumnIndex(projection[5]);
     		
     		do {
     			String event_title = cursor.getString(col_title);
     			String event_end = cursor.getString(col_end);
     			String event_isAllDay = cursor.getString(col_allDay);
     			String event_availability = cursor.getString(col_availability);
+    			String event_begin = cursor.getString(col_begin);
+    			String event_id = cursor.getString(col_id);
     			
     			//if the event is marked as busy (but is not an all day event)
     			//+ then we need no further tests
@@ -271,8 +276,12 @@ public class PollService extends IntentService {
     			}
     			
     			if (busy_notAllDay || allDay || free_notAllDay) {
+    				result = new CalEvent();
     				result.setTitle(event_title);
     				result.setEnd(Long.valueOf(event_end));
+    				result.setBegin(Long.valueOf(event_begin));
+    				result.setId(Integer.valueOf(event_id));
+    				break;
     			}
     		} while (cursor.moveToNext());
     	}

@@ -13,20 +13,81 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.util.Log;
-
 public class CalEvent {
+	//private static final String TAG = "CalEvent";
+	
+	private Integer id;
 	private String title;
-	private long end;		//in milliseconds from epoch
-	private static final String TAG = "CalEvent";
+	private Long begin;
+	private Long end;		//in milliseconds from epoch
+	private String description;
+	private Integer ringerType;
+	private Integer displayColor;
+	private Boolean isFreeTime;
+	private Boolean isAllDay;
 
 	
 	public CalEvent() {
 		super();
+		this.id = null;
 		this.title = null;
-		this.end = 0;
+		this.begin = null;
+		this.end = null;
+		this.description = null;
+		this.ringerType = null;
+		this.displayColor = null;
+		this.isFreeTime = null;
+		this.isAllDay = null;	
 	}
 	
+	public Boolean getIsFreeTime() {
+		return isFreeTime;
+	}
+
+	public void setIsFreeTime(Boolean isFreeTime) {
+		this.isFreeTime = isFreeTime;
+	}
+
+	public Boolean getIsAllDay() {
+		return isAllDay;
+	}
+
+	public void setIsAllDay(Boolean isAllDay) {
+		this.isAllDay = isAllDay;
+	}
+
+	public Integer getDisplayColor() {
+		return displayColor;
+	}
+
+	public void setDisplayColor(Integer displayColor) {
+		this.displayColor = displayColor;
+	}
+
+	public Long getBegin() {
+		return begin;
+	}
+
+	public void setBegin(Long begin) {
+		this.begin = begin;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Integer getRingerType() {
+		return ringerType;
+	}
+
+	public void setRingerType(Integer ringerType) {
+		this.ringerType = ringerType;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -35,18 +96,60 @@ public class CalEvent {
 		this.title = title;
 	}
 	
-	public long getEnd() {
+	public Long getEnd() {
 		return end;
 	}
 	
-	public void setEnd(long end) {
+	public void setEnd(Long end) {
 		this.end = end;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public String getLocalBeginTime() {
+		DateFormat dateFormatter = DateFormat.getTimeInstance();
+		Date date = new Date(begin);
+		return dateFormatter.format(date);
+	}
+	
+	public String getLocalEndTime() {
+		DateFormat dateFormatter = DateFormat.getTimeInstance();
+		Date date = new Date(end);
+		return dateFormatter.format(date);
+	}
+	
+	public String getLocalBeginDate() {
+		DateFormat dateFormatter = DateFormat.getDateInstance();
+		Date date;
+		
+		//according to the android calendar all day events start at
+		//+ 8 PM the day before the event is scheduled.  This can
+		//+ result in a wrong date being returned.
+		if (isAllDay) {
+			date = new Date(begin + 1000 * 60 * 60 * 24);
+		} else {
+			date = new Date(begin);
+		}
+		
+		return dateFormatter.format(date);
+	}
+	
+	public String getLocalEndDate() {
+		DateFormat dateFormatter = DateFormat.getDateInstance();
+		Date date = new Date(end);
+		return dateFormatter.format(date);
 	}
 	
 	public String toString() {
 		String locale = Locale.getDefault().toString();
 		DateFormat dateFormatter;
-		Log.d(TAG, "Locale detected: " + locale);
+		//Log.d(TAG, "Locale detected: " + locale);
 		if (locale.equals("en_US")) {
 			//this works well for the US local, and produces a more concise notification
 			//+ but may not be desirable for users in other locales
@@ -65,7 +168,7 @@ public class CalEvent {
 	//return true if this CalEvent only holds default values
 	public boolean isBlank() {
 		boolean result = true;
-		if (title != null && end != 0) {
+		if (title != null && end != null && begin != null && id != null) {
 			result = false;
 		}
 		return result;

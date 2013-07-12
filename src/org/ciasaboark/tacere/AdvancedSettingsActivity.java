@@ -115,7 +115,7 @@ public class AdvancedSettingsActivity extends Activity {
 		//the event buffer button
 		TextView bufferTV = (TextView)findViewById(R.id.bufferMinutesDescription);
 		String bufferText = getResources().getString(R.string.pref_buffer_minutes);
-		bufferTV.setText(String.format(bufferText, bufferMinutes, bufferMinutes));
+		bufferTV.setText(String.format(bufferText, bufferMinutes));
 		
 		//the wake device toggle
 		CheckBox wakeCB = (CheckBox)findViewById(R.id.wakeDeviceCheckBox);

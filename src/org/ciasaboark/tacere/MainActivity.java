@@ -10,9 +10,9 @@ package org.ciasaboark.tacere;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,27 +22,32 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	
+	private boolean isActivated;
 	private int quickSilenceMinutes;
 	private int quickSilenceHours;
+	private EventList evList;
+	private EventAdapter listAdapter;
+	private ArrayList<CalEvent> events;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		
-		
-		//the text and image for the state of pollservice can only be set up after the service has
-		//+ started in onStart()
-		
-		
+		//create a list of events for the next week
+		evList = EventList.get(getApplicationContext());	
 	}
 
 	@Override
@@ -54,7 +59,7 @@ public class MainActivity extends Activity {
 	
 	public void onStart() {
 		super.onStart();
-	
+		setContentView(R.layout.activity_main);
 		//start the background service
 		Intent i = new Intent(this, PollService.class);
 		i.putExtra("type", "activityRestart");
@@ -100,21 +105,32 @@ public class MainActivity extends Activity {
 			Drawable redButton = Drawable.createFromStream(inStreamRed, null);
 			TextView ssText = (TextView) findViewById(R.id.serviceStateTextView);
 			
-			//since the pollservice only runs intermittently we have to check whether there
-			//+ is a pending intent scheduled to determine whether or not the service is
-			//+ considered active
-			Intent intent = new Intent(this, PollService.class);
-			PendingIntent pintent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_NO_CREATE);
-			if (pintent != null) {
+			if (isActivated) {
 				ssImage.setImageDrawable(greenButton);
-				ssText.setText("Service Active");
+				ssText.setText(R.string.pref_service_enabled);
 			} else {
 				ssImage.setImageDrawable(redButton);
-				ssText.setText("Service Not Active");
+				ssText.setText(R.string.pref_service_disabled);
 			}
 		} catch (IOException e) {
 			Log.e(TAG, "Error loading drawable icon");
 		}
+		
+	
+		//the event list
+		evList.updateEventList();
+		events = evList.getEvents();
+		
+		int num = 0;
+		for (CalEvent e : events) {
+			Log.d(TAG, "Event " + num + ": " + " id: " + e.getId() + " " + e.toString());
+			num++;
+		}
+		
+		ListView lv = (ListView)findViewById(R.id.eventListView);
+		lv.setClickable(true);
+		listAdapter = new EventAdapter(events);
+		lv.setAdapter(listAdapter);
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -135,10 +151,70 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	private class EventAdapter extends ArrayAdapter<CalEvent> {
+		public EventAdapter(ArrayList<CalEvent> events) {
+			super(getApplicationContext(), 0, events);
+		}
+		
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = MainActivity.this.getLayoutInflater().inflate(R.layout.event_list_item, null);
+				
+				CalEvent e = getItem(position);
+				
+				//the base relative layout
+				final RelativeLayout eventRL = (RelativeLayout)convertView.findViewById(R.id.eventListItem);
+				eventRL.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Toast.makeText(getApplicationContext(), evList.getEventAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+						
+					}
+				});
+				
+				//a text view to show the event title and date
+				TextView descriptionTV = (TextView)convertView.findViewById(R.id.eventText);
+				descriptionTV.setText(e.getTitle() + " - " + e.getLocalBeginDate());
+				
+				//a text view to show the beginning and ending times for the event
+				TextView timeTV = (TextView)convertView.findViewById(R.id.eventTime);
+				StringBuilder timeSB = new StringBuilder(e.getLocalBeginTime() + " - ");
+				if (!e.getLocalBeginDate().equals(e.getLocalEndDate())) {
+					timeSB.append("(" + e.getLocalEndDate() + ") ");
+				}
+				timeSB.append(e.getLocalEndTime());
+				if (e.getIsAllDay()) {
+					timeSB = new StringBuilder(getBaseContext().getString(R.string.all_day));
+				}
+				timeTV.setText(timeSB.toString());
+				
+				//a color box to match the calendar color
+				RelativeLayout calColorBox = (RelativeLayout)convertView.findViewById(R.id.calendarColor);
+				calColorBox.setBackgroundColor(e.getDisplayColor());
+				
+				//an image button to show the ringer state for this event
+				ImageView eventIV = (ImageView)convertView.findViewById(R.id.ringerState);
+				if ((position % 1) == 0) {
+					eventIV.setImageResource(R.drawable.ic_state_silent);
+				} else {
+					eventIV.setImageResource(R.drawable.ic_state_normal);
+				}
+				eventIV.setContentDescription(getBaseContext().getString(R.string.icon_alt_text_normal));
+			}
+			return convertView;	
+		}
+		
+		public CalEvent getItem(int position) {
+			return evList.getEventAtPosition(position);
+		}
+	}
+	
 	private void readSettings() {
 		//read the saved preferences
 		try {
 			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+			isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
 			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
 			quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
 		} catch (RuntimeException e) {

@@ -13,7 +13,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/eventTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pref_events_header"
@@ -32,7 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:onClick="onClickSilenceFreeTime" >
+            android:onClick="onClickSilenceFreeTime"
+            android:background="?android:attr/selectableItemBackground" >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -77,7 +78,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:onClick="onClickSilenceAllDay" >
+            android:onClick="onClickSilenceAllDay"
+            android:background="?android:attr/selectableItemBackground" >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -129,7 +131,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:onClick="onClickRefreshInterval"
-            android:orientation="vertical" >
+            android:orientation="vertical" 
+            android:background="?android:attr/selectableItemBackground" >
 
             <TextView
                 android:id="@+id/textView9"
@@ -160,7 +163,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:onClick="onClickBufferMinutes"
-            android:orientation="vertical" >
+            android:orientation="vertical" 
+            android:background="?android:attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/textView10"
@@ -199,12 +203,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:onClick="onClickWakeDevice" >
+            android:onClick="onClickWakeDevice" 
+            android:background="?android:attr/selectableItemBackground">
 
             <LinearLayout
+                android:id="@+id/LinearLayout1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:layout_alignParentLeft="true"
+                android:orientation="vertical" 
+                android:layout_toLeftOf="@+id/wakeDeviceCheckBox">
 
                 <TextView
                     android:id="@+id/textView11"

@@ -8,36 +8,60 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
- 
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp" >
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/serviceStateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/placeholder"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageView
+            android:id="@+id/serviceStateImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center"
+            android:contentDescription="@string/placeholder"
+            android:maxHeight="16dp"
+            android:maxWidth="16dp"
+            android:minHeight="16dp"
+            android:minWidth="16dp"
+            android:src="@android:drawable/btn_radio" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/quickSilenceButton"
+        android:layout_below="@+id/relativeLayout1"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/upcoming_events"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ListView
+            android:id="@+id/eventListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/relativeLayout1">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="10dp" >
 
-            <TextView
-                android:id="@+id/serviceStateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ImageView
-                android:id="@+id/serviceStateImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="center"
-                android:contentDescription="@string/placeholder"
-                android:maxHeight="16dp"
-                android:maxWidth="16dp"
-                android:minHeight="16dp"
-                android:minWidth="16dp"
-                android:src="@android:drawable/btn_radio" />
-
-        </RelativeLayout>
-
-
+        </ListView>
+    </LinearLayout>
 
     <Button
         android:id="@+id/quickSilenceButton"
