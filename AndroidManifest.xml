@@ -73,6 +73,24 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+        <receiver
+		   android:name="org.ciasaboark.tacere.ProviderChangedReceiver">
+		        <intent-filter>
+		            <action android:name="android.intent.action.PROVIDER_CHANGED"/>
+		            <data android:scheme="content"/>
+		            <data android:host="com.android.calendar"/>
+		        </intent-filter>
+		</receiver>
+        <receiver android:name="QuickSilenceProvider" >
+            <intent-filter >
+                <action 
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quicksilence_widget_info" />
+        </receiver>
 
         <activity
             android:name="org.ciasaboark.tacere.AboutActivityLicense"

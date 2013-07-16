@@ -195,7 +195,7 @@ public class MainActivity extends Activity {
 				
 				//an image button to show the ringer state for this event
 				ImageView eventIV = (ImageView)convertView.findViewById(R.id.ringerState);
-				if ((position % 1) == 0) {
+				if ((position % 2) == 0) {
 					eventIV.setImageResource(R.drawable.ic_state_silent);
 				} else {
 					eventIV.setImageResource(R.drawable.ic_state_normal);

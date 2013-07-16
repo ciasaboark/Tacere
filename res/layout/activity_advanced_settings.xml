@@ -22,7 +22,6 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
-            android:layout_marginBottom="6dp"
             android:layout_marginLeft="0dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="3dp"
@@ -31,9 +30,10 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onClickSilenceFreeTime"
-            android:background="?android:attr/selectableItemBackground" >
+            android:paddingBottom="10dp"
+            android:paddingTop="6dp" >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -62,24 +62,25 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
                 android:clickable="false" />
+
         </RelativeLayout>
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="6dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="#FFcbcbcb" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onClickSilenceAllDay"
-            android:background="?android:attr/selectableItemBackground" >
+            android:paddingBottom="10dp"
+            android:paddingTop="6dp" >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -108,7 +109,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:clickable="false" />
+                android:clickable="false"
+                android:paddingRight="10dp" />
+
         </RelativeLayout>
 
         <TextView
@@ -122,7 +125,6 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
-            android:layout_marginBottom="6dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="3dp"
             android:background="@android:color/darker_gray" />
@@ -130,9 +132,11 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onClickRefreshInterval"
-            android:orientation="vertical" 
-            android:background="?android:attr/selectableItemBackground" >
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="6dp" >
 
             <TextView
                 android:id="@+id/textView9"
@@ -153,18 +157,17 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="6dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="#FFcbcbcb" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onClickBufferMinutes"
-            android:orientation="vertical" 
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="6dp" >
 
             <TextView
                 android:id="@+id/textView10"
@@ -193,8 +196,6 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
-            android:layout_marginBottom="6dp"
-            android:layout_marginLeft="0dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="3dp"
             android:background="@android:color/darker_gray" />
@@ -202,9 +203,10 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:onClick="onClickWakeDevice" 
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?android:attr/selectableItemBackground"
+            android:onClick="onClickWakeDevice"
+            android:paddingBottom="10dp"
+            android:paddingTop="6dp" >
 
             <LinearLayout
                 android:id="@+id/LinearLayout1"
@@ -236,7 +238,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:clickable="false" />
+                android:clickable="false"
+                android:paddingRight="10dp" />
+
         </RelativeLayout>
     </LinearLayout>
 

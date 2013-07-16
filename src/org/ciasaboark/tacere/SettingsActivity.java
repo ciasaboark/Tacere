@@ -10,6 +10,8 @@ package org.ciasaboark.tacere;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.NumberPicker;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -251,6 +254,14 @@ public class SettingsActivity extends Activity {
 		editor.putInt("quickSilenceMinutes", quickSilenceMinutes);
 		editor.putInt("quickSilenceHours", quickSilenceHours);
 		editor.commit();
+		
+		//we also need to notify any active widgets of the settings change so
+		//+ that they can redraw
+		AppWidgetManager wManager = AppWidgetManager.getInstance(this.getApplicationContext());
+		ComponentName qsWidget = new ComponentName(getApplicationContext(), QuickSilenceProvider.class);
+		RemoteViews remoteViews = new RemoteViews(this.getPackageName(), R.layout.quicksilence_widget_layout);
+		int [] widgets = wManager.getAppWidgetIds(qsWidget);
+		wManager.updateAppWidget(widgets, remoteViews);
 	}
 
 	public void onPause() {

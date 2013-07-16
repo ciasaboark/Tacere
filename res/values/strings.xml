@@ -72,5 +72,14 @@
     <string name="icon_alt_text_vibrate">vibrate ringer icon</string>
     <string name="icon_alt_text_silent">silent ringer icon</string>
     <string name="all_day">All Day</string>
+    
+    <!-- Dialog Event Details -->
+    <string name="ring">Ring</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="silent">Silent</string>
+    
+    <!-- Quick Silence Widget -->
+    <string name="widget_quicksilence">Quick Silence</string>
+    <string name="widget_duration">%1$s%2$d minutes</string>		<!-- first parameter is string for hour length and "hour" -->
 	
 </resources>

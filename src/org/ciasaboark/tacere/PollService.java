@@ -21,6 +21,7 @@ import android.media.AudioManager;
 import android.os.Vibrator;
 import android.provider.CalendarContract.Instances;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 public class PollService extends IntentService {
 	private static final String TAG = "PollService";
@@ -37,7 +38,6 @@ public class PollService extends IntentService {
 	private int refreshInterval;
 	private int bufferMinutes;
 	private boolean wakeDevice;
-	private boolean ongoing;
 	private static final int MILLISECONDS_IN_MINUTE = 60000;
 	
 	public PollService () {
@@ -70,13 +70,15 @@ public class PollService extends IntentService {
 			duration = intent.getIntExtra("duration", DefPrefs.refreshInterval);
 		}
 		
-		if (requestType.equals("quickSilent")) {
+		if (requestType.equals("firstWake")) {
+			//since the state is saved in a SharedPreferences file it can become out of sync
+			//+ if the device restarts
+			setServiceState("notActive");
+			scheduleAlarm(0, true, "normal");
+		} else if (requestType.equals("quickSilent")) {
 			//This is a bit of a hack. The state of the service is stored in the shared preferences.
 			//+ This will help the logic later on during the normal requests
-			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putBoolean("ongoing", false);
-			editor.commit();
+			setServiceState("quickSilent");
 			
 			//when the quick silence duration is over the device should wake regardless
 			//+ of the user settings
@@ -103,7 +105,7 @@ public class PollService extends IntentService {
 			//FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new pending intent
 			PendingIntent pendIntent = PendingIntent.getService(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(getApplicationContext())
-				.setContentTitle("Tacere")
+				.setContentTitle("Tacere: Quick Silence")
 				.setContentText(sb.toString())
 				.setTicker("Quick Silence activating")
 				.setSmallIcon(R.drawable.small_mono)
@@ -115,24 +117,23 @@ public class PollService extends IntentService {
 			nm.cancel(DefPrefs.NOTIFICATION_ID);
 			nm.notify(DefPrefs.NOTIFICATION_ID, notBuilder.build());
 		} else if (requestType.equals("cancelQuickSilence")) {
+			setServiceState("notActive");
 			restoreVolumes();
 			cancelNotification();			
 			vibrate();
 			//schedule an immediate normal wakeup
 			scheduleAlarm(0, true, "normal");
-		} else if (requestType.equals("activityRestart")) {
-			//we can check whether the service is considered active based on whether a pending intent
-			//+ already exists
-			Intent i = new Intent(context, PollService.class);
-			PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
-			if (pi == null) {
+		} else if (requestType.equals("activityRestart") || requestType.equals("providerChanged")) {
+			String serviceState = getServiceState();
+			if (!serviceState.equals("quickSilent")) {
 				scheduleAlarm(0, true, "normal");
 			}
 		} else  if (isActivated) {  //this is a normal request and the service is marked to be active
 			CalEvent event = activeEvent();
+			String serviceState = getServiceState();
 			if (event != null) {
 				//an event matched
-				silenceVolumes();
+				silenceRinger();
 				
 				//clicking the notification should take the user to the app
 				Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -149,7 +150,10 @@ public class PollService extends IntentService {
 					.setOngoing(true)
 					.setContentIntent(pendIntent);
 				
-				if (!ongoing) {
+				if (serviceState.equals("notActive")) {
+					//only adjust the media and alarm volumes at the beginning of each event
+					silenceVolumes();
+					
 					//we only want to vibrate at the beginning of a silent period
 					vibrate();
 					
@@ -157,7 +161,7 @@ public class PollService extends IntentService {
 					//+ not on each update
 					notBuilder.setTicker("Tacere Silencing for " + event.toString());
 					
-					setOngoing(true);
+					setServiceState("eventActive");
 				}
 
 				NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -166,12 +170,12 @@ public class PollService extends IntentService {
 				scheduleAlarm(refreshInterval, wakeDevice, "normal");
 			} else { //there was no active event
 				//cancel notification, restore volumes, schedule a new wake request
-				if (ongoing) {
+				if (serviceState.equals("eventActive")) {
 					//vibrate to signal that the event has ended
 					vibrate();
 				}
 				
-				setOngoing(false);				
+				setServiceState("notActive");			
 				cancelNotification();
 				restoreVolumes();
 				scheduleAlarm(refreshInterval, wakeDevice, "normal");
@@ -179,23 +183,16 @@ public class PollService extends IntentService {
 			}
 		} else {	//this was a normal request but the service is not marked to be active
 			//restore all volumes, clear any ongoing notifications then shutdown the service
-			if (ongoing) {
+			if (getServiceState().equals("eventActive")) {
 				//vibrate to signal that the event has ended
 				vibrate();
 			}
 			
-			setOngoing(false);
+			setServiceState("notActive");
 			restoreVolumes();
 			cancelNotification();
 			stopService();
 		}
-	}
-	
-	private void setOngoing(boolean state) {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putBoolean("ongoing", state);
-		editor.commit();
 	}
 
 	private void cancelNotification() {
@@ -316,7 +313,6 @@ public class PollService extends IntentService {
 		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
 		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
-		ongoing = preferences.getBoolean("ongoing", false);
 	}
 	
 	private void restoreVolumes() {
@@ -332,8 +328,7 @@ public class PollService extends IntentService {
 		}
 	}
 	
-	private void silenceVolumes() {
-		//change ringer state, media volume, and alarm volume
+	private void silenceRinger() {
 		AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 		switch (ringerType) {
 			case 1:
@@ -346,7 +341,10 @@ public class PollService extends IntentService {
 				audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 				break;
 		}
-
+	}
+	private void silenceVolumes() {
+		//change media volume, and alarm volume
+		AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 		if (adjustMedia) {
 			audio.setStreamVolume(AudioManager.STREAM_MUSIC, mediaVolume, 0);
 		}
@@ -355,6 +353,22 @@ public class PollService extends IntentService {
 			audio.setStreamVolume(AudioManager.STREAM_ALARM, alarmVolume, 0);
 		}
 
+	}
+	
+	private void setServiceState(String state) {
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		if (state != null) {
+			editor.putString("serviceState", state);
+		} else {
+			Log.e(TAG, "Trying to set state to null value");
+		}
+		editor.commit();
+	}
+	
+	private String getServiceState() {
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		return preferences.getString("serviceState", "notActive");
 	}
 	private void shutdown() {
 		stopSelf();
