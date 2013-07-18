@@ -64,7 +64,7 @@
         </service>
 
         <receiver
-            android:name="org.ciasaboark.tacere.PollServiceReceiver"
+            android:name="org.ciasaboark.tacere.BootCompletedReceiver"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
