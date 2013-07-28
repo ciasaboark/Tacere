@@ -26,80 +26,78 @@ public final class R {
     public static final class drawable {
         public static final int action_settings=0x7f020000;
         public static final int background=0x7f020001;
-        public static final int copyright_icon=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
-        public static final int ic_state_normal=0x7f020004;
-        public static final int ic_state_silent=0x7f020005;
-        public static final int ic_state_vibrate=0x7f020006;
-        public static final int info_icon=0x7f020007;
-        public static final int normal=0x7f020008;
-        public static final int pressed=0x7f020009;
-        public static final int rec_shape=0x7f02000a;
-        public static final int small_mono=0x7f02000b;
-        public static final int social_person=0x7f02000c;
+        public static final int blank=0x7f020002;
+        public static final int copyright_icon=0x7f020003;
+        public static final int ic_launcher=0x7f020004;
+        public static final int ic_state_normal=0x7f020005;
+        public static final int ic_state_silent=0x7f020006;
+        public static final int ic_state_vibrate=0x7f020007;
+        public static final int info_icon=0x7f020008;
+        public static final int normal=0x7f020009;
+        public static final int pressed=0x7f02000a;
+        public static final int rec_shape=0x7f02000b;
+        public static final int small_mono=0x7f02000c;
+        public static final int social_person=0x7f02000d;
     }
     public static final class id {
-        public static final int LinearLayout1=0x7f0a000f;
-        public static final int action_about=0x7f0a003b;
-        public static final int action_about_license=0x7f0a0039;
-        public static final int action_settings=0x7f0a003a;
-        public static final int action_settings_restore=0x7f0a003c;
-        public static final int activateServiceCheckBox=0x7f0a001b;
-        public static final int activateServiceDescription=0x7f0a001a;
-        public static final int adjustAlarmCheckBox=0x7f0a0023;
-        public static final int adjustAlarmDescription=0x7f0a0022;
-        public static final int adjustMediaCheckBox=0x7f0a001f;
-        public static final int adjustMediaDescription=0x7f0a001e;
-        public static final int alarmSeekBar=0x7f0a0024;
-        public static final int bufferMinutesDescription=0x7f0a000d;
-        public static final int calendarColor=0x7f0a0033;
-        public static final int eventDetailBreak=0x7f0a002b;
-        public static final int eventDetailCalendarColor=0x7f0a002a;
-        public static final int eventDetailRingerIcon=0x7f0a0029;
-        public static final int eventDetailsText=0x7f0a0028;
-        public static final int eventListItem=0x7f0a0032;
-        public static final int eventListView=0x7f0a0018;
-        public static final int eventText=0x7f0a0035;
+        public static final int TextView02=0x7f0a000c;
+        public static final int action_about=0x7f0a0038;
+        public static final int action_about_license=0x7f0a0036;
+        public static final int action_settings=0x7f0a0037;
+        public static final int action_settings_restore=0x7f0a0039;
+        public static final int activateServiceCheckBox=0x7f0a0013;
+        public static final int activateServiceDescription=0x7f0a0012;
+        public static final int adjustAlarmCheckBox=0x7f0a001c;
+        public static final int adjustAlarmDescription=0x7f0a001b;
+        public static final int adjustMediaCheckBox=0x7f0a0018;
+        public static final int adjustMediaDescription=0x7f0a0017;
+        public static final int alarmSeekBar=0x7f0a001d;
+        public static final int bufferMinutesDescription=0x7f0a000b;
+        public static final int calendarColor=0x7f0a002f;
+        public static final int eventDate=0x7f0a0032;
+        public static final int eventDetailBreak=0x7f0a0027;
+        public static final int eventDetailCalendarColor=0x7f0a0025;
+        public static final int eventDetailRingerIcon=0x7f0a0024;
+        public static final int eventDetailsText=0x7f0a0023;
+        public static final int eventListItem=0x7f0a002e;
+        public static final int eventListTitle=0x7f0a000f;
+        public static final int eventListView=0x7f0a0010;
+        public static final int eventText=0x7f0a0031;
         public static final int eventTime=0x7f0a0002;
-        public static final int hourPicker=0x7f0a0030;
-        public static final int imageView1=0x7f0a0037;
-        public static final int linearLayout1=0x7f0a002c;
-        public static final int mediaSeekBar=0x7f0a0020;
-        public static final int minutePicker=0x7f0a0031;
-        public static final int quickSilenceButton=0x7f0a0016;
-        public static final int quickSilenceDescription=0x7f0a0025;
-        public static final int radioButton1=0x7f0a002d;
-        public static final int radioButton2=0x7f0a002e;
-        public static final int radioButton3=0x7f0a002f;
-        public static final int refreshIntervalDescription=0x7f0a000b;
-        public static final int relative1=0x7f0a0027;
-        public static final int relativeLayout1=0x7f0a0013;
-        public static final int ringerState=0x7f0a0034;
-        public static final int ringerTypeDescription=0x7f0a001d;
+        public static final int hourPicker=0x7f0a002c;
+        public static final int imageView1=0x7f0a0034;
+        public static final int linearLayout1=0x7f0a0028;
+        public static final int lookaheadDaysDescription=0x7f0a000d;
+        public static final int mediaSeekBar=0x7f0a0019;
+        public static final int minutePicker=0x7f0a002d;
+        public static final int quickSilenceButton=0x7f0a000e;
+        public static final int quickSilenceDescription=0x7f0a001f;
+        public static final int radioButton1=0x7f0a0029;
+        public static final int radioButton2=0x7f0a002a;
+        public static final int radioButton3=0x7f0a002b;
+        public static final int relative1=0x7f0a0022;
+        public static final int ringerState=0x7f0a0030;
+        public static final int ringerTypeDescription=0x7f0a0015;
         public static final int scrollView2=0x7f0a0001;
-        public static final int serviceStateImageView=0x7f0a0015;
-        public static final int serviceStateTextView=0x7f0a0014;
         public static final int silenceAllDayCheckBox=0x7f0a0008;
         public static final int silenceAllDayDescription=0x7f0a0007;
         public static final int silenceFreeTimeCheckBox=0x7f0a0005;
         public static final int silenceFreeTimeDescription=0x7f0a0004;
-        public static final int textView10=0x7f0a000c;
-        public static final int textView11=0x7f0a0011;
-        public static final int textView12=0x7f0a0026;
-        public static final int textView2=0x7f0a0019;
+        public static final int textView10=0x7f0a000a;
+        public static final int textView11=0x7f0a0020;
+        public static final int textView12=0x7f0a0021;
+        public static final int textView2=0x7f0a0011;
         public static final int textView3=0x7f0a0003;
-        public static final int textView4=0x7f0a000e;
+        public static final int textView4=0x7f0a0016;
         public static final int textView5=0x7f0a0006;
-        public static final int textView6=0x7f0a0021;
+        public static final int textView6=0x7f0a001a;
         public static final int textView7=0x7f0a0009;
-        public static final int textView8=0x7f0a001c;
-        public static final int textView9=0x7f0a000a;
-        public static final int wakeDeviceCheckBox=0x7f0a0010;
-        public static final int wakeDeviceDescription=0x7f0a0012;
+        public static final int textView8=0x7f0a0014;
+        public static final int textView9=0x7f0a001e;
         public static final int webView1=0x7f0a0000;
-        public static final int widget_duration=0x7f0a0038;
-        public static final int widget_layout=0x7f0a0036;
-        public static final int widget_text=0x7f0a0017;
+        public static final int widget_duration=0x7f0a0035;
+        public static final int widget_layout=0x7f0a0033;
+        public static final int widget_text=0x7f0a0026;
     }
     public static final class layout {
         public static final int activity_about=0x7f030000;
@@ -126,31 +124,33 @@ public final class R {
          */
         public static final int action_settings=0x7f070001;
         public static final int action_settings_restore=0x7f070008;
-        public static final int all_day=0x7f070034;
+        public static final int all_day=0x7f070036;
         public static final int app_name=0x7f070000;
-        public static final int hours=0x7f07002f;
+        public static final int hours=0x7f070031;
         /**  Event List Item 
          */
-        public static final int icon_alt_text_normal=0x7f070031;
-        public static final int icon_alt_text_silent=0x7f070033;
-        public static final int icon_alt_text_vibrate=0x7f070032;
-        public static final int minutes=0x7f070030;
+        public static final int icon_alt_text_normal=0x7f070033;
+        public static final int icon_alt_text_silent=0x7f070035;
+        public static final int icon_alt_text_vibrate=0x7f070034;
+        public static final int minutes=0x7f070032;
         /**  Generics 
          */
-        public static final int placeholder=0x7f07002e;
+        public static final int placeholder=0x7f070030;
         public static final int pref_advance_header=0x7f07000c;
         public static final int pref_advanced_sub=0x7f07001d;
         public static final int pref_advanced_title=0x7f070012;
         public static final int pref_alarm_disabled=0x7f07001b;
         public static final int pref_alarm_enabled=0x7f07001a;
         public static final int pref_alarm_volume=0x7f070010;
-        public static final int pref_all_day_disabled=0x7f070029;
-        public static final int pref_all_day_enabled=0x7f070028;
+        public static final int pref_all_day_disabled=0x7f07002a;
+        public static final int pref_all_day_enabled=0x7f070029;
         public static final int pref_battery_header=0x7f070020;
-        public static final int pref_buffer_minutes=0x7f07002b;
+        public static final int pref_buffer_minutes=0x7f07002c;
         public static final int pref_buffer_minutes_title=0x7f070024;
         public static final int pref_events_header=0x7f07001f;
         public static final int pref_general_header=0x7f070009;
+        public static final int pref_list_days=0x7f07002f;
+        public static final int pref_list_days_title=0x7f070025;
         public static final int pref_media_disabled=0x7f070019;
         public static final int pref_media_enabled=0x7f070018;
         public static final int pref_media_volume=0x7f07000f;
@@ -158,7 +158,7 @@ public final class R {
         public static final int pref_quick_silence_header=0x7f07000b;
         public static final int pref_quicksilent_duration=0x7f07001c;
         public static final int pref_refresh_interval=0x7f070023;
-        public static final int pref_refresh_interval_length=0x7f07002a;
+        public static final int pref_refresh_interval_length=0x7f07002b;
         public static final int pref_ringer_type_normal=0x7f070015;
         public static final int pref_ringer_type_silent=0x7f070017;
         public static final int pref_ringer_type_title=0x7f07000e;
@@ -167,17 +167,17 @@ public final class R {
         public static final int pref_service_disabled=0x7f070014;
         public static final int pref_service_enabled=0x7f070013;
         public static final int pref_silence_all_day_title=0x7f070022;
-        public static final int pref_silence_free_disabled=0x7f070027;
-        public static final int pref_silence_free_enabled=0x7f070026;
+        public static final int pref_silence_free_disabled=0x7f070028;
+        public static final int pref_silence_free_enabled=0x7f070027;
         public static final int pref_silence_free_time_title=0x7f070021;
         public static final int pref_volumes_header=0x7f07000a;
-        public static final int pref_wake_device_title=0x7f070025;
-        public static final int pref_wakeup_disabled=0x7f07002d;
-        public static final int pref_wakeup_enabled=0x7f07002c;
+        public static final int pref_wake_device_title=0x7f070026;
+        public static final int pref_wakeup_disabled=0x7f07002e;
+        public static final int pref_wakeup_enabled=0x7f07002d;
         /**  Dialog Event Details 
          */
-        public static final int ring=0x7f070035;
-        public static final int silent=0x7f070037;
+        public static final int ring=0x7f070037;
+        public static final int silent=0x7f070039;
         /**  About Activity 
          */
         public static final int title_activity_about=0x7f070004;
@@ -191,11 +191,11 @@ public final class R {
          */
         public static final int title_activity_settings=0x7f070007;
         public static final int upcoming_events=0x7f070003;
-        public static final int vibrate=0x7f070036;
-        public static final int widget_duration=0x7f070039;
+        public static final int vibrate=0x7f070038;
+        public static final int widget_duration=0x7f07003b;
         /**  Quick Silence Widget 
          */
-        public static final int widget_quicksilence=0x7f070038;
+        public static final int widget_quicksilence=0x7f07003a;
     }
     public static final class style {
         /** 

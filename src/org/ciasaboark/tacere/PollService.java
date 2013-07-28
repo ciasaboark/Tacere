@@ -35,10 +35,10 @@ public class PollService extends IntentService {
 	private int mediaVolume;
 	private boolean adjustAlarm;
 	private int alarmVolume;
-	private int refreshInterval;
 	private int bufferMinutes;
-	private boolean wakeDevice;
-	private static final int MILLISECONDS_IN_MINUTE = 60000;
+	private int lookaheadDays;
+	private static final long MILLISECONDS_IN_MINUTE = 60000;
+	private DatabaseInterface DBIface = DatabaseInterface.get(this);
 	
 	public PollService () {
 		super(TAG);
@@ -55,6 +55,7 @@ public class PollService extends IntentService {
 		 * "normal"
 		 */
 		
+		Log.d(TAG, "Pollservice waking");
 		readSettings();
 		Context context = getApplicationContext();
 		
@@ -74,7 +75,12 @@ public class PollService extends IntentService {
 			//since the state is saved in a SharedPreferences file it can become out of sync
 			//+ if the device restarts
 			setServiceState("notActive");
-			scheduleAlarm(0, true, "normal");
+			scheduleAlarmAfter(0, true, "normal");
+			
+			//update(n) will also remove all events not found in the next n days, so we
+			//+ need to keep this in sync with the users preferences.
+			DBIface.update(lookaheadDays);
+			DBIface.pruneEventsBefore(System.currentTimeMillis());
 		} else if (requestType.equals("quickSilent")) {
 			//This is a bit of a hack. The state of the service is stored in the shared preferences.
 			//+ This will help the logic later on during the normal requests
@@ -82,7 +88,7 @@ public class PollService extends IntentService {
 			
 			//when the quick silence duration is over the device should wake regardless
 			//+ of the user settings
-			scheduleAlarm(duration, true, "cancel");
+			scheduleAlarmAfter(duration, true, "cancel");
 			
 			AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 			audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
@@ -122,23 +128,34 @@ public class PollService extends IntentService {
 			cancelNotification();			
 			vibrate();
 			//schedule an immediate normal wakeup
-			scheduleAlarm(0, true, "normal");
+			scheduleAlarmAfter(0, true, "normal");
 		} else if (requestType.equals("activityRestart") || requestType.equals("providerChanged")) {
+			//update(n) will also remove all events not found in the next n days, so we
+			//+ need to keep this in sync with the users preferences.
+			DBIface.update(lookaheadDays);
+			DBIface.pruneEventsBefore(System.currentTimeMillis());
 			String serviceState = getServiceState();
 			//schedule an immediate wakeup only if we aren't in a quick silence period
 			if (!serviceState.equals("quickSilent")) {
-				scheduleAlarm(0, true, "normal");
+				scheduleAlarmAfter(0, true, "normal");
 			}
 		} else  if (isActivated) {  //this is a normal request and the service is marked to be active
 			//CalEvent event = activeEvent();
-			CalEvent nextEvent = nextEvent();
+			CalEvent nextEvent = nextMatchingEvent();
 			String serviceState = getServiceState();
 			if (nextEvent != null) {
 				//now that we know that there is an event in the next 24 hrs that matches
 				//+ the users criteria we need to see if this event is currently active
-				if (nextEvent.getBegin() - (MILLISECONDS_IN_MINUTE * bufferMinutes) < System.currentTimeMillis()) {
+				long now = System.currentTimeMillis();
+				long begin = nextEvent.getBegin() - (MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+				long end = nextEvent.getEnd() + (MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+				if (begin <= now && end >= now) {
 					//this event is active
-					silenceRinger();
+					int ringType = nextEvent.getRingerType();
+					if (ringType == 0) {
+						ringType = ringerType;
+					}
+					silenceRinger(ringType);
 					
 					//clicking the notification should take the user to the app
 					Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -159,8 +176,11 @@ public class PollService extends IntentService {
 						//only adjust the media and alarm volumes at the beginning of each event
 						silenceVolumes();
 						
-						//we only want to vibrate at the beginning of a silent period
-						vibrate();
+						//we only want to vibrate at the beginning of a silent period, and only
+						//+ if the ringer type is silent or vibrate
+						if (ringerType == CalEvent.RINGER_TYPE_SILENT || ringerType == CalEvent.RINGER_TYPE_VIBRATE ) {
+							vibrate();
+						}
 						
 						//the ticker text should only be shown the first time the notification is created,
 						//+ not on each update
@@ -172,10 +192,8 @@ public class PollService extends IntentService {
 					NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 					nm.notify(DefPrefs.NOTIFICATION_ID, notBuilder.build());
 					
-					long difference = nextEvent.getEnd() - System.currentTimeMillis();
-					difference += MILLISECONDS_IN_MINUTE * bufferMinutes;
-					int sleepPeriod = (int) difference / MILLISECONDS_IN_MINUTE;
-					scheduleAlarm(sleepPeriod, true, "normal");
+//					//sleep until this event ends
+					scheduleAlarmAt(nextEvent.getEnd() + MILLISECONDS_IN_MINUTE * (long)bufferMinutes, "normal");
 				} else {
 					//there is at least one event in the next 24 hours but it isn't active now
 					//cancel notification, restore volumes, schedule a new wake request
@@ -188,11 +206,7 @@ public class PollService extends IntentService {
 					}
 					
 					//sleep until the next event starts
-					//TODO incorrect math
-					long difference = nextEvent.getBegin() - System.currentTimeMillis();
-					difference -= MILLISECONDS_IN_MINUTE * bufferMinutes;
-					int sleepPeriod = (int)difference / MILLISECONDS_IN_MINUTE;
-					scheduleAlarm(sleepPeriod, wakeDevice, "normal");
+					scheduleAlarmAt(nextEvent.getBegin(), "normal");
 				}
 			} else {
 				//there is no event in the next 24 hours
@@ -203,9 +217,9 @@ public class PollService extends IntentService {
 					restoreVolumes();
 				}
 				
-				//sleep for the next 24 hours
-				int sleepPeriod = MILLISECONDS_IN_MINUTE * 60 * 24;
-				scheduleAlarm(sleepPeriod, true, "normal");
+				//sleep for the next 24 hours (or until the calendar changes)
+				int sleepPeriod = (int)MILLISECONDS_IN_MINUTE * 60 * 24;
+				scheduleAlarmAfter(sleepPeriod, true, "normal");
 			}
 		} else {
 			//the service is marked not to start
@@ -215,74 +229,9 @@ public class PollService extends IntentService {
 				cancelNotification();
 				restoreVolumes();
 			}
-			
+			cancelAlarm();
 			shutdown();
 		}
-				
-//				//an event matched
-//				silenceRinger();
-//				
-//				//clicking the notification should take the user to the app
-//				Intent notificationIntent = new Intent(context, MainActivity.class);
-//				notificationIntent.putExtra("type", "normal");
-//
-//				//FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new pending intent
-//				PendingIntent pendIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-//				NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(getApplicationContext())
-//					.setContentTitle("Tacere: Event active")
-//					.setContentText(event.toString())
-//					.setSmallIcon(R.drawable.small_mono)
-//					.setAutoCancel(false)
-//					.setOnlyAlertOnce(true)
-//					.setOngoing(true)
-//					.setContentIntent(pendIntent);
-//				
-//				if (serviceState.equals("notActive")) {
-//					//only adjust the media and alarm volumes at the beginning of each event
-//					silenceVolumes();
-//					
-//					//we only want to vibrate at the beginning of a silent period
-//					vibrate();
-//					
-//					//the ticker text should only be shown the first time the notification is created,
-//					//+ not on each update
-//					notBuilder.setTicker("Tacere Silencing for " + event.toString());
-//					
-//					setServiceState("eventActive");
-//				}
-//
-//				NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//				nm.notify(DefPrefs.NOTIFICATION_ID, notBuilder.build());
-//				
-//				//Listening for the provider changed broadcast negates the need to reawaken at set intervals
-////				scheduleAlarm(refreshInterval, wakeDevice, "normal");
-//				int sleepPeriod = (int)(System.currentTimeMillis() - event.getBegin()) / MILLISECONDS_IN_MINUTE;
-//				scheduleAlarm(sleepPeriod, true, "normal");
-//			} else { //there was no active event
-//				//cancel notification, restore volumes, schedule a new wake request
-//				if (serviceState.equals("eventActive")) {
-//					//vibrate to signal that the event has ended
-//					vibrate();
-//				}
-//				
-//				setServiceState("notActive");			
-//				cancelNotification();
-//				restoreVolumes();
-//				scheduleAlarm(refreshInterval, wakeDevice, "normal");
-//
-//			}
-//		} else {	//this was a normal request but the service is not marked to be active
-//			//restore all volumes, clear any ongoing notifications then shutdown the service
-//			if (getServiceState().equals("eventActive")) {
-//				//vibrate to signal that the event has ended
-//				vibrate();
-//			}
-//			
-//			setServiceState("notActive");
-//			restoreVolumes();
-//			cancelNotification();
-//			stopService();
-//		}
 	}
 
 	private void cancelNotification() {
@@ -290,7 +239,22 @@ public class PollService extends IntentService {
 		nm.cancel(DefPrefs.NOTIFICATION_ID);
 	}
 	
-	private void scheduleAlarm(int duration, boolean wakeOnAlarm, String type) {
+	private void scheduleAlarmAt(long time, String type) {
+		Intent i = new Intent(this, PollService.class);
+		if (type.equals("cancel")) {
+			i.putExtra("type", "cancelQuickSilent");
+		}
+		
+		if (time < 0) {
+			throw new IllegalArgumentException("PollService:scheduleAlarmAt not given valid time");
+		}
+		
+		PendingIntent pintent = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+		alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
+	}
+	
+	private void scheduleAlarmAfter(int duration, boolean wakeOnAlarm, String type) {
 		Intent i = new Intent(this, PollService.class);
 		if (type.equals("cancel")) {
 			i.putExtra("type", "cancelQuickSilent");
@@ -321,130 +285,46 @@ public class PollService extends IntentService {
 		vibrator.vibrate(pattern, -1);
 	}
 	
-	private CalEvent nextEvent() {
+	
+	//check all events in the database to see if they match the user's criteria
+	//+ for silencing.  Does not check whether that event is active
+	private CalEvent nextMatchingEvent() {
 		CalEvent result = null;
-		long begin = System.currentTimeMillis();
-		long end = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * 60 * 24; //events in the next 24 hours only
-		String[] projection = new String[]{"_id", "title", "begin", "end", "allDay", "availability"};
-		Cursor cursor = Instances.query(getContentResolver(),  projection,  begin, end);
+		Cursor cursor = DBIface.getCursor(EventProvider.BEGIN);
 		
 		if (cursor.moveToFirst()) {
-			int col_id = cursor.getColumnIndex(projection[0]);
-			int col_title = cursor.getColumnIndex(projection[1]);
-			int col_begin = cursor.getColumnIndex(projection[2]);
-			int col_end = cursor.getColumnIndex(projection[3]);
-			int col_allDay = cursor.getColumnIndex(projection[4]);
-			int col_avail = cursor.getColumnIndex(projection[5]);
-			
 			do {
-				String event_id = cursor.getString(col_id);
-				String event_title = cursor.getString(col_title);
-				String event_begin = cursor.getString(col_begin);
-				String event_end = cursor.getString(col_end);
-				String event_allDay = cursor.getString(col_allDay);
-				String event_avail = cursor.getString(col_avail);
+				int id = cursor.getInt(cursor.getColumnIndex(EventProvider._ID));
+				CalEvent e = DBIface.getEvent(id);
 				
 				//if the event is marked as busy (but is not an all day event)
 				//+ then we need no further tests
 				boolean busy_notAllDay = false;
-				if (event_avail.equals("0") && event_allDay.equals("0")) {
+				if (!e.getIsFreeTime() && !e.getIsAllDay()) {
 					busy_notAllDay = true;
 				}
 				
 				//all day events
 				boolean allDay = false;
-				if (silenceAllDay && event_allDay.equals("1")) {
+				if (silenceAllDay && e.getIsAllDay()) {
 					allDay = true;
 				}
 				
 				//events marked as 'free' or 'available'
 				boolean free_notAllDay = false;
-				if (silenceFreeTime && event_avail.equals("1") && event_allDay.equals("0")) {
+				if (silenceFreeTime && e.getIsFreeTime() && !e.getIsAllDay()) {
 					free_notAllDay = true;
 				}
 				
-				
-				
 				if (busy_notAllDay || allDay || free_notAllDay) {
-					result = new CalEvent();
-					result.setId(Integer.valueOf(event_id));
-					result.setTitle(event_title);
-					result.setBegin(Long.valueOf(event_begin));
-					result.setEnd(Long.valueOf(event_end));
-					if (event_allDay.equals("1")) {
-						result.setIsAllDay(true);
-					} else {
-						result.setIsAllDay(false);
-					}
-					if (event_avail.equals("0")) {
-						result.setIsFreeTime(false);
-					} else {
-						result.setIsFreeTime(true);
-					}
+					result = e;
 					break;
 				}
 			} while (cursor.moveToNext());
 		}
 		
-		return result;
-	}
-	
-	private CalEvent activeEvent() {
-		CalEvent result = null;
-
-		long begin = System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * bufferMinutes;
-		long end = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * bufferMinutes;
+		cursor.close();
 		
-    
-    	String[] projection = new String[]{"title", "end", "allDay", "availability", "begin", "_id"};
-    	Cursor cursor = Instances.query(getContentResolver(), projection, begin, end);
-    	
-    	if (cursor.moveToFirst()) {
-    		int col_title = cursor.getColumnIndex(projection[0]);
-    		int col_end = cursor.getColumnIndex(projection[1]);
-    		int col_allDay = cursor.getColumnIndex(projection[2]);
-    		int col_availability = cursor.getColumnIndex(projection[3]);
-    		int col_begin = cursor.getColumnIndex(projection[4]);
-    		int col_id = cursor.getColumnIndex(projection[5]);
-    		
-    		do {
-    			String event_title = cursor.getString(col_title);
-    			String event_end = cursor.getString(col_end);
-    			String event_isAllDay = cursor.getString(col_allDay);
-    			String event_availability = cursor.getString(col_availability);
-    			String event_begin = cursor.getString(col_begin);
-    			String event_id = cursor.getString(col_id);
-    			
-    			//if the event is marked as busy (but is not an all day event)
-    			//+ then we need no further tests
-    			boolean busy_notAllDay = false;
-    			if (event_availability.equals("0") && event_isAllDay.equals("0")) {
-    				busy_notAllDay = true;
-    			}
-    			
-    			//all day events
-    			boolean allDay = false;
-    			if (silenceAllDay && event_isAllDay.equals("1")) {
-    				allDay = true;
-    			}
-    			
-    			//events marked as 'free' or 'available'
-    			boolean free_notAllDay = false;
-    			if (silenceFreeTime && event_availability.equals("1") && event_isAllDay.equals("0")) {
-    				free_notAllDay = true;
-    			}
-    			
-    			if (busy_notAllDay || allDay || free_notAllDay) {
-    				result = new CalEvent();
-    				result.setTitle(event_title);
-    				result.setEnd(Long.valueOf(event_end));
-    				result.setBegin(Long.valueOf(event_begin));
-    				result.setId(Integer.valueOf(event_id));
-    				break;
-    			}
-    		} while (cursor.moveToNext());
-    	}
-	
 		return result;
 	}
 	
@@ -470,11 +350,9 @@ public class PollService extends IntentService {
 		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
 		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
 		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
-		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.silenceAllDay);
-		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
-		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
+		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.lookaheadDays);
 	}
 	
 	private void restoreVolumes() {
@@ -490,9 +368,15 @@ public class PollService extends IntentService {
 		}
 	}
 	
-	private void silenceRinger() {
+	private void silenceRinger(int ringType) {
+		//a value of 0 indicates that this event has no specific preference for a
+		//+ ringer type.  Use the default value instead.
+		if (ringType == 0) {
+			ringType = ringerType;
+		}
+		
 		AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-		switch (ringerType) {
+		switch (ringType) {
 			case 1:
 				audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 				break;

@@ -9,6 +9,7 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -108,6 +109,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.SettingsActivity" />
         </activity>
+        <provider android:name="EventProvider" android:authorities="org.ciasaboark.tacere.Events">
+		</provider>
     </application>
 
 </manifest>

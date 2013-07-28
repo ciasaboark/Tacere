@@ -58,6 +58,14 @@ public class EventList {
 		return result;
 	}
 	
+	public void updateEventList(int days) {
+		if (days > 0) {
+			mEvents = getEventList(days);
+		} else {
+			mEvents = getEventList(1);
+		}
+	}
+	
 	public void updateEventList() {
 		mEvents = getEventList(7);  //defaults to 7 days
 	}
@@ -66,7 +74,7 @@ public class EventList {
 		days = Math.abs(days);
 		ArrayList<CalEvent> events = new ArrayList<CalEvent>();
 		long begin = System.currentTimeMillis();
-		long end = System.currentTimeMillis() + 1000 * 60 * 60 * 24 * days; //pull all events n days from now
+		long end = begin + 1000 * 60 * 60 * 24 * (long)days; //pull all events n days from now
 		
 		String[] projection = new String[]{"title", "begin", "end", "description", "displayColor", "allDay", "availability", "event_id" };
 		Cursor cursor = Instances.query(mAppContext.getContentResolver(), projection, begin, end);
@@ -91,7 +99,8 @@ public class EventList {
     			String event_availability = cursor.getString(col_availability);
     			String event_id = cursor.getString(col_id);
     			
-    			CalEvent event = new CalEvent();
+    			CalEvent event = new CalEvent(mAppContext);
+    			event.setId(Integer.valueOf(event_id));
     			event.setTitle(event_title);
     			event.setBegin(Long.valueOf(event_begin));
     			event.setEnd(Long.valueOf(event_end));
@@ -109,10 +118,25 @@ public class EventList {
     			}
     			event.setId(Integer.valueOf(event_id));
     			
+    			if (event.getDescription().contains("ringer=")) {
+    				//the event already has a set ringer type
+    				if (event.getDescription().contains("ringer=normal")) {
+    					event.setRingerType(CalEvent.RINGER_TYPE_NORMAL);
+    				} else if (event.getDescription().contains("ringer=vibrate")) {
+    					event.setRingerType(CalEvent.RINGER_TYPE_VIBRATE);
+    				} else if (event.getDescription().contains("ringer=silent")) {
+    					event.setRingerType(CalEvent.RINGER_TYPE_SILENT);
+    				} else {
+    					Log.e(TAG, "event " + event_title + " id:" + event_id + " has an unknown ringer type set");
+    				}
+    			}
+    			
     			events.add(event);
     		} while (cursor.moveToNext());
 			
 		}
+		
+		cursor.close();
 		
 		return events;
 	}

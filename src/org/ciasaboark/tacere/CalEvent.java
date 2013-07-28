@@ -13,10 +13,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Context;
+
 public class CalEvent {
-	//private static final String TAG = "CalEvent";
+	private static final String TAG = "CalEvent";
 	
 	private Integer id;
+	private Integer cal_id;
 	private String title;
 	private Long begin;
 	private Long end;		//in milliseconds from epoch
@@ -25,11 +28,18 @@ public class CalEvent {
 	private Integer displayColor;
 	private Boolean isFreeTime;
 	private Boolean isAllDay;
+	
+	public static final int RINGER_TYPE_UNDEFINED = 0;
+	public static final int RINGER_TYPE_NORMAL = 1;
+	public static final int RINGER_TYPE_VIBRATE = 2;
+	public static final int RINGER_TYPE_SILENT = 3;
+	
 
 	
-	public CalEvent() {
+	public CalEvent(Context c) {
 		super();
 		this.id = null;
+		this.cal_id = null;
 		this.title = null;
 		this.begin = null;
 		this.end = null;
@@ -37,7 +47,7 @@ public class CalEvent {
 		this.ringerType = null;
 		this.displayColor = null;
 		this.isFreeTime = null;
-		this.isAllDay = null;	
+		this.isAllDay = null;
 	}
 	
 	public Boolean getIsFreeTime() {
@@ -81,7 +91,11 @@ public class CalEvent {
 	}
 
 	public Integer getRingerType() {
-		return ringerType;
+		Integer result = ringerType;
+		if (result == null) {
+			result = 0;
+		}
+		return result;
 	}
 
 	public void setRingerType(Integer ringerType) {
@@ -96,6 +110,14 @@ public class CalEvent {
 		this.title = title;
 	}
 	
+	public Integer getCal_id() {
+		return cal_id;
+	}
+
+	public void setCal_id(Integer cal_id) {
+		this.cal_id = cal_id;
+	}
+
 	public Long getEnd() {
 		return end;
 	}
@@ -165,11 +187,11 @@ public class CalEvent {
 		return new String(title + ", ends " + fdate);
 	}
 	
-	//return true if this CalEvent only holds default values
-	public boolean isBlank() {
-		boolean result = true;
-		if (title != null && end != null && begin != null && id != null) {
-			result = false;
+	public boolean isValid() {
+		boolean result = false;
+		if (title != null && id != null && begin != null && end != null
+				&& isFreeTime != null && isAllDay != null) {
+			result = true;
 		}
 		return result;
 	}

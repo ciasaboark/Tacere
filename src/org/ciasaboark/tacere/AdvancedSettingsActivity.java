@@ -31,6 +31,7 @@ public class AdvancedSettingsActivity extends Activity {
 	private int refreshInterval;
 	private int bufferMinutes;
 	private boolean wakeDevice;
+	private int lookaheadDays;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,28 +108,15 @@ public class AdvancedSettingsActivity extends Activity {
 			dayTV.setText(R.string.pref_all_day_disabled);
 		}
 		
-		//the refresh interval button
-		TextView refreshTV = (TextView)findViewById(R.id.refreshIntervalDescription);
-		String refreshText = getResources().getString(R.string.pref_refresh_interval_length);
-		refreshTV.setText(String.format(refreshText, refreshInterval));
-		
 		//the event buffer button
 		TextView bufferTV = (TextView)findViewById(R.id.bufferMinutesDescription);
 		String bufferText = getResources().getString(R.string.pref_buffer_minutes);
 		bufferTV.setText(String.format(bufferText, bufferMinutes));
 		
-		//the wake device toggle
-		CheckBox wakeCB = (CheckBox)findViewById(R.id.wakeDeviceCheckBox);
-		TextView wakeTV = (TextView)findViewById(R.id.wakeDeviceDescription);
-		if (wakeDevice) {
-			wakeCB.setChecked(true);
-			String wakeText = getResources().getString(R.string.pref_wakeup_enabled);
-			wakeTV.setText(String.format(wakeText, refreshInterval));
-		} else {
-			wakeCB.setChecked(false);
-			wakeTV.setText(R.string.pref_wakeup_disabled);
-			
-		}
+		//the lookahead interval button
+		TextView lookaheadTV = (TextView)findViewById(R.id.lookaheadDaysDescription);
+		String lookaheadText = getResources().getString(R.string.pref_list_days);
+		lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
 	}
 
 	private void readSettings() {
@@ -138,6 +126,7 @@ public class AdvancedSettingsActivity extends Activity {
 		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
 		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
+		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.lookaheadDays);
 	}
 	
 	private void saveSettings() {
@@ -149,6 +138,7 @@ public class AdvancedSettingsActivity extends Activity {
 		editor.putInt("refreshInterval", refreshInterval);
 		editor.putInt("bufferMinutes", bufferMinutes);
 		editor.putBoolean("wakeDevice", wakeDevice);
+		editor.putInt("lookaheadDays", lookaheadDays);
 		editor.commit();
 	}
 
@@ -217,6 +207,40 @@ public class AdvancedSettingsActivity extends Activity {
 	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 	    	 public void onClick(DialogInterface dialog, int whichButton) {
 	    		 bufferMinutes = number.getValue() - 1;
+	    		 saveSettings();
+	    		 refreshDisplay();
+	    	 }
+	     });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int whichButton) {
+        		// Do nothing
+        	}
+        });
+	        
+        alert.setView(number);
+        alert.show();       
+	}
+	
+	public void onClickListDays(View v) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setTitle("Lookahead Interval");
+		final NumberPicker number = new NumberPicker(this);
+		String[] nums = new String[32];
+		
+		for(int i = 0; i < nums.length; i++) {
+            nums[i] = Integer.toString(i);
+		}
+
+	     number.setMinValue(1);
+	     number.setMaxValue(nums.length-1);
+	     number.setWrapSelectorWheel(false);
+	     number.setDisplayedValues(nums);
+	     number.setValue(lookaheadDays + 1);
+		
+	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	    	 public void onClick(DialogInterface dialog, int whichButton) {
+	    		 lookaheadDays = number.getValue() - 1;
 	    		 saveSettings();
 	    		 refreshDisplay();
 	    	 }

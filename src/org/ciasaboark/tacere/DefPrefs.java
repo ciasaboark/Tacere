@@ -25,4 +25,5 @@ public class DefPrefs {
 	public static final int 	bufferMinutes = 5;
 	public static final Boolean wakeDevice = false;
 	public static final int 	NOTIFICATION_ID = 1;			//an id to reference all notifications
+	public static final int		lookaheadDays = 7;
 }

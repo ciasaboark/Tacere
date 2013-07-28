@@ -129,31 +129,6 @@
             android:layout_marginTop="3dp"
             android:background="@android:color/darker_gray" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:onClick="onClickRefreshInterval"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp" >
-
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_refresh_interval"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/refreshIntervalDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
-
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
@@ -166,8 +141,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:onClick="onClickBufferMinutes"
             android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp" >
+            android:paddingBottom="10dp" >
 
             <TextView
                 android:id="@+id/textView10"
@@ -185,63 +159,30 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/pref_battery_header"
-            android:textStyle="bold" />
-
-        <View
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/darker_gray" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
-            android:onClick="onClickWakeDevice"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp" >
+            android:onClick="onClickListDays"
+            android:orientation="vertical"
+            android:paddingBottom="10dp" >
 
-            <LinearLayout
-                android:id="@+id/LinearLayout1"
+            <TextView
+                android:id="@+id/TextView02"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:orientation="vertical" 
-                android:layout_toLeftOf="@+id/wakeDeviceCheckBox">
+                android:text="@string/pref_list_days_title"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <TextView
-                    android:id="@+id/textView11"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pref_wake_device_title"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <TextView
-                    android:id="@+id/wakeDeviceDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:text="@string/placeholder"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <CheckBox
-                android:id="@+id/wakeDeviceCheckBox"
+            <TextView
+                android:id="@+id/lookaheadDaysDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:clickable="false"
-                android:paddingRight="10dp" />
+                android:paddingLeft="10dp"
+                android:text="@string/placeholder"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
 
-        </RelativeLayout>
     </LinearLayout>
 
 </ScrollView>
