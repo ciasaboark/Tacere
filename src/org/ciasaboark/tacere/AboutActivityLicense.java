@@ -47,6 +47,7 @@ public class AboutActivityLicense extends Activity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setIcon(R.drawable.copyright_icon);
 
 	}
 

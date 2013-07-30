@@ -1,3 +1,15 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
+
+/* Provides access to a homescreen widget, currently disabled
+ * within the manifest
+ */
 package org.ciasaboark.tacere;
 
 import android.app.PendingIntent;
@@ -22,8 +34,8 @@ public class QuickSilenceProvider extends AppWidgetProvider {
     
     //read quicksilence preferences
     SharedPreferences preferences = context.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-    int quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
-	int quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
+    int quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
+	int quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
 	
 	String quicksilenceText = context.getResources().getString(R.string.widget_duration);
 	String hrs = "";

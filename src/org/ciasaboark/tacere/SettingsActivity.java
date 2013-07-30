@@ -32,7 +32,7 @@ import android.widget.Toast;
 
 
 public class SettingsActivity extends Activity {
-//	private static final String TAG = "Settings";
+	private static final String TAG = "Settings";
 	
 	private boolean isActivated;
 	private int ringerType;
@@ -60,6 +60,7 @@ public class SettingsActivity extends Activity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setIcon(R.drawable.action_settings);
 
 	}
 
@@ -137,7 +138,7 @@ public class SettingsActivity extends Activity {
 		
 		//the media volumes slider
 		SeekBar mediaSB = (SeekBar)findViewById(R.id.mediaSeekBar);
-		mediaSB.setMax(DefPrefs.mediaVolumeMax);
+		mediaSB.setMax(DefPrefs.MEDIA_VOLUME_MAX);
 		mediaSB.setProgress(mediaVolume);
 		if (!adjustMedia) {
 			mediaSB.setEnabled(false);
@@ -175,7 +176,7 @@ public class SettingsActivity extends Activity {
 		
 		//the alarm volumes slider
 		SeekBar alarmSB = (SeekBar)findViewById(R.id.alarmSeekBar);
-		alarmSB.setMax(DefPrefs.alarmVolumeMax);
+		alarmSB.setMax(DefPrefs.ALARM_VOLUME_MAX);
 		alarmSB.setProgress(alarmVolume);
 		if (!adjustAlarm) {
 			alarmSB.setEnabled(false);
@@ -211,33 +212,32 @@ public class SettingsActivity extends Activity {
 	
 	private void readSettings() {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
-		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
-		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
-		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
-		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
-		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
-		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
-		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
+		isActivated = preferences.getBoolean("isActivated", DefPrefs.IS_ACTIVATED);
+		ringerType = preferences.getInt("ringerType", DefPrefs.RINGER_TYPE);
+		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.ADJUST_MEDIA);
+		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.MEDIA_VOLUME);
+		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.ADJUST_ALARM);
+		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.ALARM_VOLUME);
+		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
+		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
 	}
 	
 	private void restoreDefaults() {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putBoolean("isActivated", DefPrefs.isActivated);
-		editor.putBoolean("silenceFreeTime", DefPrefs.silenceFreeTime);
-		editor.putBoolean("silenceAllDay", DefPrefs.silenceAllDay);
-		editor.putInt("ringerType", DefPrefs.ringerType);
-		editor.putBoolean("adjustMedia", DefPrefs.adjustMedia);
-		editor.putBoolean("adjustAlarm", DefPrefs.adjustAlarm);
-		editor.putInt("mediaVolume", DefPrefs.mediaVolume);
-		editor.putInt("alarmVolume", DefPrefs.alarmVolume);
-		editor.putInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
-		editor.putInt("quickSilenceHours", DefPrefs.quickSilenceHours);
-		editor.putInt("refreshInterval", DefPrefs.refreshInterval);
-		editor.putInt("bufferMinutes", DefPrefs.bufferMinutes);
-		editor.putBoolean("wakeDevice", DefPrefs.wakeDevice);
-		editor.putInt("lookaheadDays", DefPrefs.lookaheadDays);
+		editor.putBoolean("isActivated", DefPrefs.IS_ACTIVATED);
+		editor.putBoolean("silenceFreeTime", DefPrefs.SILENCE_FREE_TIME);
+		editor.putBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
+		editor.putInt("ringerType", DefPrefs.RINGER_TYPE);
+		editor.putBoolean("adjustMedia", DefPrefs.ADJUST_MEDIA);
+		editor.putBoolean("adjustAlarm", DefPrefs.ADJUST_ALARM);
+		editor.putInt("mediaVolume", DefPrefs.MEDIA_VOLUME);
+		editor.putInt("alarmVolume", DefPrefs.ALARM_VOLUME);
+		editor.putInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
+		editor.putInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
+		editor.putInt("refreshInterval", DefPrefs.REFRESH_INTERVAL);
+		editor.putInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
+		editor.putInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
 		editor.commit();
 		readSettings();
 		refreshDisplay();

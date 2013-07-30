@@ -34,6 +34,10 @@ public class CalEvent {
 	public static final int RINGER_TYPE_VIBRATE = 2;
 	public static final int RINGER_TYPE_SILENT = 3;
 	
+	public static final long MILLISECONDS_IN_SECOND = 1000;
+	public static final long MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
+	public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
+	
 
 	
 	public CalEvent(Context c) {
@@ -105,7 +109,7 @@ public class CalEvent {
 	public String getTitle() {
 		String result;
 		if (title == null || title.equals("")) {
-			result = "<No Title>";
+			result = "(No title)";
 		} else {
 			result = title;
 		}
@@ -141,13 +145,13 @@ public class CalEvent {
 	}
 	
 	public String getLocalBeginTime() {
-		DateFormat dateFormatter = DateFormat.getTimeInstance();
+		DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 		Date date = new Date(begin);
 		return dateFormatter.format(date);
 	}
 	
 	public String getLocalEndTime() {
-		DateFormat dateFormatter = DateFormat.getTimeInstance();
+		DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 		Date date = new Date(end);
 		return dateFormatter.format(date);
 	}
@@ -160,7 +164,8 @@ public class CalEvent {
 		//+ 8 PM the day before the event is scheduled.  This can
 		//+ result in a wrong date being returned.
 		if (isAllDay) {
-			date = new Date(begin + 1000 * 60 * 60 * 24);
+			//shift ahead by one full day
+			date = new Date(begin + MILLISECONDS_IN_DAY);
 		} else {
 			date = new Date(begin);
 		}
@@ -175,19 +180,8 @@ public class CalEvent {
 	}
 	
 	public String toString() {
-		String locale = Locale.getDefault().toString();
 		DateFormat dateFormatter;
-		//Log.d(TAG, "Locale detected: " + locale);
-		if (locale.equals("en_US")) {
-			//this works well for the US local, and produces a more concise notification
-			//+ but may not be desirable for users in other locales
-			dateFormatter = new SimpleDateFormat("MM/dd/yy h:mm a", Locale.US);		
-		} else {
-			//the fallback should generate a date/time format specific to the
-			//+ users locale
-			dateFormatter = DateFormat.getDateTimeInstance();
-		}
-		
+		dateFormatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault());
 		Date date = new Date(end);
 		String fdate = dateFormatter.format(date);
 		return new String(title + ", ends " + fdate);

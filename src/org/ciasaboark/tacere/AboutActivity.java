@@ -31,6 +31,7 @@ public class AboutActivity extends Activity {
         wv.loadUrl("file:///android_asset/about.html");
         
         //All links should open in the default browser, not this WebView
+        //NOTE: this does not seem to work for POST links.
         wv.setWebViewClient(new WebViewClient() {
         	@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -48,6 +49,7 @@ public class AboutActivity extends Activity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setIcon(R.drawable.info_icon);
 
 	}
 

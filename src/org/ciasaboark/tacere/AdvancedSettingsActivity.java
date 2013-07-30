@@ -30,7 +30,6 @@ public class AdvancedSettingsActivity extends Activity {
 	private boolean silenceAllDay;
 	private int refreshInterval;
 	private int bufferMinutes;
-	private boolean wakeDevice;
 	private int lookaheadDays;
 
 	@Override
@@ -52,6 +51,7 @@ public class AdvancedSettingsActivity extends Activity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setIcon(R.drawable.action_settings);
 
 	}
 
@@ -121,12 +121,11 @@ public class AdvancedSettingsActivity extends Activity {
 
 	private void readSettings() {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
-		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.silenceAllDay);
-		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.refreshInterval);
-		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
-		wakeDevice = preferences.getBoolean("wakeDevice", DefPrefs.wakeDevice);
-		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.lookaheadDays);
+		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.SILENCE_FREE_TIME);
+		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
+		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.REFRESH_INTERVAL);
+		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
+		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
 	}
 	
 	private void saveSettings() {
@@ -137,7 +136,6 @@ public class AdvancedSettingsActivity extends Activity {
 		editor.putInt("ringerType", 3);
 		editor.putInt("refreshInterval", refreshInterval);
 		editor.putInt("bufferMinutes", bufferMinutes);
-		editor.putBoolean("wakeDevice", wakeDevice);
 		editor.putInt("lookaheadDays", lookaheadDays);
 		editor.commit();
 	}
@@ -229,7 +227,7 @@ public class AdvancedSettingsActivity extends Activity {
 		String[] nums = new String[32];
 		
 		for(int i = 0; i < nums.length; i++) {
-            nums[i] = Integer.toString(i);
+            nums[i] = Integer.toString(i + 1);
 		}
 
 	     number.setMinValue(1);
@@ -254,10 +252,5 @@ public class AdvancedSettingsActivity extends Activity {
 	        
         alert.setView(number);
         alert.show();       
-	}
-	
-	public void onClickWakeDevice(View v) {
-		wakeDevice = !wakeDevice;
-		refreshDisplay();
 	}
 }

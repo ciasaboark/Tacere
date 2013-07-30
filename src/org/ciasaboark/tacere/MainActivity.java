@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		//+ remove events beyond the lookahead period
 		DBIface.pruneEventsAfter(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * (long)lookaheadDays);
 		
-		DBIface.printEvents();
+		//DBIface.printEvents();
 		
 		//the list of upcoming events
 		ListView lv = (ListView)findViewById(R.id.eventListView);
@@ -176,10 +176,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		//read the saved preferences
 		try {
 			SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.quickSilenceMinutes);
-			quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.quickSilenceHours);
-			lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.lookaheadDays);
-			bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
+			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
+			quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
+			lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
+			bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}	
@@ -204,7 +204,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		
 		@Override
 		public void bindView(View view, final Context context, final Cursor cursor) {
-			Log.d(TAG, "bindView called");
 			int id = cursor.getInt(cursor.getColumnIndex(EventProvider._ID));
 			CalEvent thisEvent = DBIface.getEvent(id);
 			

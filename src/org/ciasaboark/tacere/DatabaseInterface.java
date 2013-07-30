@@ -1,3 +1,11 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 import java.util.ArrayList;
@@ -79,7 +87,7 @@ public class DatabaseInterface {
 		//we need to make sure not to remove events from our database that might still
 		//+ be ongoing due to the event buffer
 		SharedPreferences preferences = mAppContext.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		int bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
+		int bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
 		long begin = System.currentTimeMillis() - 1000 * 60 * (long)bufferMinutes;
 		long end = begin + 1000 * 60 * 60 * 24 * (long)cutoff; //pull all events n days from now
 		
@@ -102,7 +110,7 @@ public class DatabaseInterface {
 				long loc_id = loc_cursor.getLong(loc_cursor.getColumnIndex(EventProvider._ID));
 				if (!cal_ids.contains(loc_id)) {
 					String loc_title = loc_cursor.getString(loc_cursor.getColumnIndex(EventProvider.TITLE));
-					Log.d(TAG, "Event with id:" + loc_id + " and title: " + loc_title + " not found in calendar DB, removing");
+					//Log.d(TAG, "Event with id:" + loc_id + " and title: " + loc_title + " not found in calendar DB, removing");
 					ContentResolver cr = mAppContext.getContentResolver();
 					cr.delete(EventProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(loc_id)).build(), null, null);
 				}
@@ -254,6 +262,8 @@ public class DatabaseInterface {
 		mAppContext.getContentResolver().update(EventProvider.CONTENT_URI, values, mSelectionClause, mSelectionArgs);
 	}
 	
+	//Return a cursor, sorting by the column given.
+	//+ See EventProvider for valid column names
 	public Cursor getCursor(String sortBy) {
 		Uri allEvents = Uri.parse("content://org.ciasaboark.tacere.Events/events");
 		if (sortBy == null) {

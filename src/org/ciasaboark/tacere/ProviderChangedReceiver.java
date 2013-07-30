@@ -22,7 +22,5 @@ public class ProviderChangedReceiver extends BroadcastReceiver {
 		Intent i = new Intent(context, PollService.class);
 		i.putExtra("type", "providerChanged");
 		context.startService(i);
-
 	}
-
 }

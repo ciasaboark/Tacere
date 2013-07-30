@@ -36,7 +36,7 @@ public class PollService extends IntentService {
 	private int alarmVolume;
 	private int bufferMinutes;
 	private int lookaheadDays;
-	private static final long MILLISECONDS_IN_MINUTE = 60000;
+	
 	private static final long TEN_SECONDS = 10000;
 	private DatabaseInterface DBIface = DatabaseInterface.get(this);
 	
@@ -61,14 +61,14 @@ public class PollService extends IntentService {
 		
 		//pull extra info (if any) from the incoming intent
 		String requestType = "";
-		int duration = DefPrefs.refreshInterval;
+		int duration = DefPrefs.REFRESH_INTERVAL;
 		if (intent.getExtras() != null) {
 			//for some reason intents that have no extras are still getting through this check
 			String t = intent.getStringExtra("type");
 			if (t != null) {
 				requestType = t;
 			}
-			duration = intent.getIntExtra("duration", DefPrefs.refreshInterval);
+			duration = intent.getIntExtra("duration", DefPrefs.REFRESH_INTERVAL);
 		}
 		
 		if (requestType.equals("firstWake")) {
@@ -80,7 +80,7 @@ public class PollService extends IntentService {
 			//update(n) will also remove all events not found in the next n days, so we
 			//+ need to keep this in sync with the users preferences.
 			DBIface.update(lookaheadDays);
-			DBIface.pruneEventsBefore(System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+			DBIface.pruneEventsBefore(System.currentTimeMillis() - CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
 		} else if (requestType.equals("quickSilent")) {
 			//This is a bit of a hack. The state of the service is stored in the shared preferences.
 			//+ This will help the logic later on during the normal requests
@@ -88,7 +88,7 @@ public class PollService extends IntentService {
 			
 			//when the quick silence duration is over the device should wake regardless
 			//+ of the user settings
-			long wakeAt = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * duration;
+			long wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_MINUTE * duration;
 			scheduleAlarmAt(wakeAt, "cancel");
 			
 			AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -134,22 +134,22 @@ public class PollService extends IntentService {
 			//update(n) will also remove all events not found in the next n days, so we
 			//+ need to keep this in sync with the users preferences.
 			DBIface.update(lookaheadDays);
-			DBIface.pruneEventsBefore(System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+			DBIface.pruneEventsBefore(System.currentTimeMillis() - CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
 			String serviceState = getServiceState();
 			//schedule an immediate wakeup only if we aren't in a quick silence period
 			if (!serviceState.equals("quickSilent")) {
 				scheduleAlarmAt(System.currentTimeMillis(), "normal");
 			}
 		} else  if (isActivated) {  //this is a normal request and the service is marked to be active
-			DBIface.pruneEventsBefore(System.currentTimeMillis() - MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+			DBIface.pruneEventsBefore(System.currentTimeMillis() - CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
 			CalEvent nextEvent = nextMatchingEvent();
 			String serviceState = getServiceState();
 			if (nextEvent != null) {
 				//now that we know that there is an event in the next 24 hrs that matches
 				//+ the users criteria we need to see if this event is currently active
 				long now = System.currentTimeMillis();
-				long begin = nextEvent.getBegin() - (MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
-				long end = nextEvent.getEnd() + (MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+				long begin = nextEvent.getBegin() - (CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
+				long end = nextEvent.getEnd() + (CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes);
 				if (begin <= now && end >= now) {
 					//this event is active
 					
@@ -198,7 +198,7 @@ public class PollService extends IntentService {
 					
 					//sleep until this event ends.  The extra seconds are tacked on to make sure
 					//+ that this event will be removed during the next database prune
-					long wakeAt = nextEvent.getEnd() + MILLISECONDS_IN_MINUTE * (long)bufferMinutes + TEN_SECONDS;
+					long wakeAt = nextEvent.getEnd() + CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes + TEN_SECONDS;
 					scheduleAlarmAt(wakeAt, "normal");
 				} else {
 					//there is at least one event in the next 24 hours but it isn't active now
@@ -212,7 +212,7 @@ public class PollService extends IntentService {
 					}
 					
 					//sleep until the next event starts, shifted a few seconds to avoid collisions 
-					long wakeAt = nextEvent.getBegin() - MILLISECONDS_IN_MINUTE * (long)bufferMinutes + TEN_SECONDS;
+					long wakeAt = nextEvent.getBegin() - CalEvent.MILLISECONDS_IN_MINUTE * (long)bufferMinutes + TEN_SECONDS;
 					scheduleAlarmAt(wakeAt, "normal");
 				}
 			} else {
@@ -225,7 +225,7 @@ public class PollService extends IntentService {
 				}
 				
 				//sleep for the next 24 hours (or until the calendar changes)
-				long wakeAt = System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * 60 * 24;
+				long wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_DAY;
 				scheduleAlarmAt(wakeAt, "normal");
 			}
 		} else {
@@ -262,22 +262,6 @@ public class PollService extends IntentService {
 		alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
 	}
 	
-//	private void scheduleAlarmAfter(int duration, boolean wakeOnAlarm, String type) {
-//		Intent i = new Intent(this, PollService.class);
-//		if (type.equals("cancel")) {
-//			i.putExtra("type", "cancelQuickSilent");
-//		}
-//		
-//		if (duration < 0) {
-//			duration = Math.abs(duration);
-//		}
-//		
-//		PendingIntent pintent = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-//
-//		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-//		alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + MILLISECONDS_IN_MINUTE * duration, pintent);
-//	}
-	
 	private void vibrate() {
 		Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 		long[] pattern = {0, 500, 200, 500};
@@ -286,7 +270,8 @@ public class PollService extends IntentService {
 	
 	
 	//check all events in the database to see if they match the user's criteria
-	//+ for silencing.  Does not check whether that event is active
+	//+ for silencing.  Returns the first event that matches.  Does not check
+	//+ whether that event is active
 	private CalEvent nextMatchingEvent() {
 		CalEvent result = null;
 		
@@ -337,16 +322,16 @@ public class PollService extends IntentService {
 	
 	private void readSettings() {
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		isActivated = preferences.getBoolean("isActivated", DefPrefs.isActivated);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.silenceFreeTime);
-		ringerType = preferences.getInt("ringerType", DefPrefs.ringerType);
-		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.adjustMedia);
-		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.mediaVolume);
-		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.adjustAlarm);
-		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.alarmVolume);
-		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.silenceAllDay);
-		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
-		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.lookaheadDays);
+		isActivated = preferences.getBoolean("isActivated", DefPrefs.IS_ACTIVATED);
+		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.SILENCE_FREE_TIME);
+		ringerType = preferences.getInt("ringerType", DefPrefs.RINGER_TYPE);
+		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.ADJUST_MEDIA);
+		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.MEDIA_VOLUME);
+		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.ADJUST_ALARM);
+		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.ALARM_VOLUME);
+		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
+		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
+		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
 	}
 	
 	private void restoreVolumes() {
@@ -354,11 +339,11 @@ public class PollService extends IntentService {
 		audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 		
 		if (adjustMedia) {
-			audio.setStreamVolume(AudioManager.STREAM_MUSIC, DefPrefs.mediaVolume, 0);
+			audio.setStreamVolume(AudioManager.STREAM_MUSIC, DefPrefs.MEDIA_VOLUME, 0);
 		}
 
 		if (adjustAlarm) {
-			audio.setStreamVolume(AudioManager.STREAM_ALARM, DefPrefs.alarmVolume, 0);
+			audio.setStreamVolume(AudioManager.STREAM_ALARM, DefPrefs.ALARM_VOLUME, 0);
 		}
 	}
 	

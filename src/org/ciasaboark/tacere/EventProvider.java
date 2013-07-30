@@ -1,3 +1,11 @@
+/*
+ * Created by Jonathan Nelson
+ * 
+ * Copyright 2013 Jonathan Nelson
+ *
+ * Released under the BSD license.  For details see the COPYING file.
+*/
+
 package org.ciasaboark.tacere;
 
 import android.content.ContentProvider;
@@ -17,6 +25,8 @@ public class EventProvider extends ContentProvider {
 
 	public static final String PROVIDER_NAME = "org.ciasaboark.tacere.Events";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/event");
+	
+	//Columns available
 	public static final String _ID = "_id";
 	public static final String TITLE = "title";
 	public static final String CAL_ID = "cal_id";
@@ -106,16 +116,16 @@ public class EventProvider extends ContentProvider {
 		SQLiteQueryBuilder sqlBuilder = new SQLiteQueryBuilder();
 		sqlBuilder.setTables(TABLE_EVENTS);
 		
-		if (uriMatcher.match(uri) == EVENT_ID) { //---if getting a particular book---
+		if (uriMatcher.match(uri) == EVENT_ID) {
 			sqlBuilder.appendWhere(_ID + " = " + uri.getPathSegments().get(1));
 		}
 		
 		if (sortOrder==null || sortOrder=="") {
+			//if we aren't given a sort order preference, order the results chronologically
 			sortOrder = BEGIN;
 		}
 		
 		Cursor c = sqlBuilder.query( eventsDB, projection, selection, selectionArgs, null, null, sortOrder);
-		//---register to watch a content URI for changes---
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
 	}
@@ -157,7 +167,7 @@ public class EventProvider extends ContentProvider {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-			// TODO Auto-generated method stub
+			// TODO Add code to update the database from a previous version
 		}
 	}
 
