@@ -237,6 +237,7 @@ public class SettingsActivity extends Activity {
 		editor.putInt("refreshInterval", DefPrefs.refreshInterval);
 		editor.putInt("bufferMinutes", DefPrefs.bufferMinutes);
 		editor.putBoolean("wakeDevice", DefPrefs.wakeDevice);
+		editor.putInt("lookaheadDays", DefPrefs.lookaheadDays);
 		editor.commit();
 		readSettings();
 		refreshDisplay();

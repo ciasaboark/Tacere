@@ -103,7 +103,13 @@ public class CalEvent {
 	}
 
 	public String getTitle() {
-		return title;
+		String result;
+		if (title == null || title.equals("")) {
+			result = "<No Title>";
+		} else {
+			result = title;
+		}
+		return result;
 	}
 	
 	public void setTitle(String title) {

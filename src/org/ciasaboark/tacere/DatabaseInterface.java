@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract.Instances;
@@ -45,7 +46,7 @@ public class DatabaseInterface {
 			do {
 				int id = c.getInt(c.getColumnIndex(EventProvider._ID));
 				long end = c.getLong(c.getColumnIndex(EventProvider.END));
-				if (end < cutoff) {
+				if (end <= cutoff) {
 					ContentResolver cr = mAppContext.getContentResolver();
 					cr.delete(EventProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build(), null, null);
 				}
@@ -75,7 +76,11 @@ public class DatabaseInterface {
 	//removes events from the local database that can not be found in the calendar
 	//+ database in the next n days
 	private void pruneRemovedEvents(long cutoff) {
-		long begin = System.currentTimeMillis();
+		//we need to make sure not to remove events from our database that might still
+		//+ be ongoing due to the event buffer
+		SharedPreferences preferences = mAppContext.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		int bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.bufferMinutes);
+		long begin = System.currentTimeMillis() - 1000 * 60 * (long)bufferMinutes;
 		long end = begin + 1000 * 60 * 60 * 24 * (long)cutoff; //pull all events n days from now
 		
 		String[] projection = new String[]{"title", "begin", "end", "description", "displayColor", "allDay", "availability", "_id", "event_id"};

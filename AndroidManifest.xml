@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ciasaboark.tacere"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="2.0" >
 
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -82,7 +81,7 @@
 		            <data android:host="com.android.calendar"/>
 		        </intent-filter>
 		</receiver>
-        <receiver android:name="QuickSilenceProvider" >
+        <!-- <receiver android:name="QuickSilenceProvider" >
             <intent-filter >
                 <action 
                     android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -91,7 +90,7 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/quicksilence_widget_info" />
-        </receiver>
+        </receiver> -->
 
         <activity
             android:name="org.ciasaboark.tacere.AboutActivityLicense"
