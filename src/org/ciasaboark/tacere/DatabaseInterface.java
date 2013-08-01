@@ -109,7 +109,7 @@ public class DatabaseInterface {
 			do {
 				long loc_id = loc_cursor.getLong(loc_cursor.getColumnIndex(EventProvider._ID));
 				if (!cal_ids.contains(loc_id)) {
-					String loc_title = loc_cursor.getString(loc_cursor.getColumnIndex(EventProvider.TITLE));
+					//String loc_title = loc_cursor.getString(loc_cursor.getColumnIndex(EventProvider.TITLE));
 					//Log.d(TAG, "Event with id:" + loc_id + " and title: " + loc_title + " not found in calendar DB, removing");
 					ContentResolver cr = mAppContext.getContentResolver();
 					cr.delete(EventProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(loc_id)).build(), null, null);

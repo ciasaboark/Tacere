@@ -181,7 +181,7 @@ public class CalEvent {
 	
 	public String toString() {
 		DateFormat dateFormatter;
-		dateFormatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault());
+		dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
 		Date date = new Date(end);
 		String fdate = dateFormatter.format(date);
 		return new String(title + ", ends " + fdate);

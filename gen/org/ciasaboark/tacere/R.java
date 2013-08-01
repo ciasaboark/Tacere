@@ -41,10 +41,10 @@ public final class R {
     }
     public static final class id {
         public static final int TextView02=0x7f0a000c;
-        public static final int action_about=0x7f0a0038;
-        public static final int action_about_license=0x7f0a0036;
-        public static final int action_settings=0x7f0a0037;
-        public static final int action_settings_restore=0x7f0a0039;
+        public static final int action_about=0x7f0a003b;
+        public static final int action_about_license=0x7f0a0039;
+        public static final int action_settings=0x7f0a003a;
+        public static final int action_settings_restore=0x7f0a003c;
         public static final int activateServiceCheckBox=0x7f0a0013;
         public static final int activateServiceDescription=0x7f0a0012;
         public static final int adjustAlarmCheckBox=0x7f0a001c;
@@ -53,30 +53,30 @@ public final class R {
         public static final int adjustMediaDescription=0x7f0a0017;
         public static final int alarmSeekBar=0x7f0a001d;
         public static final int bufferMinutesDescription=0x7f0a000b;
-        public static final int calendarColor=0x7f0a002f;
-        public static final int eventDate=0x7f0a0032;
-        public static final int eventDetailBreak=0x7f0a0027;
-        public static final int eventDetailCalendarColor=0x7f0a0025;
-        public static final int eventDetailRingerIcon=0x7f0a0024;
-        public static final int eventDetailsText=0x7f0a0023;
-        public static final int eventListItem=0x7f0a002e;
+        public static final int calendarColor=0x7f0a0032;
+        public static final int eventDate=0x7f0a0035;
+        public static final int eventDetailBreak=0x7f0a002a;
+        public static final int eventDetailCalendarColor=0x7f0a0028;
+        public static final int eventDetailRingerIcon=0x7f0a0027;
+        public static final int eventDetailsText=0x7f0a0026;
+        public static final int eventListItem=0x7f0a0031;
         public static final int eventListTitle=0x7f0a000f;
         public static final int eventListView=0x7f0a0010;
-        public static final int eventText=0x7f0a0031;
+        public static final int eventText=0x7f0a0034;
         public static final int eventTime=0x7f0a0002;
-        public static final int hourPicker=0x7f0a002c;
-        public static final int imageView1=0x7f0a0034;
-        public static final int linearLayout1=0x7f0a0028;
+        public static final int hourPicker=0x7f0a002f;
+        public static final int imageView1=0x7f0a0037;
+        public static final int linearLayout1=0x7f0a002b;
         public static final int lookaheadDaysDescription=0x7f0a000d;
         public static final int mediaSeekBar=0x7f0a0019;
-        public static final int minutePicker=0x7f0a002d;
+        public static final int minutePicker=0x7f0a0030;
         public static final int quickSilenceButton=0x7f0a000e;
         public static final int quickSilenceDescription=0x7f0a001f;
-        public static final int radioButton1=0x7f0a0029;
-        public static final int radioButton2=0x7f0a002a;
-        public static final int radioButton3=0x7f0a002b;
-        public static final int relative1=0x7f0a0022;
-        public static final int ringerState=0x7f0a0030;
+        public static final int radioButton1=0x7f0a002c;
+        public static final int radioButton2=0x7f0a002d;
+        public static final int radioButton3=0x7f0a002e;
+        public static final int relative1=0x7f0a0025;
+        public static final int ringerState=0x7f0a0033;
         public static final int ringerTypeDescription=0x7f0a0015;
         public static final int scrollView2=0x7f0a0001;
         public static final int silenceAllDayCheckBox=0x7f0a0008;
@@ -94,10 +94,13 @@ public final class R {
         public static final int textView7=0x7f0a0009;
         public static final int textView8=0x7f0a0014;
         public static final int textView9=0x7f0a001e;
+        public static final int updatesButton=0x7f0a0024;
+        public static final int updatesCheckBox=0x7f0a0023;
+        public static final int updatesWebView=0x7f0a0022;
         public static final int webView1=0x7f0a0000;
-        public static final int widget_duration=0x7f0a0035;
-        public static final int widget_layout=0x7f0a0033;
-        public static final int widget_text=0x7f0a0026;
+        public static final int widget_duration=0x7f0a0038;
+        public static final int widget_layout=0x7f0a0036;
+        public static final int widget_text=0x7f0a0029;
     }
     public static final class layout {
         public static final int activity_about=0x7f030000;
@@ -105,10 +108,11 @@ public final class R {
         public static final int activity_advanced_settings=0x7f030002;
         public static final int activity_main=0x7f030003;
         public static final int activity_settings=0x7f030004;
-        public static final int dialog_event_details=0x7f030005;
-        public static final int dialog_quicksilent=0x7f030006;
-        public static final int event_list_item=0x7f030007;
-        public static final int quicksilence_widget_layout=0x7f030008;
+        public static final int activity_updates=0x7f030005;
+        public static final int dialog_event_details=0x7f030006;
+        public static final int dialog_quicksilent=0x7f030007;
+        public static final int event_list_item=0x7f030008;
+        public static final int quicksilence_widget_layout=0x7f030009;
     }
     public static final class menu {
         public static final int about=0x7f090000;
@@ -124,14 +128,16 @@ public final class R {
          */
         public static final int action_settings=0x7f070001;
         public static final int action_settings_restore=0x7f070008;
-        public static final int all_day=0x7f070036;
+        public static final int all_day=0x7f070037;
         public static final int app_name=0x7f070000;
+        public static final int close=0x7f070033;
+        public static final int hide_updates=0x7f07003c;
         public static final int hours=0x7f070031;
         /**  Event List Item 
          */
-        public static final int icon_alt_text_normal=0x7f070033;
-        public static final int icon_alt_text_silent=0x7f070035;
-        public static final int icon_alt_text_vibrate=0x7f070034;
+        public static final int icon_alt_text_normal=0x7f070034;
+        public static final int icon_alt_text_silent=0x7f070036;
+        public static final int icon_alt_text_vibrate=0x7f070035;
         public static final int minutes=0x7f070032;
         /**  Generics 
          */
@@ -176,8 +182,8 @@ public final class R {
         public static final int pref_wakeup_enabled=0x7f07002d;
         /**  Dialog Event Details 
          */
-        public static final int ring=0x7f070037;
-        public static final int silent=0x7f070039;
+        public static final int ring=0x7f070038;
+        public static final int silent=0x7f07003a;
         /**  About Activity 
          */
         public static final int title_activity_about=0x7f070004;
@@ -191,11 +197,14 @@ public final class R {
          */
         public static final int title_activity_settings=0x7f070007;
         public static final int upcoming_events=0x7f070003;
-        public static final int vibrate=0x7f070038;
-        public static final int widget_duration=0x7f07003b;
+        /**  Updates Dialog 
+         */
+        public static final int updates_title=0x7f07003b;
+        public static final int vibrate=0x7f070039;
+        public static final int widget_duration=0x7f07003e;
         /**  Quick Silence Widget 
          */
-        public static final int widget_quicksilence=0x7f07003a;
+        public static final int widget_quicksilence=0x7f07003d;
     }
     public static final class style {
         /** 

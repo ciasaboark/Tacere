@@ -68,6 +68,7 @@
 	<string name="placeholder">Placeholder String</string>
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
+    <string name="close">Close</string>
     
     <!-- Event List Item -->
     <string name="icon_alt_text_normal">normal ringer icon</string>
@@ -79,6 +80,10 @@
     <string name="ring">Ring</string>
     <string name="vibrate">Vibrate</string>
     <string name="silent">Silent</string>
+    
+    <!-- Updates Dialog -->
+    <string name="updates_title">Recent Updates</string>
+    <string name="hide_updates">Hide this dialog until the next update</string>
     
     <!-- Quick Silence Widget -->
     <string name="widget_quicksilence">Quick Silence</string>

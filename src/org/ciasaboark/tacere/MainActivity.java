@@ -1,9 +1,9 @@
 /*
+ * Created by Jonathan Nelson
  * 
  * Copyright 2013 Jonathan Nelson
  *
  * Released under the BSD license.  For details see the COPYING file.
- * Created by Jonathan Nelson
 */
 
 package org.ciasaboark.tacere;
@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -118,6 +117,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		cursor = DBIface.getCursor(EventProvider.BEGIN);
 		cursorAdapter = new EventCursorAdapter(this, cursor);
 		lv.setAdapter(cursorAdapter);
+		
+		//display the updates dialog if it hasn't been shown yet
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, DefPrefs.UPDATES_CHECKBOX);
+		if (showUpdates) {
+			Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
+			startActivity(updatesIntent);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")

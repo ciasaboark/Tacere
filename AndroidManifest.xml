@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ciasaboark.tacere"
-    android:versionCode="2"
-    android:versionName="2.0" >
+    android:versionCode="3"
+    android:versionName="2.0.1" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -53,6 +53,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere2.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.UpdatesActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
 
         <service
