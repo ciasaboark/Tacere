@@ -85,6 +85,10 @@
     <string name="updates_title">Recent Updates</string>
     <string name="hide_updates">Hide this dialog until the next update</string>
     
+    <!-- Donation Thank You Dialog -->
+    <string name="donation_title">Thank You!</string>
+    <string name="donation_text">Thanks for your donation.  Your support is greatly appreciated.</string>
+    
     <!-- Quick Silence Widget -->
     <string name="widget_quicksilence">Quick Silence</string>
     <string name="widget_duration">%1$s%2$d minutes</string>		<!-- first parameter is string for hour length and "hour" -->

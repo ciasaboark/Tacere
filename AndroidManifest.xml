@@ -58,6 +58,10 @@
             android:name="org.ciasaboark.tacere.UpdatesActivity"
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.DonationActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" >
+        </activity>
 
         <service
             android:name="org.ciasaboark.tacere.PollService"

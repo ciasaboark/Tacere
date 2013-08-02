@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -45,6 +46,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		DBIface = DatabaseInterface.get(this);
+		
+		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		
+		//display the updates dialog if it hasn't been shown yet
+		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, true);
+		if (showUpdates) {
+			Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
+			startActivity(updatesIntent);
+		}
 	}
 
 	@Override
@@ -118,13 +128,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		cursorAdapter = new EventCursorAdapter(this, cursor);
 		lv.setAdapter(cursorAdapter);
 		
-		//display the updates dialog if it hasn't been shown yet
+		//display the "thank you" dialog once if the donation key is installed
 		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, DefPrefs.UPDATES_CHECKBOX);
-		if (showUpdates) {
-			Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
-			startActivity(updatesIntent);
+		boolean show_donation_thanks = preferences.getBoolean("show_donation_thanks", DefPrefs.SHOW_DONATION_THANKS);
+		if (show_donation_thanks) {
+			PackageManager manager = getPackageManager();
+			if (manager.checkSignatures("org.ciasaboark.tacere", "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH) {
+			    Intent donationIntent = new Intent(getApplicationContext(), DonationActivity.class);
+			    startActivity(donationIntent);
+			}
 		}
+		
 	}
 	
 	@SuppressWarnings("deprecation")

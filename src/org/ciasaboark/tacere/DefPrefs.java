@@ -27,5 +27,6 @@ public class DefPrefs {
 	public static final int 	NOTIFICATION_ID = 1;			//an id to reference all notifications
 	public static final int		LOOKAHEAD_DAYS = 7;
 	public static final boolean UPDATES_CHECKBOX = true;
-	public static final String  UPDATES_VERSION = "2.0";	//we don't track minor version changes when showing the updates dialog
+	public static final String  UPDATES_VERSION = "2.0.1";
+	public static final boolean SHOW_DONATION_THANKS = true;
 }
