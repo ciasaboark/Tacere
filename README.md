@@ -12,6 +12,10 @@ Tacere is available on the <a href="https://play.google.com/store/apps/details?i
 ###Authors
 <a href="https://github.com/ciasaboark">Jonathan Nelson</a>
 
+###Screenshots
+![Main Activity](https://github.com/ciasaboark/Tacere/blob/master/web/device-2013-07-29-211444.png)
+![Notification](https://github.com/ciasaboark/Tacere/blob/master/web/device-2013-08-01-143025.png)
+
 ###License
 Tacere is released under the BSD license
 Copyright (c) 2013, Jonathan Nelson
