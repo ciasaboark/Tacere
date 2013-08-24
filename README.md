@@ -1,4 +1,4 @@
-![Logo](assets/icon.png) Tacere
+![Logo](https://raw.github.com/ciasaboark/Tacere/master/assets/icon.png) Tacere
 ======
 
 
