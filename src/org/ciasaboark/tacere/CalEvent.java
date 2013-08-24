@@ -17,8 +17,8 @@ import android.content.Context;
 public class CalEvent {
 	private static final String TAG = "CalEvent";
 	
-	private Integer id;
-	private Integer cal_id;
+	private Integer instanceId;
+	private Integer eventId;
 	private String title;
 	private Long begin;
 	private Long end;		//in milliseconds from epoch
@@ -41,8 +41,8 @@ public class CalEvent {
 	
 	public CalEvent(Context c) {
 		super();
-		this.id = null;
-		this.cal_id = null;
+		this.instanceId = null;
+		this.eventId = null;
 		this.title = null;
 		this.begin = null;
 		this.end = null;
@@ -120,11 +120,11 @@ public class CalEvent {
 	}
 	
 	public Integer getCal_id() {
-		return cal_id;
+		return eventId;
 	}
 
 	public void setCal_id(Integer cal_id) {
-		this.cal_id = cal_id;
+		this.eventId = cal_id;
 	}
 
 	public Long getEnd() {
@@ -136,11 +136,11 @@ public class CalEvent {
 	}
 	
 	public Integer getId() {
-		return id;
+		return instanceId;
 	}
 
 	public void setId(Integer id) {
-		this.id = id;
+		this.instanceId = id;
 	}
 	
 	public String getLocalBeginTime() {
@@ -188,7 +188,7 @@ public class CalEvent {
 	
 	public boolean isValid() {
 		boolean result = false;
-		if (title != null && id != null && begin != null && end != null
+		if (title != null && instanceId != null && begin != null && end != null
 				&& isFreeTime != null && isAllDay != null) {
 			result = true;
 		}
