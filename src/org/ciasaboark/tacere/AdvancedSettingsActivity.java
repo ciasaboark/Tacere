@@ -234,11 +234,11 @@ public class AdvancedSettingsActivity extends Activity {
 	     number.setMaxValue(nums.length-1);
 	     number.setWrapSelectorWheel(false);
 	     number.setDisplayedValues(nums);
-	     number.setValue(lookaheadDays + 1);
+	     number.setValue(lookaheadDays);
 		
 	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 	    	 public void onClick(DialogInterface dialog, int whichButton) {
-	    		 lookaheadDays = number.getValue() - 1;
+	    		 lookaheadDays = number.getValue();
 	    		 saveSettings();
 	    		 refreshDisplay();
 	    	 }

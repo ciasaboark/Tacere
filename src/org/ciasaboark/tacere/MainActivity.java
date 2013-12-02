@@ -261,6 +261,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			ImageView eventIV = (ImageView)view.findViewById(R.id.ringerState);
 			Integer thisRinger = thisEvent.getRingerType();
 		
+			//TODO show a muted icon to indicate the default action (if the event will trigger silencing)
+			//otherwise show a colored icon to indicate that this event is different 
 			if (thisRinger == CalEvent.RINGER_TYPE_NORMAL) {
 				eventIV.setImageResource(R.drawable.ic_state_normal);
 			} else if (thisRinger == CalEvent.RINGER_TYPE_VIBRATE) {

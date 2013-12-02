@@ -36,6 +36,8 @@ public class PollService extends IntentService {
 	private int alarmVolume;
 	private int bufferMinutes;
 	private int lookaheadDays;
+	private int quickSilenceMinutes;
+	private int quickSilenceHours;
 	
 	private static final long TEN_SECONDS = 10000;
 	private DatabaseInterface DBIface = DatabaseInterface.get(this);
@@ -61,6 +63,8 @@ public class PollService extends IntentService {
 		
 		//pull extra info (if any) from the incoming intent
 		String requestType = "";
+
+		//TODO is DefPrefs.REFRESH_INTERVAL needed anymore?
 		int duration = DefPrefs.REFRESH_INTERVAL;
 		if (intent.getExtras() != null) {
 			//for some reason intents that have no extras are still getting through this check
@@ -88,7 +92,8 @@ public class PollService extends IntentService {
 			
 			//when the quick silence duration is over the device should wake regardless
 			//+ of the user settings
-			long wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_MINUTE * duration;
+			long wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_MINUTE * (quickSilenceMinutes + (quickSilenceHours * 60));
+			//TODO check here to make sure scheduling is working
 			scheduleAlarmAt(wakeAt, "cancel");
 			
 			AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -110,7 +115,7 @@ public class PollService extends IntentService {
 			sb.append(min + " min. Touch to cancel");
 			
 			//FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new pending intent
-			PendingIntent pendIntent = PendingIntent.getService(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+			PendingIntent pendIntent = PendingIntent.getService(context, DefPrefs.RC_NOTIFICATION, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(getApplicationContext())
 				.setContentTitle("Tacere: Quick Silence")
 				.setContentText(sb.toString())
@@ -166,7 +171,7 @@ public class PollService extends IntentService {
 					notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	
 					//FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new pending intent
-					PendingIntent pendIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+					PendingIntent pendIntent = PendingIntent.getActivity(context, DefPrefs.RC_NOTIFICATION, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 					NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(getApplicationContext())
 						.setContentTitle("Tacere: Event active")
 						.setContentText(nextEvent.toString())
@@ -248,16 +253,31 @@ public class PollService extends IntentService {
 	}
 	
 	private void scheduleAlarmAt(long time, String type) {
-		Intent i = new Intent(this, PollService.class);
+//		Intent i = new Intent(getApplicationContext(), PollService.class);
+//		i.putExtra("type", "cancelQuickSilence");
+		
+		Intent i = new Intent(getApplicationContext(), PollService.class);
 		if (type.equals("cancel")) {
-			i.putExtra("type", "cancelQuickSilent");
+			i.putExtra("type", "cancelQuickSilence");
 		}
 		
 		if (time < 0) {
 			throw new IllegalArgumentException("PollService:scheduleAlarmAt not given valid time");
 		}
 		
-		PendingIntent pintent = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+		//note that alarm manager allows multiple pending intents to be scheduled per app
+		//+ but only if each intent has a unique request code.  Since we want to schedule
+		//+ wakeups for ending quicksilent durations as well as starting events we check
+		//+ the type and assign a different requestCode
+		//default to 0
+		int requestCode = 0;
+		if (type.equals("cancel")) {
+			requestCode = DefPrefs.RC_QUICKSILENT;
+		} else if (type.equals("normal")) {
+			requestCode = DefPrefs.RC_EVENT;
+		}
+		
+		PendingIntent pintent = PendingIntent.getService(this, requestCode, i, PendingIntent.FLAG_CANCEL_CURRENT);
 		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 		alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
 	}
@@ -314,10 +334,13 @@ public class PollService extends IntentService {
 	}
 	
 	private void cancelAlarm() {
-		Intent i = new Intent(this, PollService.class);
-		PendingIntent pintent = PendingIntent.getService(this, 0, i, 0);
-		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-		alarm.cancel(pintent);
+		//there could be multiple alarms scheduled, we have to cancel all of them
+		for (int requestCode = 0; requestCode <= 4; requestCode++) {
+			Intent i = new Intent(this, PollService.class);
+			PendingIntent pintent = PendingIntent.getService(this, requestCode, i, 0);
+			AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+			alarm.cancel(pintent);
+		}
 	}
 	
 	private void readSettings() {
@@ -332,6 +355,8 @@ public class PollService extends IntentService {
 		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
 		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
+		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
+		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
 	}
 	
 	private void restoreVolumes() {
