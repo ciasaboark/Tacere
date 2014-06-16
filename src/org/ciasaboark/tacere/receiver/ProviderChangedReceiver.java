@@ -6,21 +6,23 @@
  * Released under the BSD license.  For details see the COPYING file.
 */
 
-package org.ciasaboark.tacere;
+package org.ciasaboark.tacere.receiver;
+
+import org.ciasaboark.tacere.service.PollService;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
-public class BootCompletedReceiver extends BroadcastReceiver {
-	
-	//private static final String TAG = "PollServiceReceiver";
+public class ProviderChangedReceiver extends BroadcastReceiver {
+	private static final String TAG = "ProviderChangedReceiver";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.d(TAG, "received broadcast intent, waking service");
 		Intent i = new Intent(context, PollService.class);
-		i.putExtra("type", "firstWake");
+		i.putExtra("type", "providerChanged");
 		context.startService(i);
 	}
-
 }

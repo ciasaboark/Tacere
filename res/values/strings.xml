@@ -17,6 +17,7 @@
     <!-- Settings Activity -->
     <string name="title_activity_settings">Settings</string>
     <string name="action_settings_restore">Restore Defaults</string>
+    <string name="action_about_updates">Updates</string>
     <string name="pref_general_header">GENERAL</string>
     <string name="pref_volumes_header">VOLUMES</string>
     <string name="pref_quick_silence_header">INTERVALS</string>
@@ -54,7 +55,7 @@
     <string name="pref_list_days_title">Lookahead</string>
     <string name="pref_wake_device_title">Wake Device</string>
     
-	<string name="pref_silence_free_enabled">Silence during events marked as free</string>
+	<string name="pref_silence_free_enabled">Silence during events marked as available</string>
 	<string name="pref_silence_free_disabled">Events marked as free will be ignored</string>
 	<string name="pref_all_day_enabled">Silence during all day events</string>
 	<string name="pref_all_day_disabled">All day events will be ignored</string>

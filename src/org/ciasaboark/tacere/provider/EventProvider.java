@@ -6,7 +6,7 @@
  * Released under the BSD license.  For details see the COPYING file.
 */
 
-package org.ciasaboark.tacere;
+package org.ciasaboark.tacere.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;

@@ -8,6 +8,10 @@
 
 package org.ciasaboark.tacere;
 
+import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.provider.QuickSilenceProvider;
+import org.ciasaboark.tacere.service.PollService;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -32,6 +36,7 @@ import android.widget.Toast;
 
 
 public class SettingsActivity extends Activity {
+	@SuppressWarnings("unused")
 	private static final String TAG = "Settings";
 	
 	private boolean isActivated;

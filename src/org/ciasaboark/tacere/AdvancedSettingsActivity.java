@@ -4,9 +4,11 @@
  * Copyright 2013 Jonathan Nelson
  *
  * Released under the BSD license.  For details see the COPYING file.
-*/
+ */
 
 package org.ciasaboark.tacere;
+
+import org.ciasaboark.tacere.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,8 +26,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 public class AdvancedSettingsActivity extends Activity {
-//	private static final String TAG = "AdvancedSettingsActivity";
-	
+	// private static final String TAG = "AdvancedSettingsActivity";
+
 	private boolean silenceFreeTime;
 	private boolean silenceAllDay;
 	private int refreshInterval;
@@ -38,11 +40,11 @@ public class AdvancedSettingsActivity extends Activity {
 		setContentView(R.layout.activity_advanced_settings);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		//read the saved preferences
+
+		// read the saved preferences
 		readSettings();
-		
-		refreshDisplay();	
+
+		refreshDisplay();
 	}
 
 	/**
@@ -80,15 +82,15 @@ public class AdvancedSettingsActivity extends Activity {
 	}
 
 	public void onPause() {
-		//save all changes to the preferences
+		// save all changes to the preferences
 		saveSettings();
 		super.onPause();
 	}
-	
+
 	private void refreshDisplay() {
-		//the silence free time state toggle
-		CheckBox freeCB = (CheckBox)findViewById(R.id.silenceFreeTimeCheckBox);
-		TextView freeTV = (TextView)findViewById(R.id.silenceFreeTimeDescription);
+		// the silence free time state toggle
+		CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
+		TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
 		if (silenceFreeTime) {
 			freeCB.setChecked(true);
 			freeTV.setText(R.string.pref_silence_free_enabled);
@@ -96,10 +98,10 @@ public class AdvancedSettingsActivity extends Activity {
 			freeCB.setChecked(false);
 			freeTV.setText(R.string.pref_silence_free_disabled);
 		}
-		
-		//the silence all day state toggle
-		CheckBox dayCB = (CheckBox)findViewById(R.id.silenceAllDayCheckBox);
-		TextView dayTV = (TextView)findViewById(R.id.silenceAllDayDescription);
+
+		// the silence all day state toggle
+		CheckBox dayCB = (CheckBox) findViewById(R.id.silenceAllDayCheckBox);
+		TextView dayTV = (TextView) findViewById(R.id.silenceAllDayDescription);
 		if (silenceAllDay) {
 			dayCB.setChecked(true);
 			dayTV.setText(R.string.pref_all_day_enabled);
@@ -107,29 +109,31 @@ public class AdvancedSettingsActivity extends Activity {
 			dayCB.setChecked(false);
 			dayTV.setText(R.string.pref_all_day_disabled);
 		}
-		
-		//the event buffer button
-		TextView bufferTV = (TextView)findViewById(R.id.bufferMinutesDescription);
+
+		// the event buffer button
+		TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
 		String bufferText = getResources().getString(R.string.pref_buffer_minutes);
 		bufferTV.setText(String.format(bufferText, bufferMinutes));
-		
-		//the lookahead interval button
-		TextView lookaheadTV = (TextView)findViewById(R.id.lookaheadDaysDescription);
+
+		// the lookahead interval button
+		TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
 		String lookaheadText = getResources().getString(R.string.pref_list_days);
 		lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
 	}
 
 	private void readSettings() {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime",DefPrefs.SILENCE_FREE_TIME);
+		SharedPreferences preferences = this.getSharedPreferences(
+				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		silenceFreeTime = preferences.getBoolean("silenceFreeTime", DefPrefs.SILENCE_FREE_TIME);
 		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
 		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.REFRESH_INTERVAL);
 		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
 		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
 	}
-	
+
 	private void saveSettings() {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		SharedPreferences preferences = this.getSharedPreferences(
+				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean("silenceFreeTime", silenceFreeTime);
 		editor.putBoolean("silenceAllDay", silenceAllDay);
@@ -140,117 +144,115 @@ public class AdvancedSettingsActivity extends Activity {
 		editor.commit();
 	}
 
-
-
 	public void onClickSilenceFreeTime(View v) {
 		silenceFreeTime = !silenceFreeTime;
 		refreshDisplay();
 	}
-	
+
 	public void onClickSilenceAllDay(View v) {
 		silenceAllDay = !silenceAllDay;
 		refreshDisplay();
 	}
-	
+
 	public void onClickRefreshInterval(View v) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Refresh Interval");
 		final NumberPicker number = new NumberPicker(this);
 		String[] nums = new String[120];
-		
-		for(int i = 0; i < nums.length; i++) {
-            nums[i] = Integer.toString(i + 1);
+
+		for (int i = 0; i < nums.length; i++) {
+			nums[i] = Integer.toString(i + 1);
 		}
 
 		number.setMinValue(1);
-		number.setMaxValue(nums.length-1);
+		number.setMaxValue(nums.length - 1);
 		number.setWrapSelectorWheel(false);
 		number.setDisplayedValues(nums);
 		number.setValue(refreshInterval);
-		
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
-	          	refreshInterval = number.getValue();
-	          	saveSettings();
-	 	        refreshDisplay();
-	          }
-	        });
 
-	        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	          public void onClick(DialogInterface dialog, int whichButton) {
-	            // Do nothing
-	          }
-	        });
-	        
-	        alert.setView(number);
-	        alert.show();       
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				refreshInterval = number.getValue();
+				saveSettings();
+				refreshDisplay();
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Do nothing
+			}
+		});
+
+		alert.setView(number);
+		alert.show();
 	}
-	
+
 	public void onClickBufferMinutes(View v) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Buffer Minutes");
 		final NumberPicker number = new NumberPicker(this);
 		String[] nums = new String[32];
-		
-		for(int i = 0; i < nums.length; i++) {
-            nums[i] = Integer.toString(i);
+
+		for (int i = 0; i < nums.length; i++) {
+			nums[i] = Integer.toString(i);
 		}
 
-	     number.setMinValue(1);
-	     number.setMaxValue(nums.length-1);
-	     number.setWrapSelectorWheel(false);
-	     number.setDisplayedValues(nums);
-	     number.setValue(bufferMinutes + 1);
-		
-	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	    	 public void onClick(DialogInterface dialog, int whichButton) {
-	    		 bufferMinutes = number.getValue() - 1;
-	    		 saveSettings();
-	    		 refreshDisplay();
-	    	 }
-	     });
+		number.setMinValue(1);
+		number.setMaxValue(nums.length - 1);
+		number.setWrapSelectorWheel(false);
+		number.setDisplayedValues(nums);
+		number.setValue(bufferMinutes + 1);
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int whichButton) {
-        		// Do nothing
-        	}
-        });
-	        
-        alert.setView(number);
-        alert.show();       
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				bufferMinutes = number.getValue() - 1;
+				saveSettings();
+				refreshDisplay();
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Do nothing
+			}
+		});
+
+		alert.setView(number);
+		alert.show();
 	}
-	
+
 	public void onClickListDays(View v) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Lookahead Interval");
 		final NumberPicker number = new NumberPicker(this);
 		String[] nums = new String[32];
-		
-		for(int i = 0; i < nums.length; i++) {
-            nums[i] = Integer.toString(i + 1);
+
+		for (int i = 0; i < nums.length; i++) {
+			nums[i] = Integer.toString(i + 1);
 		}
 
-	     number.setMinValue(1);
-	     number.setMaxValue(nums.length-1);
-	     number.setWrapSelectorWheel(false);
-	     number.setDisplayedValues(nums);
-	     number.setValue(lookaheadDays);
-		
-	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	    	 public void onClick(DialogInterface dialog, int whichButton) {
-	    		 lookaheadDays = number.getValue();
-	    		 saveSettings();
-	    		 refreshDisplay();
-	    	 }
-	     });
+		number.setMinValue(1);
+		number.setMaxValue(nums.length - 1);
+		number.setWrapSelectorWheel(false);
+		number.setDisplayedValues(nums);
+		number.setValue(lookaheadDays);
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int whichButton) {
-        		// Do nothing
-        	}
-        });
-	        
-        alert.setView(number);
-        alert.show();       
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				lookaheadDays = number.getValue();
+				saveSettings();
+				refreshDisplay();
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Do nothing
+			}
+		});
+
+		alert.setView(number);
+		alert.show();
 	}
 }

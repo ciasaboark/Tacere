@@ -6,7 +6,7 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context=".AboutActivityLicense" >
+    tools:context=".AboutLicenseActivity" >
 
 <WebView
     android:id="@+id/webView1"

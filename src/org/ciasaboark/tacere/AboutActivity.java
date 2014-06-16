@@ -4,9 +4,11 @@
  * Copyright 2013 Jonathan Nelson
  *
  * Released under the BSD license.  For details see the COPYING file.
-*/
+ */
 
 package org.ciasaboark.tacere;
+
+import org.ciasaboark.tacere.R;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -26,21 +28,21 @@ public class AboutActivity extends Activity {
 		setContentView(R.layout.activity_about);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		WebView wv = (WebView)findViewById(R.id.webView1); 
-        wv.loadUrl("file:///android_asset/about.html");
-        
-        //All links should open in the default browser, not this WebView
-        //NOTE: this does not seem to work for POST links.
-        wv.setWebViewClient(new WebViewClient() {
-        	@Override
+
+		WebView wv = (WebView) findViewById(R.id.webView1);
+		wv.loadUrl("file:///android_asset/about.html");
+
+		// All links should open in the default browser, not this WebView
+		// NOTE: this does not seem to work for POST links.
+		wv.setWebViewClient(new WebViewClient() {
+			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        		Intent i = new Intent(Intent.ACTION_VIEW);
-        		i.setData(Uri.parse(url));
-        		startActivity(i);
-        		return true;
-        	}
-        });
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(url));
+				startActivity(i);
+				return true;
+			}
+		});
 	}
 
 	/**
@@ -64,11 +66,10 @@ public class AboutActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_about_license:
-			Intent i = new Intent(this, AboutActivityLicense.class);
+			Intent i = new Intent(this, org.ciasaboark.tacere.AboutLicenseActivity.class);
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
 			return true;
-			
 		case android.R.id.home:
 			// This ID represents the Home or Up button. In the case of this
 			// activity, the Up button is shown. Use NavUtils to allow users
@@ -78,6 +79,10 @@ public class AboutActivity extends Activity {
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
 			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		case R.id.action_about_updates:
+			Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
+			startActivity(updatesIntent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

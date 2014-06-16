@@ -5,4 +5,10 @@
         android:showAsAction="always|withText"
        	android:icon="@drawable/copyright_icon"
         android:title="@string/action_about_license" />
+  <item
+        android:id="@+id/action_about_updates"
+        android:orderInCategory="100"
+        android:showAsAction="always|withText"
+       	android:icon="@drawable/history_icon"
+        android:title="@string/action_about_updates" />
 </menu>

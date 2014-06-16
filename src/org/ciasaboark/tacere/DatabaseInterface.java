@@ -10,6 +10,8 @@ package org.ciasaboark.tacere;
 
 import java.util.ArrayList;
 
+import org.ciasaboark.tacere.provider.EventProvider;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -236,12 +238,12 @@ public class DatabaseInterface {
 			cv.put(EventProvider.DESCRIPTION, e.getDescription());
 			cv.put(EventProvider.RINGER_TYPE, e.getRingerType());
 			cv.put(EventProvider.DISPLAY_COLOR, e.getDisplayColor());
-			if (e.getIsAllDay()) {
+			if (e.isAllDay()) {
 				cv.put(EventProvider.IS_ALLDAY, 1);
 			} else {
 				cv.put(EventProvider.IS_ALLDAY, 0);
 			}
-			if (e.getIsFreeTime()) {
+			if (e.isFreeTime()) {
 				cv.put(EventProvider.IS_FREETIME, 0);
 			} else {
 				cv.put(EventProvider.IS_FREETIME, 1);
@@ -284,7 +286,10 @@ public class DatabaseInterface {
 			do {
 				int id = c.getInt(c.getColumnIndex(EventProvider._ID));
 				CalEvent e = getEvent(id);
-				Log.i(TAG, "Event id:" + e.getCal_id() + " Instance id:" + e.getId() + " Title:" + e.getTitle() + " Begins:" + e.getLocalBeginDate() + " - " + e.getLocalBeginTime());
+				Log.i(TAG,
+						"Event id:" + e.getCal_id() + " Instance id:" + e.getId() + " Title:"
+								+ e.getTitle() + " Begins:" + e.getLocalBeginDate() + " - "
+								+ e.getLocalBeginTime());
 			} while (c.moveToNext());
 		}
 		c.close();

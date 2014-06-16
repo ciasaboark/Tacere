@@ -13,15 +13,16 @@
 
     <RelativeLayout
         android:id="@+id/calendarColor"
-        android:layout_width="7dp"
+        android:layout_width="12dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:minWidth="10dp"
         android:minHeight="50dp"
-        android:padding="10dp" >
+        android:minWidth="10dp"
+        android:padding="10dp"
+        android:paddingRight="10dp" >
 
     </RelativeLayout>
 

@@ -7,6 +7,8 @@
 */
 package org.ciasaboark.tacere;
 
+import org.ciasaboark.tacere.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -8,6 +8,8 @@
 
 package org.ciasaboark.tacere;
 
+import org.ciasaboark.tacere.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +32,7 @@ public class UpdatesActivity extends Activity {
     @Override
     public void onStart() {
     	super.onStart();
+    	this.setTitle(R.string.updates_title);
     	WebView webView = (WebView)findViewById(R.id.updatesWebView);
     	webView.loadUrl("file:///android_asset/updates.html");
         

@@ -4,21 +4,23 @@
  * Copyright 2013 Jonathan Nelson
  *
  * Released under the BSD license.  For details see the COPYING file.
-*/
+ */
 
 package org.ciasaboark.tacere;
 
-import android.net.Uri;
-import android.os.Bundle;
+import org.ciasaboark.tacere.R;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.support.v4.app.NavUtils;
 
-public class AboutActivityLicense extends Activity {
+public class AboutLicenseActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,19 +28,18 @@ public class AboutActivityLicense extends Activity {
 		setContentView(R.layout.activity_about_activity_license);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		WebView wv = (WebView)findViewById(R.id.webView1); 
-        wv.loadUrl("file:///android_asset/license.html");
-        
-        //All links should open in the default browser, not this WebView
-        wv.setWebViewClient(new WebViewClient() {
-        	@Override
+
+		WebView wv = (WebView) findViewById(R.id.webView1);
+		wv.loadUrl("file:///android_asset/license.html");
+
+		// All links should open in the default browser, not this WebView
+		wv.setWebViewClient(new WebViewClient() {
+			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        		view.getContext().startActivity(
-        			new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        		return true;
-        	}
-        });
+				view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+				return true;
+			}
+		});
 	}
 
 	/**
