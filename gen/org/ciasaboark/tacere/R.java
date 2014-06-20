@@ -38,13 +38,12 @@ public final class R {
         public static final int ic_state_normal=0x7f020006;
         public static final int ic_state_silent=0x7f020007;
         public static final int ic_state_vibrate=0x7f020008;
-        public static final int inco_icon=0x7f020009;
-        public static final int info_icon=0x7f02000a;
-        public static final int normal=0x7f02000b;
-        public static final int pressed=0x7f02000c;
-        public static final int rec_shape=0x7f02000d;
-        public static final int small_mono=0x7f02000e;
-        public static final int social_person=0x7f02000f;
+        public static final int info_icon=0x7f020009;
+        public static final int normal=0x7f02000a;
+        public static final int pressed=0x7f02000b;
+        public static final int rec_shape=0x7f02000c;
+        public static final int small_mono=0x7f02000d;
+        public static final int social_person=0x7f02000e;
     }
     public static final class id {
         public static final int TextView02=0x7f0b000c;

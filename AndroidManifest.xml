@@ -5,7 +5,7 @@
     android:versionName="2.0.4" >
 
     <uses-sdk
-        android:minSdkVersion="15"
+        android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
@@ -68,6 +68,20 @@
             android:exported="false" >
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.PollService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.SkipEventService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.SkipEventService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.ResetEventService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.SkipEventService" />
             </intent-filter>
         </service>
 

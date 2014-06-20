@@ -17,6 +17,7 @@ import org.ciasaboark.tacere.provider.EventProvider;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -26,6 +27,7 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class PollService extends IntentService {
@@ -189,11 +191,37 @@ public class PollService extends IntentService {
 					PendingIntent pendIntent = PendingIntent.getActivity(context,
 							DefPrefs.RC_NOTIFICATION, notificationIntent,
 							PendingIntent.FLAG_CANCEL_CURRENT);
-					NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
-							getApplicationContext()).setContentTitle("Tacere: Event active")
+
+					
+
+					Notification.Builder notBuilder = new Notification.Builder(this)
+							.setContentTitle("Tacere: Event active")
 							.setContentText(nextEvent.toString())
-							.setSmallIcon(R.drawable.small_mono).setAutoCancel(false)
-							.setOnlyAlertOnce(true).setOngoing(true).setContentIntent(pendIntent);
+							.setSmallIcon(R.drawable.small_mono)
+							.setAutoCancel(false)
+							.setOnlyAlertOnce(true)
+							.setOngoing(true)
+							.setContentIntent(pendIntent);
+					
+					if (nextEvent.getRingerType() != CalEvent.RINGER_TYPE_IGNORE) {
+						//this intent will be attached to the button on the notification
+						Intent skipEventIntent = new Intent(this, SkipEventService.class);
+						skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", nextEvent.getId());
+						PendingIntent skipEventPendIntent = PendingIntent.getService(this, 0,
+								skipEventIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+						
+						notBuilder.addAction(R.drawable.ic_state_normal, "Skip this event",
+								skipEventPendIntent);
+					} else {
+						//this intent will be attached to the button on the notification
+						Intent skipEventIntent = new Intent(this, ResetEventService.class);
+						skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", nextEvent.getId());
+						PendingIntent skipEventPendIntent = PendingIntent.getService(this, 0,
+								skipEventIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+						
+						notBuilder.addAction(R.drawable.ic_state_normal, "Enable auto silencing",
+								skipEventPendIntent);
+					}
 
 					// a ringer type of 0 means we should use the default setting
 					int ringType = nextEvent.getRingerType();
@@ -268,6 +296,8 @@ public class PollService extends IntentService {
 			cancelAlarm();
 			shutdown();
 		}
+		
+		notifyCursorAdapterDataChanged();
 	}
 
 	private void cancelNotification() {
@@ -343,8 +373,8 @@ public class PollService extends IntentService {
 				if (silenceFreeTime && e.isFreeTime() && !e.isAllDay()) {
 					free_notAllDay = true;
 				}
-				
-				//events with a custom ringer set should always use that ringer
+
+				// events with a custom ringer set should always use that ringer
 				boolean isCustomRingerSet = false;
 				if (e.getRingerType() != CalEvent.RINGER_TYPE_UNDEFINED) {
 					isCustomRingerSet = true;
@@ -397,18 +427,18 @@ public class PollService extends IntentService {
 				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 
 		switch (preferences.getInt("curRinger", -1)) {
-		case AudioManager.RINGER_MODE_NORMAL:
-			audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-			break;
-		case AudioManager.RINGER_MODE_SILENT:
-			audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			break;
-		case AudioManager.RINGER_MODE_VIBRATE:
-			audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-			break;
-		default:
-			// by default the ringer will be set back to normal
-			audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+			case AudioManager.RINGER_MODE_NORMAL:
+				audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				break;
+			case AudioManager.RINGER_MODE_SILENT:
+				audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+				break;
+			case AudioManager.RINGER_MODE_VIBRATE:
+				audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+				break;
+			default:
+				// by default the ringer will be set back to normal
+				audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 		}
 		// remove the stored ringer state
 		preferences.edit().remove("curRinger").commit();
@@ -435,15 +465,18 @@ public class PollService extends IntentService {
 		}
 
 		switch (ringType) {
-		case CalEvent.RINGER_TYPE_NORMAL:
-			audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-			break;
-		case CalEvent.RINGER_TYPE_VIBRATE:
-			audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-			break;
-		case CalEvent.RINGER_TYPE_SILENT:
-			audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			break;
+			case CalEvent.RINGER_TYPE_NORMAL:
+				audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				break;
+			case CalEvent.RINGER_TYPE_VIBRATE:
+				audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+				break;
+			case CalEvent.RINGER_TYPE_SILENT:
+				audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+				break;
+			case CalEvent.RINGER_TYPE_IGNORE:
+				audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				break;
 		}
 	}
 
@@ -481,6 +514,14 @@ public class PollService extends IntentService {
 
 	private void shutdown() {
 		stopSelf();
+	}
+	
+	private void notifyCursorAdapterDataChanged() {
+		Log.d("sender", "Broadcasting message");
+		Intent intent = new Intent("custom-event-name");
+		// You can also include some extra data.
+		intent.putExtra("message", "This is my message!");
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
 }

@@ -12,16 +12,18 @@ import org.ciasaboark.tacere.provider.EventProvider;
 import org.ciasaboark.tacere.service.PollService;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +54,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private Cursor cursor;
 	private DatabaseInterface DBIface;
 	private ListView lv = null;
+	
+	private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+		private static final String TAG = "messageReceiver";
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String message = intent.getStringExtra("message");
+			cursorAdapter.notifyDataSetChanged();
+			Log.d(TAG, message);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +74,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		SharedPreferences preferences = this.getSharedPreferences(
 				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		
+		//register to receive broadcast messages
+		LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("custom-event-name"));
 
 		// display the updates dialog if it hasn't been shown yet
 		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, true);
@@ -246,7 +262,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			e.printStackTrace();
 		}
 	}
-
+	
 	private class EventCursorAdapter extends CursorAdapter {
 		private LayoutInflater mLayoutInflator;
 		private DatabaseInterface DBIface;
