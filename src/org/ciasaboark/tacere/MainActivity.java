@@ -54,10 +54,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private Cursor cursor;
 	private DatabaseInterface DBIface;
 	private ListView lv = null;
-	
+
 	private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
 		private static final String TAG = "messageReceiver";
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String message = intent.getStringExtra("message");
@@ -74,9 +74,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		SharedPreferences preferences = this.getSharedPreferences(
 				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		
-		//register to receive broadcast messages
-		LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("custom-event-name"));
+
+		// register to receive broadcast messages
+		LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
+				new IntentFilter("custom-event-name"));
 
 		// display the updates dialog if it hasn't been shown yet
 		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, true);
@@ -178,8 +179,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		try {
 			CalEvent thisEvent = DBIface.getEvent((int) id);
 			int nextRingerType = thisEvent.getRingerType() + 1;
-			if (nextRingerType > CalEvent.RINGER_TYPE_SILENT) {
-				nextRingerType = CalEvent.RINGER_TYPE_NORMAL;
+			if (nextRingerType > CalEvent.RINGER.SILENT) {
+				nextRingerType = CalEvent.RINGER.NORMAL;
 			}
 			DBIface.setRingerType((int) id, nextRingerType);
 			lv.getAdapter().getView(position, view, lv);
@@ -199,7 +200,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		try {
 			CalEvent thisEvent = DBIface.getEvent((int) id);
-			DBIface.setRingerType((int) id, CalEvent.RINGER_TYPE_UNDEFINED);
+			DBIface.setRingerType((int) id, CalEvent.RINGER.UNDEFINED);
 			lv.getAdapter().getView(position, view, lv);
 			Toast.makeText(parent.getContext(), thisEvent.getTitle() + " reset to default ringer",
 					Toast.LENGTH_SHORT).show();
@@ -262,7 +263,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			e.printStackTrace();
 		}
 	}
-	
+
 	private class EventCursorAdapter extends CursorAdapter {
 		private LayoutInflater mLayoutInflator;
 		private DatabaseInterface DBIface;
@@ -341,22 +342,22 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			Drawable icon = null;
 
 			switch (ringerType) {
-				case CalEvent.RINGER_TYPE_NORMAL:
+				case CalEvent.RINGER.NORMAL:
 					icon = getResources().getDrawable(R.drawable.ic_state_normal);
 					break;
-				case CalEvent.RINGER_TYPE_SILENT:
+				case CalEvent.RINGER.SILENT:
 					icon = getResources().getDrawable(R.drawable.ic_state_silent);
 					break;
-				case CalEvent.RINGER_TYPE_VIBRATE:
+				case CalEvent.RINGER.VIBRATE:
 					icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
 					break;
-				case CalEvent.RINGER_TYPE_UNDEFINED:
+				case CalEvent.RINGER.UNDEFINED:
 					SharedPreferences preferences = ctx.getSharedPreferences(
 							"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 					int defaultRinger = preferences.getInt("ringerType", DefPrefs.RINGER_TYPE);
 					icon = getRingerIcon(ctx, defaultRinger, null);
 					break;
-				case CalEvent.RINGER_TYPE_IGNORE:
+				case CalEvent.RINGER.IGNORE:
 				default:
 					// events that should be ignored are given a blank icon
 					icon = getResources().getDrawable(R.drawable.blank);
@@ -381,8 +382,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 			// if a custom ringer is set then the event should silence, otherwise it depends on the
 			// event type and settings
-			if (event.getRingerType() == CalEvent.RINGER_TYPE_UNDEFINED) {
-				if ((event.isAllDay() && !silenceAllDay) || (event.isFreeTime() && !silenceFreeTime)) {
+			if (event.getRingerType() == CalEvent.RINGER.UNDEFINED) {
+				if ((event.isAllDay() && !silenceAllDay)
+						|| (event.isFreeTime() && !silenceFreeTime)) {
 					eventShouldSilence = false;
 				}
 			}
@@ -395,14 +397,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			int defaultColor = 0xFFE8E8E8;
 
 			if (eventShouldSilence(ctx, event)) {
-				if (event.getRingerType() != CalEvent.RINGER_TYPE_UNDEFINED) {
+				if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
 					// a custom ringer has been applied
 					icon = getRingerIcon(ctx, event.getRingerType(), event.getDisplayColor());
 				} else {
-					icon = getRingerIcon(ctx, CalEvent.RINGER_TYPE_UNDEFINED, defaultColor);
+					icon = getRingerIcon(ctx, CalEvent.RINGER.UNDEFINED, defaultColor);
 				}
 			} else {
-				icon = getRingerIcon(ctx, CalEvent.RINGER_TYPE_IGNORE, null);
+				icon = getRingerIcon(ctx, CalEvent.RINGER.IGNORE, null);
 			}
 
 			return icon;

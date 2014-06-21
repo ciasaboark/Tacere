@@ -29,11 +29,7 @@ public class CalEvent {
 	private Boolean isFreeTime;
 	private Boolean isAllDay;
 
-	public static final int RINGER_TYPE_UNDEFINED 	= 0;
-	public static final int RINGER_TYPE_NORMAL 		= 1;
-	public static final int RINGER_TYPE_VIBRATE		= 2;
-	public static final int RINGER_TYPE_SILENT 		= 3;
-	public static final int RINGER_TYPE_IGNORE 		= 4;
+	
 
 	public static final long MILLISECONDS_IN_SECOND = 1000;
 	public static final long MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
@@ -47,7 +43,7 @@ public class CalEvent {
 		this.begin 		= null;
 		this.end 		= null;
 		this.descr		= null;
-		this.ringerType = this.RINGER_TYPE_UNDEFINED;
+		this.ringerType = CalEvent.RINGER.UNDEFINED;
 		this.dispColor	= null;
 		this.isFreeTime = null;
 		this.isAllDay	= null;
@@ -194,5 +190,29 @@ public class CalEvent {
 			result = true;
 		}
 		return result;
+	}
+	
+	public class RINGER {
+		public static final int UNDEFINED 	= 0;
+		public static final int NORMAL 		= 1;
+		public static final int VIBRATE		= 2;
+		public static final int SILENT 		= 3;
+		public static final int IGNORE 		= 4;
+	}
+
+	/**
+	 * Check if this CalEvent is ongoing between the given times
+	 * @param beginTime
+	 * @param endTime
+	 * @return true if this event is ongoing between the startTime and endTime, false otherwise
+	 */
+	public boolean isActiveBetween(long startTime, long endTime) {
+		boolean isEventActive = false;
+		if (this.getEnd() > startTime) {
+			if (this.getBegin() < endTime) {
+				isEventActive = true;
+			}
+		}
+		return isEventActive;
 	}
 }

@@ -26,7 +26,7 @@ public class ResetEventService extends IntentService {
 			int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
 			if (eventId != -1) {
 				DatabaseInterface dbIface = DatabaseInterface.get(ctx);
-				dbIface.setRingerType(eventId, CalEvent.RINGER_TYPE_UNDEFINED);
+				dbIface.setRingerType(eventId, CalEvent.RINGER.UNDEFINED);
 				
 				Intent i = new Intent(this, PollService.class);
 				i.putExtra("type", "activityRestart");

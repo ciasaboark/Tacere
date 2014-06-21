@@ -26,7 +26,7 @@ public class SkipEventService extends IntentService {
 			int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
 			if (eventId != -1) {
 				DatabaseInterface dbIface = DatabaseInterface.get(ctx);
-				dbIface.setRingerType(eventId, CalEvent.RINGER_TYPE_IGNORE);
+				dbIface.setRingerType(eventId, CalEvent.RINGER.IGNORE);
 				
 				Intent i = new Intent(this, PollService.class);
 				i.putExtra("type", "activityRestart");
