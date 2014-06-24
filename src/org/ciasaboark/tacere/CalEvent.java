@@ -49,6 +49,14 @@ public class CalEvent {
 		this.isAllDay	= null;
 	}
 
+	public Integer getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(Integer instanceId) {
+		this.instanceId = instanceId;
+	}
+	
 	public Boolean isFreeTime() {
 		return isFreeTime;
 	}
@@ -214,5 +222,22 @@ public class CalEvent {
 			}
 		}
 		return isEventActive;
+	}
+	
+	public void setValuesFrom(CalEvent event) {
+		if (event == null) {
+			throw new IllegalArgumentException("given calendar event must not be null");
+		}
+		
+		this.begin = event.getBegin();
+		this.descr = event.getDescription();
+		this.dispColor = event.getDisplayColor();
+		this.end = event.getEnd();
+		this.eventId = event.getId();
+		this.instanceId = event.getInstanceId();
+		this.isAllDay = event.isAllDay();
+		this.isFreeTime = event.isFreeTime();
+		this.ringerType = event.getRingerType();
+		this.title = event.getTitle();
 	}
 }

@@ -8,7 +8,7 @@
 
 package org.ciasaboark.tacere;
 
-import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.prefs.Prefs;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 public class UpdatesActivity extends Activity {
+	private Prefs prefs = new Prefs(this);
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
@@ -50,7 +52,9 @@ public class UpdatesActivity extends Activity {
         
        final CheckBox checkBox = (CheckBox)findViewById(R.id.updatesCheckBox);
        checkBox.setText(R.string.hide_updates);
-       checkBox.setChecked(DefPrefs.UPDATES_CHECKBOX);
+       //TODO
+//       checkBox.setChecked(Defaults.UPDATES_CHECKBOX);
+       checkBox.setChecked(true);
        
        Button closeButton = (Button)findViewById(R.id.updatesButton);
        closeButton.setText(R.string.close);
@@ -60,7 +64,8 @@ public class UpdatesActivity extends Activity {
     		   boolean showUpdates = !checkBox.isChecked();
     		   SharedPreferences preferences = getApplicationContext().getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
     		   SharedPreferences.Editor editor = preferences.edit();
-    		   editor.putBoolean(DefPrefs.UPDATES_VERSION, showUpdates);
+    		   //TODO
+//    		   editor.putBoolean(Defaults.UPDATES_VERSION, showUpdates);
     		   editor.apply();
     		   finish();
     	   }

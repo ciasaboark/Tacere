@@ -8,7 +8,10 @@
 
 package org.ciasaboark.tacere;
 
-import org.ciasaboark.tacere.provider.EventProvider;
+import org.ciasaboark.tacere.database.Columns;
+import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.PollService;
 
 import android.app.Activity;
@@ -16,7 +19,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PorterDuff.Mode;
@@ -46,14 +49,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	@SuppressWarnings("unused")
 	private static final String TAG = "MainActivity";
 
-	private int quickSilenceMinutes;
-	private int quickSilenceHours;
-	private int lookaheadDays;
-	private int bufferMinutes;
+//	private int quickSilenceMinutes;
+//	private int quickSilenceHours;
+//	private int lookaheadDays;
+//	private int bufferMinutes;
+	
 	private EventCursorAdapter cursorAdapter;
 	private Cursor cursor;
 	private DatabaseInterface DBIface;
 	private ListView lv = null;
+	private Prefs prefs = new Prefs(this);
 
 	private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
 		private static final String TAG = "messageReceiver";
@@ -70,17 +75,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		DBIface = DatabaseInterface.get(this);
-
-		SharedPreferences preferences = this.getSharedPreferences(
-				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+		DBIface = DatabaseInterface.getInstance(this);
 
 		// register to receive broadcast messages
 		LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
 				new IntentFilter("custom-event-name"));
 
 		// display the updates dialog if it hasn't been shown yet
-		boolean showUpdates = preferences.getBoolean(DefPrefs.UPDATES_VERSION, true);
+		boolean showUpdates = prefs.changelogShouldBeShown();
 		if (showUpdates) {
 			Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
 			startActivity(updatesIntent);
@@ -102,21 +104,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		i.putExtra("type", "activityRestart");
 		startService(i);
 
-		readSettings();
-
 		// set up quick silence button
 		Button quickSettingsButton = (Button) findViewById(R.id.quickSilenceButton);
 		StringBuilder sb = new StringBuilder("Quick Silence ");
-		if (quickSilenceHours != 0) {
-			sb.append(quickSilenceHours + " hours, ");
+		if (prefs.getQuickSilenceHours() != 0) {
+			sb.append(prefs.getQuickSilenceHours() + " hours, ");
 		}
-		sb.append(quickSilenceMinutes + " minutes");
+		sb.append(prefs.getQuicksilenceMinutes() + " minutes");
 		quickSettingsButton.setText(sb.toString());
 		quickSettingsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// the length of time for the pollService to sleep in minutes
-				int duration = 60 * quickSilenceHours + quickSilenceMinutes;
+				int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
 
 				// an intent to send to PollService immediately
 				Intent i = new Intent(getApplicationContext(), PollService.class);
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			}
 		});
 
-		if (quickSilenceHours == 0 && quickSilenceMinutes == 0) {
+		if (prefs.getQuickSilenceHours() == 0 && prefs.getQuicksilenceMinutes() == 0) {
 			quickSettingsButton.setEnabled(false);
 		} else {
 			quickSettingsButton.setEnabled(true);
@@ -136,17 +136,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		// the event list title
 		TextView eventsTitle = (TextView) findViewById(R.id.eventListTitle);
 		String eventsText = getResources().getString(R.string.upcoming_events);
-		eventsTitle.setText(String.format(eventsText, lookaheadDays));
+		eventsTitle.setText(String.format(eventsText, prefs.getLookaheadDays()));
 
-		DBIface.update(lookaheadDays);
+		DBIface.update(prefs.getLookaheadDays());
 
 		// prune the database of old events
-		DBIface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) bufferMinutes);
+		DBIface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) prefs.getBufferMinutes());
 
 		// since the number of days to display can change we need to
 		// + remove events beyond the lookahead period
 		DBIface.pruneEventsAfter(System.currentTimeMillis() + 1000 * 60 * 60 * 24
-				* (long) lookaheadDays);
+				* (long) prefs.getLookaheadDays());
 
 		// DBIface.printEvents();
 
@@ -155,15 +155,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this);
 		lv.setFadingEdgeLength(0);
-		cursor = DBIface.getCursor(EventProvider.BEGIN);
+		cursor = DBIface.getCursor(Columns.BEGIN);
 		cursorAdapter = new EventCursorAdapter(this, cursor);
 		lv.setAdapter(cursorAdapter);
 
 		// display the "thank you" dialog once if the donation key is installed
-		SharedPreferences preferences = this.getSharedPreferences(
-				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		boolean show_donation_thanks = preferences.getBoolean("show_donation_thanks",
-				DefPrefs.SHOW_DONATION_THANKS);
+		boolean show_donation_thanks = prefs.isShowDonationThanks();
 		if (show_donation_thanks) {
 			PackageManager manager = getPackageManager();
 			if (manager.checkSignatures("org.ciasaboark.tacere", "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH) {
@@ -193,11 +190,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			// if the selected event is no longer in the DB, then we need to remove it from the list
 			// view
 			removeListViewEvent(view);
+		} catch (NoSuchEventException e) {
+			removeListViewEvent(view);
 		}
 	}
+	
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		boolean result = false;
+		
 		try {
 			CalEvent thisEvent = DBIface.getEvent((int) id);
 			DBIface.setRingerType((int) id, CalEvent.RINGER.UNDEFINED);
@@ -209,11 +211,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			Intent i = new Intent(this, PollService.class);
 			i.putExtra("type", "activityRestart");
 			startService(i);
-			return true;
+			result = true;
 		} catch (NullPointerException e) {
 			removeListViewEvent(view);
-			return false;
+		} catch (NoSuchEventException e) {
+			removeListViewEvent(view);
 		}
+		return result;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -241,27 +245,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
-				cursor = DBIface.getCursor(EventProvider.BEGIN);
+				cursor = DBIface.getCursor(Columns.BEGIN);
 				cursorAdapter.swapCursor(cursor);
 				cursorAdapter.notifyDataSetChanged();
 			}
 		}, anim.getDuration());
-	}
-
-	private void readSettings() {
-		// read the saved preferences
-		try {
-			SharedPreferences preferences = this.getSharedPreferences(
-					"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			quickSilenceMinutes = preferences.getInt("quickSilenceMinutes",
-					DefPrefs.QUICK_SILENCE_MINUTES);
-			quickSilenceHours = preferences.getInt("quickSilenceHours",
-					DefPrefs.QUICK_SILENCE_HOURS);
-			lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
-			bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private class EventCursorAdapter extends CursorAdapter {
@@ -272,7 +260,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		public EventCursorAdapter(Context ctx, Cursor c) {
 			super(ctx, c);
 			mLayoutInflator = LayoutInflater.from(ctx);
-			DBIface = DatabaseInterface.get(ctx);
+			DBIface = DatabaseInterface.getInstance(ctx);
 		}
 
 		@Override
@@ -283,10 +271,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		@Override
 		public void bindView(View view, final Context context, final Cursor cursor) {
-			int id = cursor.getInt(cursor.getColumnIndex(EventProvider._ID));
-			CalEvent thisEvent = DBIface.getEvent(id);
-
-			if (thisEvent != null) {
+			int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+			try {
+				CalEvent thisEvent = DBIface.getEvent(id);
 				// a text view to show the event title
 				TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
 				descriptionTV.setText(thisEvent.getTitle());
@@ -335,6 +322,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 				 * android.R.anim.slide_in_left); viewAnim.setDuration(500);
 				 * view.startAnimation(viewAnim);
 				 */
+			} catch (NoSuchEventException e) {
+				Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
 			}
 		}
 
@@ -352,9 +341,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 					icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
 					break;
 				case CalEvent.RINGER.UNDEFINED:
-					SharedPreferences preferences = ctx.getSharedPreferences(
-							"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-					int defaultRinger = preferences.getInt("ringerType", DefPrefs.RINGER_TYPE);
+					int defaultRinger = prefs.getRingerType();
 					icon = getRingerIcon(ctx, defaultRinger, null);
 					break;
 				case CalEvent.RINGER.IGNORE:
@@ -373,12 +360,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		private boolean eventShouldSilence(Context ctx, CalEvent event) {
 			boolean eventShouldSilence = true;
-			SharedPreferences preferences = ctx.getSharedPreferences(
-					"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-			boolean silenceFreeTime = preferences.getBoolean("silenceFreeTime",
-					DefPrefs.SILENCE_FREE_TIME);
-			boolean silenceAllDay = preferences.getBoolean("silenceAllDay",
-					DefPrefs.SILENCE_ALL_DAY);
+			boolean silenceFreeTime = prefs.getSilenceFreeTimeEvents();
+			boolean silenceAllDay = prefs.getSilenceAllDayEvents();
 
 			// if a custom ringer is set then the event should silence, otherwise it depends on the
 			// event type and settings

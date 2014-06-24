@@ -131,7 +131,7 @@
                 android:value="org.ciasaboark.tacere.SettingsActivity" />
         </activity>
         <provider
-            android:name=".provider.EventProvider"
+            android:name="org.ciasaboark.tacere.database.EventProvider"
             android:authorities="org.ciasaboark.tacere.Events"
             android:exported="false">
 		</provider>

@@ -1,7 +1,7 @@
 package org.ciasaboark.tacere.service;
 
 import org.ciasaboark.tacere.CalEvent;
-import org.ciasaboark.tacere.DatabaseInterface;
+import org.ciasaboark.tacere.database.DatabaseInterface;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -25,7 +25,7 @@ public class ResetEventService extends IntentService {
 			Bundle b = intent.getExtras();
 			int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
 			if (eventId != -1) {
-				DatabaseInterface dbIface = DatabaseInterface.get(ctx);
+				DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
 				dbIface.setRingerType(eventId, CalEvent.RINGER.UNDEFINED);
 				
 				Intent i = new Intent(this, PollService.class);

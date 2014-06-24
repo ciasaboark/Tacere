@@ -9,6 +9,7 @@
 package org.ciasaboark.tacere;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.prefs.Prefs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -33,6 +34,15 @@ public class AdvancedSettingsActivity extends Activity {
 	private int refreshInterval;
 	private int bufferMinutes;
 	private int lookaheadDays;
+	
+	public AdvancedSettingsActivity() {
+		Prefs prefs = new Prefs(this);
+		this.silenceFreeTime = prefs.getSilenceFreeTimeEvents();
+		this.silenceAllDay = prefs.getSilenceAllDayEvents();
+		this.refreshInterval = prefs.getRefreshInterval();
+		this.bufferMinutes = prefs.getBufferMinutes();
+		this.lookaheadDays = prefs.getLookaheadDays();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +50,6 @@ public class AdvancedSettingsActivity extends Activity {
 		setContentView(R.layout.activity_advanced_settings);
 		// Show the Up button in the action bar.
 		setupActionBar();
-
-		// read the saved preferences
-		readSettings();
-
 		refreshDisplay();
 	}
 
@@ -119,16 +125,6 @@ public class AdvancedSettingsActivity extends Activity {
 		TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
 		String lookaheadText = getResources().getString(R.string.pref_list_days);
 		lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
-	}
-
-	private void readSettings() {
-		SharedPreferences preferences = this.getSharedPreferences(
-				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		silenceFreeTime = preferences.getBoolean("silenceFreeTime", DefPrefs.SILENCE_FREE_TIME);
-		silenceAllDay = preferences.getBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
-		refreshInterval = preferences.getInt("refreshInterval", DefPrefs.REFRESH_INTERVAL);
-		bufferMinutes = preferences.getInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
-		lookaheadDays = preferences.getInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
 	}
 
 	private void saveSettings() {

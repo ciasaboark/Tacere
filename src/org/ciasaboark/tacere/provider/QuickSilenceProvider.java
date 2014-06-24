@@ -11,8 +11,8 @@
  */
 package org.ciasaboark.tacere.provider;
 
-import org.ciasaboark.tacere.DefPrefs;
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.PollService;
 
 import android.app.PendingIntent;
@@ -27,10 +27,12 @@ import android.widget.RemoteViews;
 public class QuickSilenceProvider extends AppWidgetProvider {
 	@SuppressWarnings("unused")
 	private static final String TAG = "QuickSilenceProvider";
+	private Prefs prefs;
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
+		prefs = new Prefs(context);
+		
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context, QuickSilenceProvider.class);
 		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
@@ -38,10 +40,8 @@ public class QuickSilenceProvider extends AppWidgetProvider {
 		// read quicksilence preferences
 		SharedPreferences preferences = context.getSharedPreferences(
 				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		int quickSilenceMinutes = preferences.getInt("quickSilenceMinutes",
-				DefPrefs.QUICK_SILENCE_MINUTES);
-		int quickSilenceHours = preferences.getInt("quickSilenceHours",
-				DefPrefs.QUICK_SILENCE_HOURS);
+		int quickSilenceMinutes = prefs.getQuicksilenceMinutes();
+		int quickSilenceHours = prefs.getQuickSilenceHours();
 
 		String quicksilenceText = context.getResources().getString(R.string.widget_duration);
 		String hrs = "";

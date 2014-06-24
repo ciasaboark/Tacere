@@ -6,7 +6,7 @@
  * Released under the BSD license.  For details see the COPYING file.
 */
 
-package org.ciasaboark.tacere.provider;
+package org.ciasaboark.tacere.database;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -21,22 +21,10 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-public class EventProvider extends ContentProvider {
+/*package*/ class EventProvider extends ContentProvider {
 
 	public static final String PROVIDER_NAME = "org.ciasaboark.tacere.Events";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/event");
-	
-	//Columns available
-	public static final String _ID = "_id";
-	public static final String TITLE = "title";
-	public static final String CAL_ID = "cal_id";
-	public static final String DESCRIPTION = "description";
-	public static final String BEGIN = "start";
-	public static final String END = "end";
-	public static final String RINGER_TYPE = "ringer_type";
-	public static final String DISPLAY_COLOR = "display_color";
-	public static final String IS_ALLDAY = "is_allday";
-	public static final String IS_FREETIME = "is_freetime";
 	
 	static final int EVENTS = 1;
 	static final int EVENT_ID = 2;
@@ -64,7 +52,7 @@ public class EventProvider extends ContentProvider {
 				break;
 			case EVENT_ID:
 				String id = uri.getPathSegments().get(1);
-				count = eventsDB.delete(TABLE_EVENTS, _ID + " = " + id +
+				count = eventsDB.delete(TABLE_EVENTS, Columns._ID + " = " + id +
 						(!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
 				break;
 			default:
@@ -117,12 +105,12 @@ public class EventProvider extends ContentProvider {
 		sqlBuilder.setTables(TABLE_EVENTS);
 		
 		if (uriMatcher.match(uri) == EVENT_ID) {
-			sqlBuilder.appendWhere(_ID + " = " + uri.getPathSegments().get(1));
+			sqlBuilder.appendWhere(Columns._ID + " = " + uri.getPathSegments().get(1));
 		}
 		
 		if (sortOrder==null || sortOrder=="") {
 			//if we aren't given a sort order preference, order the results chronologically
-			sortOrder = BEGIN;
+			sortOrder = Columns.BEGIN;
 		}
 		
 		Cursor c = sqlBuilder.query( eventsDB, projection, selection, selectionArgs, null, null, sortOrder);
@@ -138,7 +126,7 @@ public class EventProvider extends ContentProvider {
 				count =	eventsDB.update(TABLE_EVENTS, values, selection, selectionArgs);
 				break;
 			case EVENT_ID:
-				count = eventsDB.update(TABLE_EVENTS, values, _ID + " = " + uri.getPathSegments().get(1) +
+				count = eventsDB.update(TABLE_EVENTS, values, Columns._ID + " = " + uri.getPathSegments().get(1) +
 						(!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
 				break;
 			default:
@@ -157,12 +145,12 @@ public class EventProvider extends ContentProvider {
 		
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + _ID + " integer primary key," +
-						TITLE + " varchar(100)," + DESCRIPTION + " varchar(100)," +
-						BEGIN + " integer," + END + " integer," + 
-						IS_ALLDAY + " integer," + IS_FREETIME + " integer," +
-						RINGER_TYPE + " integer," +	DISPLAY_COLOR + " integer," +
-						CAL_ID + " integer)");
+			db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + Columns._ID + " integer primary key," +
+						Columns.TITLE + " varchar(100)," + Columns.DESCRIPTION + " varchar(100)," +
+						Columns.BEGIN + " integer," + Columns.END + " integer," + 
+						Columns.IS_ALLDAY + " integer," + Columns.IS_FREETIME + " integer," +
+						Columns.RINGER_TYPE + " integer," +	Columns.DISPLAY_COLOR + " integer," +
+						Columns.CAL_ID + " integer)");
 		}
 
 		@Override

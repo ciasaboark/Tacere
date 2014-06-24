@@ -8,7 +8,7 @@
 
 package org.ciasaboark.tacere;
 
-import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.provider.QuickSilenceProvider;
 import org.ciasaboark.tacere.service.PollService;
 
@@ -16,10 +16,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
@@ -39,14 +37,7 @@ public class SettingsActivity extends Activity {
 	@SuppressWarnings("unused")
 	private static final String TAG = "Settings";
 	
-	private boolean isActivated;
-	private int ringerType;
-	private boolean adjustMedia;
-	private int mediaVolume;
-	private boolean adjustAlarm;
-	private int alarmVolume;
-	private int quickSilenceMinutes;
-	private int quickSilenceHours;
+	private Prefs prefs = new Prefs(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +45,6 @@ public class SettingsActivity extends Activity {
 		setContentView(R.layout.activity_settings);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		readSettings();
 		refreshDisplay();
 	}
 
@@ -104,7 +93,7 @@ public class SettingsActivity extends Activity {
 		//the service state toggle
 		CheckBox serviceCB = (CheckBox)findViewById(R.id.activateServiceCheckBox);
 		TextView serviceTV = (TextView)findViewById(R.id.activateServiceDescription);
-		if (isActivated) {
+		if (prefs.getIsServiceActivated()) {
 			serviceCB.setChecked(true);
 			serviceTV.setText(R.string.pref_service_enabled);
 		} else {
@@ -114,7 +103,7 @@ public class SettingsActivity extends Activity {
 		
 		//the ringer type description
 		TextView ringerTV = (TextView)findViewById(R.id.ringerTypeDescription);
-		switch (ringerType) {
+		switch (prefs.getRingerType()) {
 			case 1:
 				ringerTV.setText(R.string.pref_ringer_type_normal);
 				break;
@@ -133,7 +122,7 @@ public class SettingsActivity extends Activity {
 		//the media volumes toggle
 		CheckBox mediaCB = (CheckBox)findViewById(R.id.adjustMediaCheckBox);
 		TextView mediaTV = (TextView)findViewById(R.id.adjustMediaDescription);
-		if (adjustMedia) {
+		if (prefs.getAdjustMedia()) {
 			mediaCB.setChecked(true);
 			mediaTV.setText(R.string.pref_media_enabled);
 		} else {
@@ -143,9 +132,9 @@ public class SettingsActivity extends Activity {
 		
 		//the media volumes slider
 		SeekBar mediaSB = (SeekBar)findViewById(R.id.mediaSeekBar);
-		mediaSB.setMax(DefPrefs.MEDIA_VOLUME_MAX);
-		mediaSB.setProgress(mediaVolume);
-		if (!adjustMedia) {
+		mediaSB.setMax(prefs.getMaxMediaVolume());
+		mediaSB.setProgress(prefs.getCurMediaVolume());
+		if (!prefs.getAdjustMedia()) {
 			mediaSB.setEnabled(false);
 		} else {
 			mediaSB.setEnabled(true);
@@ -153,7 +142,7 @@ public class SettingsActivity extends Activity {
 		mediaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				mediaVolume = progress;
+				prefs.setCurMediaVolume(progress);
 			}
 			
 			@Override
@@ -171,7 +160,7 @@ public class SettingsActivity extends Activity {
 		//the alarm volumes toggle
 		CheckBox alarmCB = (CheckBox)findViewById(R.id.adjustAlarmCheckBox);
 		TextView alarmTV = (TextView)findViewById(R.id.adjustAlarmDescription);
-		if (adjustAlarm) {
+		if (prefs.getAdjustAlarm()) {
 			alarmCB.setChecked(true);
 			alarmTV.setText(R.string.pref_alarm_enabled);
 		} else {
@@ -181,9 +170,9 @@ public class SettingsActivity extends Activity {
 		
 		//the alarm volumes slider
 		SeekBar alarmSB = (SeekBar)findViewById(R.id.alarmSeekBar);
-		alarmSB.setMax(DefPrefs.ALARM_VOLUME_MAX);
-		alarmSB.setProgress(alarmVolume);
-		if (!adjustAlarm) {
+		alarmSB.setMax(prefs.getMaxAlarmVolume());
+		alarmSB.setProgress(prefs.getCurAlarmVolume());
+		if (!prefs.getAdjustAlarm()) {
 			alarmSB.setEnabled(false);
 		} else {
 			alarmSB.setEnabled(true);
@@ -191,7 +180,7 @@ public class SettingsActivity extends Activity {
 		alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				alarmVolume = progress;
+				prefs.setCurAlarmVolume(progress);
 			}
 			
 			@Override
@@ -209,57 +198,51 @@ public class SettingsActivity extends Activity {
 		TextView quickTV = (TextView)findViewById(R.id.quickSilenceDescription);
 		String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
 		String hrs = "";
-		if (quickSilenceHours > 0) {
-			hrs = String.valueOf(quickSilenceHours) + " hours "; 
+		if (prefs.getQuickSilenceHours() > 0) {
+			hrs = String.valueOf(prefs.getQuickSilenceHours()) + " hours "; 
 		}
-		quickTV.setText(String.format(quicksilenceText, hrs, quickSilenceMinutes));
+		quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
 	}
 	
-	private void readSettings() {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		isActivated = preferences.getBoolean("isActivated", DefPrefs.IS_ACTIVATED);
-		ringerType = preferences.getInt("ringerType", DefPrefs.RINGER_TYPE);
-		adjustMedia = preferences.getBoolean("adjustMedia", DefPrefs.ADJUST_MEDIA);
-		mediaVolume = preferences.getInt("mediaVolume", DefPrefs.MEDIA_VOLUME);
-		adjustAlarm = preferences.getBoolean("adjustAlarm", DefPrefs.ADJUST_ALARM);
-		alarmVolume = preferences.getInt("alarmVolume", DefPrefs.ALARM_VOLUME);
-		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
-		quickSilenceHours = preferences.getInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
-	}
+//	private void readSettings() {
+//		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+//		isActivated = preferences.getBoolean("isActivated", Defaults.IS_ACTIVATED);
+//		ringerType = preferences.getInt("ringerType", Defaults.RINGER_TYPE);
+//		adjustMedia = preferences.getBoolean("adjustMedia", Defaults.ADJUST_MEDIA);
+//		mediaVolume = preferences.getInt("mediaVolume", Defaults.MEDIA_VOLUME);
+//		adjustAlarm = preferences.getBoolean("adjustAlarm", Defaults.ADJUST_ALARM);
+//		alarmVolume = preferences.getInt("alarmVolume", Defaults.ALARM_VOLUME);
+//		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", Defaults.QUICK_SILENCE_MINUTES);
+//		quickSilenceHours = preferences.getInt("quickSilenceHours", Defaults.QUICK_SILENCE_HOURS);
+//	}
+	
+//	private void restoreDefaults() {
+//		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
+//		SharedPreferences.Editor editor = preferences.edit();
+//		editor.putBoolean("isActivated", Defaults.IS_ACTIVATED);
+//		editor.putBoolean("silenceFreeTime", Defaults.SILENCE_FREE_TIME);
+//		editor.putBoolean("silenceAllDay", Defaults.SILENCE_ALL_DAY);
+//		editor.putInt("ringerType", Defaults.RINGER_TYPE);
+//		editor.putBoolean("adjustMedia", Defaults.ADJUST_MEDIA);
+//		editor.putBoolean("adjustAlarm", Defaults.ADJUST_ALARM);
+//		editor.putInt("mediaVolume", Defaults.MEDIA_VOLUME);
+//		editor.putInt("alarmVolume", Defaults.ALARM_VOLUME);
+//		editor.putInt("quickSilenceMinutes", Defaults.QUICK_SILENCE_MINUTES);
+//		editor.putInt("quickSilenceHours", Defaults.QUICK_SILENCE_HOURS);
+//		editor.putInt("refreshInterval", Defaults.REFRESH_INTERVAL);
+//		editor.putInt("bufferMinutes", Defaults.BUFFER_MINUTES);
+//		editor.putInt("lookaheadDays", Defaults.LOOKAHEAD_DAYS);
+//		editor.commit();
+//		readSettings();
+//		refreshDisplay();
+//	}
 	
 	private void restoreDefaults() {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putBoolean("isActivated", DefPrefs.IS_ACTIVATED);
-		editor.putBoolean("silenceFreeTime", DefPrefs.SILENCE_FREE_TIME);
-		editor.putBoolean("silenceAllDay", DefPrefs.SILENCE_ALL_DAY);
-		editor.putInt("ringerType", DefPrefs.RINGER_TYPE);
-		editor.putBoolean("adjustMedia", DefPrefs.ADJUST_MEDIA);
-		editor.putBoolean("adjustAlarm", DefPrefs.ADJUST_ALARM);
-		editor.putInt("mediaVolume", DefPrefs.MEDIA_VOLUME);
-		editor.putInt("alarmVolume", DefPrefs.ALARM_VOLUME);
-		editor.putInt("quickSilenceMinutes", DefPrefs.QUICK_SILENCE_MINUTES);
-		editor.putInt("quickSilenceHours", DefPrefs.QUICK_SILENCE_HOURS);
-		editor.putInt("refreshInterval", DefPrefs.REFRESH_INTERVAL);
-		editor.putInt("bufferMinutes", DefPrefs.BUFFER_MINUTES);
-		editor.putInt("lookaheadDays", DefPrefs.LOOKAHEAD_DAYS);
-		editor.commit();
-		readSettings();
-		refreshDisplay();
+		prefs.restoreDefaultPreferences();
 	}
 
 	private void saveSettings() {
-		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putBoolean("isActivated", isActivated);
-		editor.putInt("ringerType", ringerType);
-		editor.putBoolean("adjustMedia", adjustMedia);
-		editor.putBoolean("adjustAlarm", adjustAlarm);
-		editor.putInt("mediaVolume", mediaVolume);
-		editor.putInt("alarmVolume", alarmVolume);
-		editor.putInt("quickSilenceMinutes", quickSilenceMinutes);
-		editor.putInt("quickSilenceHours", quickSilenceHours);
-		editor.commit();
+		prefs.storePreferences();
 		
 		//we also need to notify any active widgets of the settings change so
 		//+ that they can redraw
@@ -278,9 +261,9 @@ public class SettingsActivity extends Activity {
 	}
 
 	public void onClickActivateService(View v) {
-		isActivated = !isActivated;
+		prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
 		//if the service has been reactivated then we should restart it
-		if (isActivated) {
+		if (prefs.getIsServiceActivated()) {
 			Intent i = new Intent(this, PollService.class);
 			i.putExtra("type", "activityRestart");
 			startService(i);
@@ -291,10 +274,10 @@ public class SettingsActivity extends Activity {
 	public void onClickRingerType(View v) {
 		AlertDialog alert = new AlertDialog.Builder(this)
 				.setTitle("Ringer Type")
-				.setSingleChoiceItems(R.array.ringer_types, ringerType - 1, new DialogInterface.OnClickListener() {
+				.setSingleChoiceItems(R.array.ringer_types, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						ringerType = which + 1;
+						prefs.setRingerType(which + 1);
 						saveSettings();
 						refreshDisplay();
 						
@@ -320,12 +303,12 @@ public class SettingsActivity extends Activity {
 	}
 	
 	public void onClickAdjustMedia(View v) {
-		adjustMedia = !adjustMedia;
+		prefs.setAdjustMedia(!prefs.getAdjustMedia());
 		refreshDisplay();
 	}
 	
 	public void onClickAdjustAlarm(View v) {
-		adjustAlarm = !adjustAlarm;
+		prefs.setAdjustAlarm(!prefs.getAdjustAlarm());
 		refreshDisplay();
 	}
 	
@@ -358,19 +341,19 @@ public class SettingsActivity extends Activity {
 		hourP.setMaxValue(hours.length - 1);
 		hourP.setWrapSelectorWheel(false);
 		hourP.setDisplayedValues(hours);
-		hourP.setValue(quickSilenceHours + 1);
+		hourP.setValue(prefs.getQuickSilenceHours() + 1);
 		
 		minP.setMinValue(1);
 		minP.setMaxValue(minutes.length - 1);
 		minP.setWrapSelectorWheel(false);
 		minP.setDisplayedValues(minutes);
-		minP.setValue(quickSilenceMinutes + 1);
+		minP.setValue(prefs.getQuicksilenceMinutes() + 1);
 		
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				quickSilenceHours = hourP.getValue() - 1;
-				quickSilenceMinutes = minP.getValue() - 1;
+				prefs.setQuickSilenceHours(hourP.getValue() - 1);
+				prefs.setQuicksilenceMinutes(minP.getValue() - 1);
 				saveSettings();
 				refreshDisplay();
 			}
