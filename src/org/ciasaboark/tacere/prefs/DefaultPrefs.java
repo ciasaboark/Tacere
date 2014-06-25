@@ -13,24 +13,13 @@ class DefaultPrefs {
 	static final Boolean ADJUST_MEDIA = false;
 	// change the alarm volume during an event
 	static final Boolean ADJUST_ALARM = false;
-	// TODO max volumes were grabbed from an AOSP ROM, test with non-standard ROMs
-	// max media volume reported by AlarmManager.getStreamMaxVolume
-	static final int MEDIA_VOLUME_MAX = 15;
-	// max alarm volume reported by AlarmManager.getStreamMaxVolume
-	static final int ALARM_VOLUME_MAX = 7;
 	static final int MEDIA_VOLUME = 10;
 	static final int ALARM_VOLUME = 6;
 	static final int QUICK_SILENCE_MINUTES = 30;
-	static final int QUICK_SILENCE_HOURS = 0;
-	@Deprecated
-	// how often to refresh the service (deprecated since the change to using intents)
-	static final int REFRESH_INTERVAL = 5;
+	static final int QUICK_SILENCE_HOURS = 0;;
 	// how far in advance to begin silencing and continue silencing after event is over
 	static final int BUFFER_MINUTES = 5;
-	@Deprecated
-	static final Boolean WAKE_DEVICE = false;
-	// an id to reference all notifications
-	static final int NOTIFICATION_ID = 1;
+	
 	// how many days to merge when a calendar change is detected
 	static final int LOOKAHEAD_DAYS = 7;
 	// when the app is updated an activity listing all changes is displayed,
@@ -42,8 +31,5 @@ class DefaultPrefs {
 	// static final String UPDATES_VERSION = "2.0.4";
 	// after the donate thank you activity is displayed this will be changed to false
 	static final boolean SHOW_DONATION_THANKS = true;
-	// requestCodes for the different pending intents
-	static final int RC_EVENT = 1;
-	static final int RC_QUICKSILENT = 2;
-	static final int RC_NOTIFICATION = 3;
+	
 }

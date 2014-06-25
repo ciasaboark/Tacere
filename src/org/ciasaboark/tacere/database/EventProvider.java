@@ -21,7 +21,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-/*package*/ class EventProvider extends ContentProvider {
+public class EventProvider extends ContentProvider {
 
 	public static final String PROVIDER_NAME = "org.ciasaboark.tacere.Events";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/event");

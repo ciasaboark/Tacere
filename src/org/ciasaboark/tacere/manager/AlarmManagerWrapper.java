@@ -1,7 +1,8 @@
 package org.ciasaboark.tacere.manager;
 
+import org.ciasaboark.tacere.prefs.ConstVariables;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.PollService;
+import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 import android.app.AlarmManager;
@@ -10,12 +11,15 @@ import android.content.Context;
 import android.content.Intent;
 
 public class AlarmManagerWrapper {
+	// requestCodes for the different pending intents
+	private static final int RC_EVENT 		= 1;
+	private static final int RC_QUICKSILENT 	= 2;
+	private static final int RC_NOTIFICATION = 3;
+	
 	private Context context;
-	private Prefs prefs;
 
 	public AlarmManagerWrapper(Context ctx) {
 		this.context = ctx;
-		this.prefs = new Prefs(ctx);
 	}
 	
 	public void scheduleNormalWakeAt(long time) {
@@ -43,7 +47,7 @@ public class AlarmManagerWrapper {
 			throw new IllegalArgumentException("PollService:scheduleAlarmAt not given valid time");
 		}
 
-		Intent i = new Intent(context, PollService.class);
+		Intent i = new Intent(context, EventSilencerService.class);
 		i.putExtra("type", type);
 
 		// note that the android alarm manager allows multiple pending intents to be scheduled per
@@ -53,9 +57,9 @@ public class AlarmManagerWrapper {
 		// default to 0
 		int requestCode = 0;
 		if (type.equals(RequestTypes.CANCEL_QUICKSILENCE)) {
-			requestCode = prefs.getRequestCodeQuicksilence();
+			requestCode = RC_QUICKSILENT;
 		} else if (type.equals(RequestTypes.NORMAL)) {
-			requestCode = prefs.getRequestCodeEvent();
+			requestCode = RC_EVENT;
 		}
 
 		PendingIntent pintent = PendingIntent.getService(context, requestCode, i,
@@ -67,7 +71,7 @@ public class AlarmManagerWrapper {
 	public void cancelAllAlarms() {
 		// there could be multiple alarms scheduled, we have to cancel all of them
 		for (int requestCode = 0; requestCode <= 4; requestCode++) {
-			Intent i = new Intent(context, PollService.class);
+			Intent i = new Intent(context, EventSilencerService.class);
 			PendingIntent pintent = PendingIntent.getService(context, requestCode, i, 0);
 			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			alarm.cancel(pintent);

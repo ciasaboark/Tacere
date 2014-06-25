@@ -12,7 +12,7 @@ import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.PollService;
+import org.ciasaboark.tacere.service.EventSilencerService;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -100,7 +100,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		super.onStart();
 		setContentView(R.layout.activity_main);
 		// start the background service
-		Intent i = new Intent(this, PollService.class);
+		Intent i = new Intent(this, EventSilencerService.class);
 		i.putExtra("type", "activityRestart");
 		startService(i);
 
@@ -119,7 +119,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 				int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
 
 				// an intent to send to PollService immediately
-				Intent i = new Intent(getApplicationContext(), PollService.class);
+				Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
 				i.putExtra("type", "quickSilent");
 				i.putExtra("duration", duration);
 				startService(i);
@@ -183,7 +183,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			lv.getAdapter().getView(position, view, lv);
 
 			// since the database has changed we need to wake the service
-			Intent i = new Intent(this, PollService.class);
+			Intent i = new Intent(this, EventSilencerService.class);
 			i.putExtra("type", "activityRestart");
 			startService(i);
 		} catch (NullPointerException e) {
@@ -208,7 +208,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 					Toast.LENGTH_SHORT).show();
 
 			// since the database has changed we need to wake the service
-			Intent i = new Intent(this, PollService.class);
+			Intent i = new Intent(this, EventSilencerService.class);
 			i.putExtra("type", "activityRestart");
 			startService(i);
 			result = true;

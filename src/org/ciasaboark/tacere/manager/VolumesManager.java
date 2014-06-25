@@ -6,6 +6,9 @@ import android.content.Context;
 import android.media.AudioManager;
 
 public class VolumesManager {
+	public static final int MAX_MEDIA_VOLUME = 15;
+	public static final int MAX_ALARM_VOLUME = 7;
+	
 	private Context context;
 	private Prefs prefs;
 	private RingerStateManager ringerState;
@@ -14,6 +17,14 @@ public class VolumesManager {
 		this.context = ctx;
 		this.prefs = new Prefs(ctx);
 		this.ringerState = new RingerStateManager(ctx);
+	}
+	
+	public int getMaxMediaVolume() {
+		return MAX_MEDIA_VOLUME;
+	}
+	
+	public int getMaxAlarmVolume() {
+		return MAX_ALARM_VOLUME;
 	}
 	
 	public void restoreVolumes() {

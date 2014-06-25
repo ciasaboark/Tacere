@@ -8,9 +8,11 @@
 
 package org.ciasaboark.tacere;
 
+import org.ciasaboark.tacere.manager.VolumesManager;
+import org.ciasaboark.tacere.prefs.ConstVariables;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.provider.QuickSilenceProvider;
-import org.ciasaboark.tacere.service.PollService;
+import org.ciasaboark.tacere.service.EventSilencerService;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -132,7 +134,7 @@ public class SettingsActivity extends Activity {
 		
 		//the media volumes slider
 		SeekBar mediaSB = (SeekBar)findViewById(R.id.mediaSeekBar);
-		mediaSB.setMax(prefs.getMaxMediaVolume());
+		mediaSB.setMax(VolumesManager.MAX_MEDIA_VOLUME);
 		mediaSB.setProgress(prefs.getCurMediaVolume());
 		if (!prefs.getAdjustMedia()) {
 			mediaSB.setEnabled(false);
@@ -170,7 +172,7 @@ public class SettingsActivity extends Activity {
 		
 		//the alarm volumes slider
 		SeekBar alarmSB = (SeekBar)findViewById(R.id.alarmSeekBar);
-		alarmSB.setMax(prefs.getMaxAlarmVolume());
+		alarmSB.setMax(VolumesManager.MAX_ALARM_VOLUME);
 		alarmSB.setProgress(prefs.getCurAlarmVolume());
 		if (!prefs.getAdjustAlarm()) {
 			alarmSB.setEnabled(false);
@@ -204,46 +206,11 @@ public class SettingsActivity extends Activity {
 		quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
 	}
 	
-//	private void readSettings() {
-//		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-//		isActivated = preferences.getBoolean("isActivated", Defaults.IS_ACTIVATED);
-//		ringerType = preferences.getInt("ringerType", Defaults.RINGER_TYPE);
-//		adjustMedia = preferences.getBoolean("adjustMedia", Defaults.ADJUST_MEDIA);
-//		mediaVolume = preferences.getInt("mediaVolume", Defaults.MEDIA_VOLUME);
-//		adjustAlarm = preferences.getBoolean("adjustAlarm", Defaults.ADJUST_ALARM);
-//		alarmVolume = preferences.getInt("alarmVolume", Defaults.ALARM_VOLUME);
-//		quickSilenceMinutes = preferences.getInt("quickSilenceMinutes", Defaults.QUICK_SILENCE_MINUTES);
-//		quickSilenceHours = preferences.getInt("quickSilenceHours", Defaults.QUICK_SILENCE_HOURS);
-//	}
-	
-//	private void restoreDefaults() {
-//		SharedPreferences preferences = this.getSharedPreferences("org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-//		SharedPreferences.Editor editor = preferences.edit();
-//		editor.putBoolean("isActivated", Defaults.IS_ACTIVATED);
-//		editor.putBoolean("silenceFreeTime", Defaults.SILENCE_FREE_TIME);
-//		editor.putBoolean("silenceAllDay", Defaults.SILENCE_ALL_DAY);
-//		editor.putInt("ringerType", Defaults.RINGER_TYPE);
-//		editor.putBoolean("adjustMedia", Defaults.ADJUST_MEDIA);
-//		editor.putBoolean("adjustAlarm", Defaults.ADJUST_ALARM);
-//		editor.putInt("mediaVolume", Defaults.MEDIA_VOLUME);
-//		editor.putInt("alarmVolume", Defaults.ALARM_VOLUME);
-//		editor.putInt("quickSilenceMinutes", Defaults.QUICK_SILENCE_MINUTES);
-//		editor.putInt("quickSilenceHours", Defaults.QUICK_SILENCE_HOURS);
-//		editor.putInt("refreshInterval", Defaults.REFRESH_INTERVAL);
-//		editor.putInt("bufferMinutes", Defaults.BUFFER_MINUTES);
-//		editor.putInt("lookaheadDays", Defaults.LOOKAHEAD_DAYS);
-//		editor.commit();
-//		readSettings();
-//		refreshDisplay();
-//	}
-	
 	private void restoreDefaults() {
 		prefs.restoreDefaultPreferences();
 	}
 
 	private void saveSettings() {
-		prefs.storePreferences();
-		
 		//we also need to notify any active widgets of the settings change so
 		//+ that they can redraw
 		AppWidgetManager wManager = AppWidgetManager.getInstance(this.getApplicationContext());
@@ -254,9 +221,6 @@ public class SettingsActivity extends Activity {
 	}
 
 	public void onPause() {
-		//onDestroy might not be called before the next activities onCreate
-		//+ so settings should be saved here
-		saveSettings();
 		super.onPause();
 	}
 
@@ -264,7 +228,7 @@ public class SettingsActivity extends Activity {
 		prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
 		//if the service has been reactivated then we should restart it
 		if (prefs.getIsServiceActivated()) {
-			Intent i = new Intent(this, PollService.class);
+			Intent i = new Intent(this, EventSilencerService.class);
 			i.putExtra("type", "activityRestart");
 			startService(i);
 		}

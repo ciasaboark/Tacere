@@ -28,7 +28,7 @@ public class ResetEventService extends IntentService {
 				DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
 				dbIface.setRingerType(eventId, CalEvent.RINGER.UNDEFINED);
 				
-				Intent i = new Intent(this, PollService.class);
+				Intent i = new Intent(this, EventSilencerService.class);
 				i.putExtra("type", "activityRestart");
 				startService(i);
 			}

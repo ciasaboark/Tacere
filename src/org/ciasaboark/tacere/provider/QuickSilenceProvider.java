@@ -13,7 +13,7 @@ package org.ciasaboark.tacere.provider;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.PollService;
+import org.ciasaboark.tacere.service.EventSilencerService;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -59,7 +59,7 @@ public class QuickSilenceProvider extends AppWidgetProvider {
 			int duration = 60 * quickSilenceHours + quickSilenceMinutes;
 
 			// an intent to send to PollService immediately
-			Intent i = new Intent(context, PollService.class);
+			Intent i = new Intent(context, EventSilencerService.class);
 			i.putExtra("type", "quickSilent");
 			i.putExtra("duration", duration);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, i,
