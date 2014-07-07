@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.ciasaboark.tacere" >
+    <!--android:versionCode="7"-->
+    <!--android:versionName="2.0.4 beta"-->
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="14" />
+
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <uses-library android:name="android.test.runner" />
+        <activity
+            android:name="org.ciasaboark.tacere.activity.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activity.MainActivity" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.activity.SettingsActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".activity.MainActivity" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.activity.AboutActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.UpdatesActivity"
+            android:theme="@android:style/Theme.Material.Light.Dialog" >
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.DonationActivity"
+            android:theme="@android:style/Theme.Material.Light.Dialog" >
+        </activity>
+
+        <service
+            android:name="org.ciasaboark.tacere.service.EventSilencerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.EventSilencerService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.SkipEventService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.SkipEventService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.ResetEventService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.ResetEventService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="org.ciasaboark.tacere.receiver.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="org.ciasaboark.tacere.receiver.ProviderChangedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PROVIDER_CHANGED"/>
+                <data android:scheme="content"/>
+                <data android:host="com.android.calendar"/>
+            </intent-filter>
+        </receiver>
+        <!-- <receiver android:name="QuickSilenceProvider" >
+            <intent-filter >
+                <action 
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quicksilence_widget_info" />
+        </receiver> -->
+
+        <activity
+            android:name="org.ciasaboark.tacere.activity.AboutLicenseActivity"
+            android:label="@string/title_activity_about_activity_license"
+            android:parentActivityName="org.ciasaboark.tacere.activity.AboutActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.AboutActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.AdvancedSettingsActivity"
+            android:label="@string/title_activity_advanced_settings"
+            android:parentActivityName="org.ciasaboark.tacere.activity.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
+        </activity>
+        <provider
+            android:name="org.ciasaboark.tacere.database.EventProvider"
+            android:authorities="org.ciasaboark.tacere.Events"
+            android:exported="false">
+        </provider>
+    </application>
+
+</manifest>

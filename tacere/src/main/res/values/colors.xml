@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="primary" type="color">#00bcd4</item>
+    <item name="primary_dark" type="color">#0097a7</item>
+    <!-- Yellow accent color-->
+    <!--<item name="accent" type="color">#ffff00</item>-->
+
+    <!-- Magenta accent color -->
+    <item name="accent" type="color">#ff4081</item>
+    <item name="textcolor" type="color">#ff000000</item>
+    <item name="textColorPrimary" type="color">#ff000000</item>
+    <item name="textColorHeading" type="color">#ff555555</item>
+    <item name="textColorDisabled" type="color">#ff777777</item>
+    <item name="windowBackground" type="color">#fffafafa</item>
+</resources>
