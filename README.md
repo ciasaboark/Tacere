@@ -7,7 +7,7 @@ Tacere is an Android app to automatically silence the phone whenever there is an
 
 Tacere is Open Source.  The code is hosted at <a href="http://www.github.com/ciasaboark/Tacere">GitHub</a>. Bugs and other issues can be reported via the <a href="https://github.com/ciasaboark/Tacere/issues">Issues</a> tab.
 
-Tacere is available on the <a href="https://play.google.com/store/apps/details?id=org.ciasaboark.tacere">Google Play Store</a>.
+Tacere is available on the <a href="https://play.google.com/store/apps/details?id=org.ciasaboark.tacere">Google Play Store</a>.  Releases are also available in the <a href="https://github.com/ciasaboark/Tacere/tree/master/release">GitHub repository</a>
 
 ###Authors
 <a href="https://github.com/ciasaboark">Jonathan Nelson</a>
