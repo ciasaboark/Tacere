@@ -25,6 +25,14 @@ public class ServiceStateManager {
 		prefs.storePreference(SERVICE_STATE_KEY, state);
 	}
 
+    public boolean isEventActive() {
+        return getServiceState().equals(ServiceStates.EVENT_ACTIVE);
+    }
+
+    public boolean isQuickSilenceActive() {
+        return getServiceState().equals(ServiceStates.QUICKSILENCE);
+    }
+
 	public String getServiceState() {
 		String currentState = tryReadServiceState();
         if (currentState == null) {

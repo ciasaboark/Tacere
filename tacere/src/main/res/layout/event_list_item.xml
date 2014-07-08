@@ -28,8 +28,8 @@
 
     <ImageView
         android:id="@+id/ringerState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
@@ -37,8 +37,6 @@
         android:contentDescription="@string/icon_alt_text_normal"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:minHeight="24dp"
-        android:minWidth="24dp"
         android:src="@android:drawable/btn_radio" />
 
     <TextView

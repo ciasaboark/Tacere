@@ -43,6 +43,7 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -53,6 +54,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		AdapterView.OnItemLongClickListener {
 	@SuppressWarnings("unused")
 	private static final String TAG = "MainActivity";
+    private Context ctx;
 
 	private EventCursorAdapter cursorAdapter;
 	private Cursor cursor;
@@ -63,6 +65,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        ctx = this;
 		setContentView(R.layout.activity_main);
 		databaseInterface = DatabaseInterface.getInstance(this);
         prefs = new Prefs(this);
@@ -71,9 +74,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra("message");
                 cursorAdapter.notifyDataSetChanged();
-                Log.d(TAG, message);
+                Log.d(TAG, "got a notification from the service, updating adpater and views");
+                cursor = databaseInterface.getCursor(Columns.BEGIN);
+                cursorAdapter = new EventCursorAdapter(ctx, cursor);
+                lv.setAdapter(cursorAdapter);
+                lv.invalidateViews(); //TODO test that this forces the listview to redraw
+
+                //redraw the widgets
+                drawQuicksilenceButton();
             }
         };
 
@@ -86,6 +95,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);
+
+        drawQuicksilenceButton();
+
 	}
 
     @Override
@@ -100,44 +112,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		setContentView(R.layout.activity_main);
 		// start the background service
         restartEventSilencerService();
+        drawQuicksilenceButton();
 
-		// set up quick silence button
-		ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
-		StringBuilder sb = new StringBuilder("Quick Silence ");
-		if (prefs.getQuickSilenceHours() != 0) {
-			sb.append(prefs.getQuickSilenceHours()).append(" hours, ");
-		}
-		sb.append(prefs.getQuicksilenceMinutes()).append(" minutes");
-//		quickSettingsButton.setText(sb.toString());
-		quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // the length of time for the pollService to sleep in minutes
-                int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-
-                // an intent to send to PollService immediately
-                Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-                i.putExtra("type", RequestTypes.QUICKSILENCE);
-                i.putExtra("duration", duration);
-                startService(i);
-
-            }
-        });
-
-        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
-        Outline outline = new Outline();
-        outline.setOval(0, 0, size, size);
-        ((ImageButton)findViewById(R.id.quickSilenceButton)).setOutline(outline);
-
-
-		if (prefs.getQuickSilenceHours() == 0 && prefs.getQuicksilenceMinutes() == 0) {
-			quickSilenceImageButton.setEnabled(false);
-            //TODO should the button be hidden entirely if it wont do anything?
-            quickSilenceImageButton.setVisibility(View.INVISIBLE);
-		} else {
-			quickSilenceImageButton.setEnabled(true);
-            quickSilenceImageButton.setVisibility(View.VISIBLE);
-		}
 
         /***
          * The event list was removed to test transition to material design
@@ -172,7 +148,57 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		lv.setAdapter(cursorAdapter);
 	}
 
-	@Override
+    private void drawQuicksilenceButton() {
+        ImageButton quickSilenceImageButton = (ImageButton)findViewById(R.id.quickSilenceButton);
+        ServiceStateManager ssManager = new ServiceStateManager(this);
+        quickSilenceImageButton.setBackground(getResources().getDrawable(R.drawable.action_button));
+        if (ssManager.isQuickSilenceActive()) {
+            quickSilenceImageButton.setBackground(getResources().getDrawable(R.drawable.action_button));
+            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.button_ongoing));
+            quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_normal));
+        } else {
+            quickSilenceImageButton.setBackground(getResources().getDrawable(R.drawable.action_button));
+            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.accent));
+            quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_silent));
+        }
+
+        //Draw a round outline on the button
+        //TODO should this be done on older styles as well?  It might be better to use the normal
+        //rectangular button instead
+        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
+        Outline outline = new Outline();
+        outline.setOval(0, 0, size, size);
+        quickSilenceImageButton.setOutline(outline);
+
+        if (prefs.getQuickSilenceHours() == 0 && prefs.getQuicksilenceMinutes() == 0) {
+            quickSilenceImageButton.setEnabled(false);
+            quickSilenceImageButton.setVisibility(View.INVISIBLE);
+        } else {
+            quickSilenceImageButton.setEnabled(true);
+            quickSilenceImageButton.setVisibility(View.VISIBLE);
+        }
+
+        quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // an intent to send to either start or stop a quick silence duration
+                Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+                ServiceStateManager ssManager = new ServiceStateManager(ctx);
+                if (ssManager.isQuickSilenceActive()) {
+                    i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
+                } else {
+                    i.putExtra("type", RequestTypes.QUICKSILENCE);
+                    // the length of time for the pollService to sleep in minutes
+                    int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+                    i.putExtra("duration", duration);
+                }
+                startService(i);
+            }
+        });
+//        quickSilenceImageButton.draw();
+    }
+
+    @Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		try {
 			CalEvent thisEvent = databaseInterface.getEvent((int) id);

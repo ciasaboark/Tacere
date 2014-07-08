@@ -120,7 +120,14 @@ public class EventSilencerService extends IntentService {
 	 * @param durationMinutes
 	 */
 	private void quickSilence(int durationMinutes) {
-		stateManager.setServiceState(ServiceStates.QUICKSILENCE);
+        // quick silence requests can occur during three states, either no event is active, an event
+        // is active, or a previous quick silence request is still ongoing. If this request occurred
+        // while no event was active, then save the current ringer state so it can be restored later
+        if (stateManager.getServiceState().equals(ServiceStates.NOT_ACTIVE)) {
+            ringerState.storeRingerState();
+        }
+
+        stateManager.setServiceState(ServiceStates.QUICKSILENCE);
 
 		// when the quick silence duration is over the device should wake regardless
 		// + of the user settings
@@ -130,13 +137,8 @@ public class EventSilencerService extends IntentService {
 		// TODO check here to make sure scheduling is working
 		alarmManager.scheduleCancelQuickSilenceAlarmAt(wakeAt);
 
-		// quick silence requests can occur during three states, either no event is active, an event
-		// is active, or a previous quick silence request is still ongoing. If this request occurred
-		// while no event was active, then save the current ringer state so it can be restored later
-		if (stateManager.getServiceState().equals(ServiceStates.NOT_ACTIVE)) {
-			ringerState.storeRingerState();
-		}
 
+        //quick silence requests are always explicitly request to silence the ringer
 		ringerState.setPhoneRinger(CalEvent.RINGER.SILENT);
 
 		vibrate();

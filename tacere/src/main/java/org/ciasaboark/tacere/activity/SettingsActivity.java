@@ -16,16 +16,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.graphics.drawable.Drawable;
 import android.view.ViewAnimationUtils;
 import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
@@ -57,7 +59,7 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(View view) {
                 prefs.setAdjustAlarm(!prefs.getAdjustAlarm());
-                refreshDisplay();
+                drawAlarmWidgets();
             }
         });
 
@@ -66,7 +68,7 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(View view) {
                 prefs.setAdjustMedia(!prefs.getAdjustMedia());
-                refreshDisplay();
+                drawMediaWidgets();
             }
         });
 
@@ -81,10 +83,15 @@ public class SettingsActivity extends Activity {
                     i.putExtra("type", "activityRestart");
                     startService(i);
                 }
-                refreshDisplay();
+                drawServiceWidget();
+                drawMediaWidgets();
+                drawAlarmWidgets();
+                drawRingerWidgets();
             }
         });
-		refreshDisplay();
+
+
+		drawAllWidgets();
 	}
 
 	/**
@@ -125,126 +132,173 @@ public class SettingsActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	private void refreshDisplay() {
-		//the service state toggle
-		Switch serviceActivatedSwitch = (Switch)findViewById(R.id.activateServiceSwitch);
-		TextView serviceTV = (TextView)findViewById(R.id.activateServiceDescription);
-		if (prefs.getIsServiceActivated()) {
-			serviceActivatedSwitch.setChecked(true);
-			serviceTV.setText(R.string.pref_service_enabled);
-		} else {
-			serviceActivatedSwitch.setChecked(false);
-			serviceTV.setText(R.string.pref_service_disabled);
-		}
-		
-		//the ringer type description
-		TextView ringerTV = (TextView)findViewById(R.id.ringerTypeDescription);
-		switch (prefs.getRingerType()) {
-			case 1:
-				ringerTV.setText(R.string.pref_ringer_type_normal);
-				break;
-			case 2:
-				ringerTV.setText(R.string.pref_ringer_type_vibrate);
-				break;
-			case 3:
-				ringerTV.setText(R.string.pref_ringer_type_silent);
-				break;
-			default :
-				ringerTV.setText(R.string.pref_ringer_type_silent);
-		}
-		
 
-		
-		//the media volumes toggle
-		Switch mediaCB = (Switch)findViewById(R.id.adjustMediaCheckBox);
+    private void redrawMediaControls() {
 
-        if (prefs.getAdjustMedia()) {
-            mediaCB.setChecked(true);
-        } else {
-            mediaCB.setChecked(false);
+    }
+
+	private void drawAllWidgets() {
+        drawServiceWidget();
+        drawRingerWidgets();
+        drawMediaWidgets();
+        drawAlarmWidgets();
+        drawQuickSilenceWidget();
+    }
+
+    private void drawQuickSilenceWidget() {
+        //the quick silence button
+        TextView quickTV = (TextView)findViewById(id.quickSilenceDescription);
+        String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
+        String hrs = "";
+        if (prefs.getQuickSilenceHours() > 0) {
+            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " hours ";
         }
-        mediaCB.setEnabled(prefs.getIsServiceActivated());
+        quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
+    }
 
-		
-		//the media volumes slider
-		SeekBar mediaSB = (SeekBar)findViewById(R.id.mediaSeekBar);
-		mediaSB.setMax(VolumesManager.getMaxMediaVolume());
-		mediaSB.setProgress(prefs.getCurMediaVolume());
-		if (!prefs.getAdjustMedia()) {
-			mediaSB.setEnabled(false);
+    private void drawAlarmWidgets() {
+        TextView alarmTV = (TextView)findViewById(id.settings_alarmText);
+        if (prefs.getIsServiceActivated()) {
+            alarmTV.setTextColor(getResources().getColor(R.color.textcolor));
+        } else {
+            alarmTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
 
-            mediaSB.setVisibility(View.GONE);
-		} else {
-			mediaSB.setEnabled(true);
-            mediaSB.setVisibility(View.VISIBLE);
-		}
-		mediaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				prefs.setCurMediaVolume(progress);
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-                //required stub
-			}
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-                //required stub
-			}
-		});
+        //the alarm volumes toggle
+        Switch alarmSwitch = (Switch)findViewById(id.adjustAlarmCheckBox);
+        if (prefs.getAdjustAlarm()) {
+            alarmSwitch.setChecked(true);
+        } else {
+            alarmSwitch.setChecked(false);
+        }
+        alarmSwitch.setEnabled(prefs.getIsServiceActivated());
 
-		
-		//the alarm volumes toggle
-		Switch alarmCB = (Switch)findViewById(R.id.adjustAlarmCheckBox);
-		if (prefs.getAdjustAlarm()) {
-			alarmCB.setChecked(true);
-		} else {
-			alarmCB.setChecked(false);
-		}
-        alarmCB.setEnabled(prefs.getIsServiceActivated());
-		
-		//the alarm volumes slider
-		SeekBar alarmSB = (SeekBar)findViewById(R.id.alarmSeekBar);
-		alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
-		alarmSB.setProgress(prefs.getCurAlarmVolume());
-		if (!prefs.getAdjustAlarm()) {
-			alarmSB.setEnabled(false);
-            this.animateHideView(alarmSB);
-//            alarmSB.setVisibility(View.GONE);
-		} else {
-			alarmSB.setEnabled(true);
-//            alarmSB.setVisibility(View.VISIBLE);
+        //the alarm volumes slider
+        SeekBar alarmSB = (SeekBar)findViewById(id.alarmSeekBar);
+        alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
+        alarmSB.setProgress(prefs.getCurAlarmVolume());
+        if (prefs.getAdjustAlarm() && prefs.getIsServiceActivated()) {
             this.animateRevealView(alarmSB);
-		}
-		alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				prefs.setCurAlarmVolume(progress);
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
+            alarmSB.setEnabled(true);
+                    } else {
+            alarmSB.setEnabled(false);
+            this.animateHideView(alarmSB);
+        }
+        alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.setCurAlarmVolume(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
                 //required stub
-			}
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
                 //required stub
-			}
-		});
-		
-		//the quick silence button
-		TextView quickTV = (TextView)findViewById(R.id.quickSilenceDescription);
-		String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
-		String hrs = "";
-		if (prefs.getQuickSilenceHours() > 0) {
-			hrs = String.valueOf(prefs.getQuickSilenceHours()) + " hours "; 
-		}
-		quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
-	}
+            }
+        });
+    }
+
+    private void drawServiceWidget() {
+        //the service state toggle
+        Switch serviceActivatedSwitch = (Switch)findViewById(id.activateServiceSwitch);
+        TextView serviceTV = (TextView)findViewById(id.activateServiceDescription);
+        if (prefs.getIsServiceActivated()) {
+            serviceActivatedSwitch.setChecked(true);
+            serviceTV.setText(R.string.pref_service_enabled);
+        } else {
+            serviceActivatedSwitch.setChecked(false);
+            serviceTV.setText(R.string.pref_service_disabled);
+        }
+    }
+
+    private void drawRingerWidgets() {
+        //the ringer type description
+        TextView ringerDescriptionTV = (TextView)findViewById(id.ringerTypeDescription);
+        TextView ringerTV = (TextView)findViewById(id.settings_ringerTitle);
+
+        Drawable icon;
+        switch (prefs.getRingerType()) {
+            case 1:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
+                icon = getResources().getDrawable(R.drawable.ringer_normal_cropped);
+                break;
+            case 2:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
+                icon = getResources().getDrawable(R.drawable.ringer_vibrate_cropped);
+                break;
+            default:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
+                icon = getResources().getDrawable(R.drawable.ringer_silent_cropped);
+                break;
+        }
+
+
+        if (prefs.getIsServiceActivated()) {
+            int iconColor = getResources().getColor(R.color.accent);
+            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
+            ringerTV.setTextColor(getResources().getColor(R.color.textcolor));
+        } else {
+            int iconColor = getResources().getColor(android.R.color.darker_gray);
+            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            ringerTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
+
+        ImageButton ringerIcon = (ImageButton)findViewById(id.settings_ringerIcon);
+        ringerIcon.setBackground(icon);
+    }
+
+    private void drawMediaWidgets() {
+        TextView mediaTV = (TextView)findViewById(id.settings_mediaText);
+        if (prefs.getIsServiceActivated()) {
+            mediaTV.setTextColor(getResources().getColor(R.color.textcolor));
+        } else {
+            mediaTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
+
+        //the media volumes toggle
+        Switch mediaSwitch = (Switch)findViewById(id.adjustMediaCheckBox);
+        if (prefs.getAdjustMedia()) {
+            mediaSwitch.setChecked(true);
+        } else {
+            mediaSwitch.setChecked(false);
+        }
+        mediaSwitch.setEnabled(prefs.getIsServiceActivated());
+
+
+        //the media volumes slider
+        SeekBar mediaSB = (SeekBar)findViewById(id.mediaSeekBar);
+        mediaSB.setMax(VolumesManager.getMaxMediaVolume());
+        mediaSB.setProgress(prefs.getCurMediaVolume());
+        if (prefs.getAdjustMedia() && prefs.getIsServiceActivated()) {
+            this.animateRevealView(mediaSB);
+            mediaSB.setEnabled(true);
+        } else {
+            mediaSB.setEnabled(false);
+            this.animateHideView(mediaSB);
+        }
+        mediaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.setCurMediaVolume(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //required stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //required stub
+            }
+        });
+    }
 
     private void animateRevealView(View v) {
         // previously invisible view
@@ -294,7 +348,7 @@ public class SettingsActivity extends Activity {
 	
 	private void restoreDefaults() {
 		prefs.restoreDefaultPreferences();
-        refreshDisplay();
+        drawAllWidgets();
 	}
 
 	private void saveSettings() {
@@ -319,8 +373,7 @@ public class SettingsActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						prefs.setRingerType(which + 1);
 						saveSettings();
-						refreshDisplay();
-						
+						drawRingerWidgets();
 					}
 				})
 				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -386,7 +439,7 @@ public class SettingsActivity extends Activity {
 				prefs.setQuickSilenceHours(hourP.getValue() - 1);
 				prefs.setQuicksilenceMinutes(minP.getValue() - 1);
 				saveSettings();
-				refreshDisplay();
+				drawQuickSilenceWidget();
 			}
 		});
 	           
