@@ -40,6 +40,7 @@ import org.ciasaboark.tacere.manager.VolumesManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.provider.QuickSilenceProvider;
 import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 
 public class SettingsActivity extends Activity {
@@ -80,7 +81,7 @@ public class SettingsActivity extends Activity {
                 //if the service has been reactivated then we should restart it
                 if (prefs.getIsServiceActivated()) {
                     Intent i = new Intent(context, EventSilencerService.class);
-                    i.putExtra("type", "activityRestart");
+                    i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
                     startService(i);
                 }
                 drawServiceWidget();
@@ -116,7 +117,7 @@ public class SettingsActivity extends Activity {
             //restore settings to default values then navigate to the main activity
 			restoreDefaults();
 			//navigate back to the main screen
-			Toast.makeText(getApplicationContext(),"Settings have been restored to defaults", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(),R.string.settings_restored, Toast.LENGTH_SHORT).show();
             return true;
 		case android.R.id.home:
 			// This ID represents the Home or Up button. In the case of this
@@ -151,7 +152,7 @@ public class SettingsActivity extends Activity {
         String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
         String hrs = "";
         if (prefs.getQuickSilenceHours() > 0) {
-            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " hours ";
+            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
         }
         quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
     }
@@ -367,7 +368,7 @@ public class SettingsActivity extends Activity {
 
 	public void onClickRingerType(View v) {
 		AlertDialog alert = new AlertDialog.Builder(this)
-				.setTitle("Ringer Type")
+				.setTitle(R.string.pref_ringer_type)
 				.setSingleChoiceItems(R.array.ringer_types, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -376,14 +377,14 @@ public class SettingsActivity extends Activity {
 						drawRingerWidgets();
 					}
 				})
-				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						//do nothing
 						
 					}
 				})
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						//do nothing
@@ -400,7 +401,7 @@ public class SettingsActivity extends Activity {
 		LayoutInflater inflator = LayoutInflater.from(this);
 		View view = inflator.inflate(R.layout.dialog_quicksilent, null);
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Quick Silence");
+		builder.setTitle(R.string.notification_quicksilence_title);
 		builder.setView(view);
 	
 		final NumberPicker hourP = (NumberPicker)view.findViewById(R.id.hourPicker);
@@ -433,7 +434,7 @@ public class SettingsActivity extends Activity {
 		minP.setDisplayedValues(minutes);
 		minP.setValue(prefs.getQuicksilenceMinutes() + 1);
 		
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				prefs.setQuickSilenceHours(hourP.getValue() - 1);
@@ -443,7 +444,7 @@ public class SettingsActivity extends Activity {
 			}
 		});
 	           
-	    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 	    	public void onClick(DialogInterface dialog, int id) {
 	    		//do nothing
 	    	}

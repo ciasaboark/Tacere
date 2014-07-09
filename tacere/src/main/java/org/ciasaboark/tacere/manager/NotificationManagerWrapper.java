@@ -26,6 +26,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 public class NotificationManagerWrapper {
+    private static final String TAG = "NotificationManagerWrapper";
 	// an id to reference all notifications
 	private static final int NOTIFICATION_ID	= 1;
 	
@@ -56,22 +57,33 @@ public class NotificationManagerWrapper {
 
 		int hrs = quicksilenceDurationMinutes / 60;
 		int min = quicksilenceDurationMinutes % 60;
-		StringBuilder sb = new StringBuilder("Silencing for ");
-		if (hrs > 0) {
-			sb.append(hrs + " hr ");
-		}
+        String hour = "";
+        if (hrs == 1) {
+            hour = context.getString(R.string.hour_lower);
+        } else if (hrs > 1) {
+            hour = context.getString(R.string.hours_lower);
+        }
 
-		sb.append(min + " min. Touch to cancel");
+        String minute = "";
+        if (min == 1) {
+            minute = context.getString(R.string.minute_lower);
+        } else if (min > 1) {
+            minute = context.getString(R.string.minutes_lower);
+        }
+
+        String formatString = context.getString(R.string.notification_quicksilence_description);
+        String formattedString = String.format(formatString, hrs, hour, min, minute);
+
 
 		// FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new
 		// pending intent
 		PendingIntent pendIntent = PendingIntent.getService(context,
 				NOTIFICATION_ID, notificationIntent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
-		// TODO use strings in xml
+
 		NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
-				context).setContentTitle("Tacere: Quick Silence")
-				.setContentText(sb.toString()).setTicker("Quick Silence activating")
+				context).setContentTitle(context.getString(R.string.notification_quicksilence_title))
+				.setContentText(formattedString).setTicker(context.getString(R.string.notification_quicksilence_ticker))
 				.setSmallIcon(R.drawable.small_mono).setAutoCancel(true).setOngoing(true)
 				.setContentIntent(pendIntent);
 
@@ -89,6 +101,9 @@ public class NotificationManagerWrapper {
 	 *            the CalEvent that is currently active.
 	 */
 	public void displayEventNotification(CalEvent event) {
+        if (event == null) {
+            throw new IllegalArgumentException(TAG + " displayEventNotification given null event");
+        }
 		int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
 		if (apiLevelAvailable >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
 			displayNewEventNotification(event);
@@ -117,14 +132,14 @@ public class NotificationManagerWrapper {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 
 		NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
-				context).setContentTitle("Tacere: Event active")
+				context).setContentTitle(context.getString(R.string.notification_event_active_title))
 				.setContentText(event.toString()).setSmallIcon(R.drawable.small_mono)
 				.setAutoCancel(false).setOnlyAlertOnce(true).setOngoing(true)
 				.setContentIntent(pendIntent);
 
 		// the ticker text should only be shown the first time the notification is
 		// created, not on each update
-		notBuilder.setTicker("Tacere event starting: " + event.toString());
+		notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + event.toString());
 
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.notify(NOTIFICATION_ID, notBuilder.build());
@@ -151,7 +166,7 @@ public class NotificationManagerWrapper {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 
 		Notification.Builder notBuilder = new Notification.Builder(context)
-				.setContentTitle("Tacere: Event active").setContentText(event.toString())
+				.setContentTitle(context.getString(R.string.notification_event_active_title)).setContentText(event.toString())
 				.setSmallIcon(R.drawable.small_mono).setAutoCancel(false).setOnlyAlertOnce(true)
 				.setOngoing(true).setContentIntent(pendIntent);
 
@@ -163,7 +178,7 @@ public class NotificationManagerWrapper {
 					PendingIntent.FLAG_CANCEL_CURRENT);
 
 			notBuilder
-					.addAction(R.drawable.ic_state_normal, "Skip this event", skipEventPendIntent);
+					.addAction(R.drawable.ic_state_normal, context.getString(R.string.notification_event_skip), skipEventPendIntent);
 		} else {
 			// this intent will be attached to the button on the notification
 			Intent skipEventIntent = new Intent(context, ResetEventService.class);
@@ -171,13 +186,13 @@ public class NotificationManagerWrapper {
 			PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
 					PendingIntent.FLAG_CANCEL_CURRENT);
 
-			notBuilder.addAction(R.drawable.ic_state_normal, "Enable auto silencing",
+			notBuilder.addAction(R.drawable.ic_state_normal, context.getString(R.string.notification_event_enable),
 					skipEventPendIntent);
 		}
 
 		// the ticker text should only be shown the first time the notification is
 		// created, not on each update
-		notBuilder.setTicker("Tacere event starting: " + event.toString());
+		notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + event.toString());
 
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.notify(NOTIFICATION_ID, notBuilder.build());
