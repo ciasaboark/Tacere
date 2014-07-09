@@ -14,6 +14,7 @@
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:actionMenuTextColor">@color/textColorMenu</item>
     </style>
 
 </resources>

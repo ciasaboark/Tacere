@@ -10,5 +10,6 @@
     <item name="textColorPrimary" type="color">#ff000000</item>
     <item name="textColorHeading" type="color">#ff555555</item>
     <item name="textColorDisabled" type="color">#ff777777</item>
-    <item name="windowBackground" type="color">#fffafafa</item>
+    <item name="textColorMenu" type="color">#ffffffff</item>
+    <item name="windowBackground" type="color">#ffe9eee0</item>
 </resources>
