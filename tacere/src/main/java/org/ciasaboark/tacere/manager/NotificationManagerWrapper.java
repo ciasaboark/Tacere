@@ -57,23 +57,22 @@ public class NotificationManagerWrapper {
 
 		int hrs = quicksilenceDurationMinutes / 60;
 		int min = quicksilenceDurationMinutes % 60;
-        String hour = "";
+        String formattedHours = "";
         if (hrs == 1) {
-            hour = context.getString(R.string.hour_lower);
+            formattedHours = String.format(context.getString(R.string.notification_time_and_unit), hrs, context.getString(R.string.hour_lower));
         } else if (hrs > 1) {
-            hour = context.getString(R.string.hours_lower);
+            formattedHours = String.format(context.getString(R.string.notification_time_and_unit), hrs, context.getString(R.string.hours_lower));
         }
 
-        String minute = "";
+        String formattedMinutes = "";
         if (min == 1) {
-            minute = context.getString(R.string.minute_lower);
+            formattedMinutes = " " + String.format(context.getString(R.string.notification_time_and_unit), min, context.getString(R.string.minute_lower));
         } else if (min > 1) {
-            minute = context.getString(R.string.minutes_lower);
+            formattedMinutes = " " + String.format(context.getString(R.string.notification_time_and_unit), min, context.getString(R.string.minutes_lower));
         }
 
-        String formatString = context.getString(R.string.notification_quicksilence_description);
-        String formattedString = String.format(formatString, hrs, hour, min, minute);
 
+        String formattedString = String.format(context.getString(R.string.notification_quicksilence_description), formattedHours, formattedMinutes);
 
 		// FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new
 		// pending intent
@@ -85,7 +84,8 @@ public class NotificationManagerWrapper {
 				context).setContentTitle(context.getString(R.string.notification_quicksilence_title))
 				.setContentText(formattedString).setTicker(context.getString(R.string.notification_quicksilence_ticker))
 				.setSmallIcon(R.drawable.small_mono).setAutoCancel(true).setOngoing(true)
-				.setContentIntent(pendIntent);
+				.setContentIntent(pendIntent)
+                .setTicker(context.getString(R.string.notification_quicksilence_ticker));
 
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(NOTIFICATION_ID);
