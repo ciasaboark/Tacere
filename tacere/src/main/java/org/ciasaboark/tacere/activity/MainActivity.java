@@ -146,24 +146,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     private void drawQuicksilenceButton() {
-        setContentView(R.layout.activity_main);
         ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
-        quickSilenceImageButton.clearAnimation();
-        quickSilenceImageButton.cancelPendingInputEvents();
-        quickSilenceImageButton.setEnabled(false);
+        ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
+
 
         ServiceStateManager ssManager = new ServiceStateManager(this);
 
         if (ssManager.isQuickSilenceActive()) {
-//            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.button_ongoing));
-//            Drawable d = getResources().getDrawable(R.drawable.action_button_cancel_quicksilence);
-//            quickSilenceImageButton.setBackground(d);
-            quickSilenceImageButton.setImageResource(R.drawable.ic_state_normal);
+            quickSilenceImageButton.setVisibility(View.GONE);
+            cancelQuickSilenceButton.setVisibility(View.VISIBLE);
         } else {
-//            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.accent));
-//            Drawable d = getResources().getDrawable(R.drawable.action_button_quicksilence);
-//            quickSilenceImageButton.setBackground(d);
-            quickSilenceImageButton.setImageResource(R.drawable.ic_state_silent);
+            quickSilenceImageButton.setVisibility(View.VISIBLE);
+            cancelQuickSilenceButton.setVisibility(View.GONE);
         }
 
 
@@ -174,10 +168,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         Outline outline = new Outline();
         outline.setOval(0, 0, size, size);
         quickSilenceImageButton.setOutline(outline);
+        cancelQuickSilenceButton.setOutline(outline);
 
+        //only the quicksilence button should be hidden, we may still need to be able to cancel
+        //an ongoing quicksilence duration
         if (prefs.getQuickSilenceHours() == 0 && prefs.getQuicksilenceMinutes() == 0) {
             quickSilenceImageButton.setEnabled(false);
-            quickSilenceImageButton.setVisibility(View.INVISIBLE);
+            quickSilenceImageButton.setVisibility(View.GONE);
         } else {
             quickSilenceImageButton.setEnabled(true);
             quickSilenceImageButton.setVisibility(View.VISIBLE);
@@ -188,19 +185,24 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             public void onClick(View v) {
                 // an intent to send to either start or stop a quick silence duration
                 Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-                ServiceStateManager ssManager = new ServiceStateManager(ctx);
-                if (ssManager.isQuickSilenceActive()) {
-                    i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-                } else {
-                    i.putExtra("type", RequestTypes.QUICKSILENCE);
-                    // the length of time for the pollService to sleep in minutes
-                    int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-                    i.putExtra("duration", duration);
-                }
+                i.putExtra("type", RequestTypes.QUICKSILENCE);
+                // the length of time for the pollService to sleep in minutes
+                int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+                i.putExtra("duration", duration);
+                startService(i);
+            }
+        });
+
+        cancelQuickSilenceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+                i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
                 startService(i);
             }
         });
         quickSilenceImageButton.invalidate();
+        cancelQuickSilenceButton.invalidate();
     }
 
     @Override
