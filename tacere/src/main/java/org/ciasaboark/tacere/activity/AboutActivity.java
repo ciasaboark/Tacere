@@ -47,6 +47,9 @@ public class AboutActivity extends Activity {
 				return true;
 			}
 		});
+
+        wv.setBackgroundColor(0x00000000);
+        wv.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
 	}
 
 	/**

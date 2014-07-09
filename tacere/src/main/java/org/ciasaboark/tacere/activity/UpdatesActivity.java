@@ -59,6 +59,8 @@ public class UpdatesActivity extends Activity {
         		return true;
         	}
         });
+        webView.setBackgroundColor(0x00000000);
+        webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
 
         Button closeButton = (Button)findViewById(R.id.updatesButton);
         if (showingUpdatesFromMainScreen) {
