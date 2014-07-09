@@ -1,9 +1,6 @@
 /*
- * Created by Jonathan Nelson
- * 
- * Copyright 2013 Jonathan Nelson
- * 
- * Released under the BSD license. For details see the COPYING file.
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
  */
 
 package org.ciasaboark.tacere.prefs;
@@ -19,7 +16,7 @@ import android.content.SharedPreferences;
  */
 public class Prefs {
 	private static final String TAG = "Prefs";
-	private static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
+    private static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
 	private static SharedPreferences sharedPreferences;
 	private static SharedPreferences.Editor editor;
 
@@ -39,32 +36,65 @@ public class Prefs {
 		return sharedPreferences.getBoolean(Keys.IS_SERVICE_ACTIVATED, DefaultPrefs.IS_ACTIVATED);
 	}
 
+	public void setIsServiceActivated(Boolean isServiceActivated) {
+		editor.putBoolean(Keys.IS_SERVICE_ACTIVATED, isServiceActivated).commit();
+	}
+
 	public Boolean getSilenceFreeTimeEvents() {
 		return sharedPreferences.getBoolean(Keys.SILENCE_FREE_TIME, DefaultPrefs.SILENCE_FREE_TIME);
+	}
+
+	public void setSilenceFreeTimeEvents(Boolean silenceFreeTimeEvents) {
+		editor.putBoolean(Keys.SILENCE_FREE_TIME, silenceFreeTimeEvents).commit();
+
 	}
 
 	public Boolean getSilenceAllDayEvents() {
 		return sharedPreferences.getBoolean(Keys.SILENCE_ALL_DAY, DefaultPrefs.SILENCE_ALL_DAY);
 	}
 
+	public void setSilenceAllDayEvents(Boolean silenceAllDayEvents) {
+		editor.putBoolean(Keys.SILENCE_ALL_DAY, silenceAllDayEvents).commit();
+	}
+
 	public int getRingerType() {
 		return sharedPreferences.getInt(Keys.RINGER_TYPE, DefaultPrefs.RINGER_TYPE);
+	}
+
+	public void setRingerType(int ringerType) {
+		editor.putInt(Keys.RINGER_TYPE, ringerType).commit();
 	}
 
 	public Boolean getAdjustMedia() {
 		return sharedPreferences.getBoolean(Keys.ADJUST_MEDIA, DefaultPrefs.ADJUST_MEDIA);
 	}
 
+	public void setAdjustMedia(Boolean adjustMedia) {
+		editor.putBoolean(Keys.ADJUST_MEDIA, adjustMedia).commit();
+	}
+
 	public Boolean getAdjustAlarm() {
 		return sharedPreferences.getBoolean(Keys.ADJUST_ALARM, DefaultPrefs.ADJUST_ALARM);
+	}
+
+	public void setAdjustAlarm(Boolean adjustAlarm) {
+		editor.putBoolean(Keys.ADJUST_ALARM, adjustAlarm).commit();
 	}
 
 	public int getCurMediaVolume() {
 		return sharedPreferences.getInt(Keys.MEDIA_VOLUME, DefaultPrefs.MEDIA_VOLUME);
 	}
 
+	public void setCurMediaVolume(int curMediaVolume) {
+		editor.putInt(Keys.MEDIA_VOLUME, curMediaVolume).commit();
+	}
+
 	public int getCurAlarmVolume() {
 		return sharedPreferences.getInt(Keys.ALARM_VOLUME, DefaultPrefs.ALARM_VOLUME);
+	}
+
+	public void setCurAlarmVolume(int curAlarmVolume) {
+		editor.putInt(Keys.ALARM_VOLUME, curAlarmVolume).commit();
 	}
 
 	public int getQuicksilenceMinutes() {
@@ -72,17 +102,33 @@ public class Prefs {
 				DefaultPrefs.QUICK_SILENCE_MINUTES);
 	}
 
+	public void setQuicksilenceMinutes(int quicksilenceMinutes) {
+		editor.putInt(Keys.QUICKSILENCE_MINUTES, quicksilenceMinutes).commit();
+	}
+
 	public int getQuickSilenceHours() {
 
 		return sharedPreferences.getInt(Keys.QUICKSILENCE_HOURS, DefaultPrefs.QUICK_SILENCE_HOURS);
+	}
+
+	public void setQuickSilenceHours(int quickSilenceHours) {
+		editor.putInt(Keys.QUICKSILENCE_HOURS, quickSilenceHours).commit();
 	}
 
 	public int getBufferMinutes() {
 		return sharedPreferences.getInt(Keys.BUFFER_MINUTES, DefaultPrefs.BUFFER_MINUTES);
 	}
 
+	public void setBufferMinutes(int bufferMinutes) {
+		editor.putInt(Keys.BUFFER_MINUTES, bufferMinutes).commit();
+	}
+
 	public int getLookaheadDays() {
 		return sharedPreferences.getInt(Keys.LOOKAHEAD_DAYS, DefaultPrefs.LOOKAHEAD_DAYS);
+	}
+
+	public void setLookaheadDays(int lookaheadDays) {
+		editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays).commit();
 	}
 
 	public int getDefaultRinger() {
@@ -100,8 +146,6 @@ public class Prefs {
 	public boolean isUpdatesCheckboxChecked() {
 		return sharedPreferences.getBoolean(Keys.UPDATES_CHECKBOX, DefaultPrefs.UPDATES_CHECKBOX);
 	}
-
-
 
     public boolean getBoolean(String key) {
         if (sharedPreferences.contains(key)) {
@@ -134,55 +178,6 @@ public class Prefs {
             throw new IllegalArgumentException("key " + key + " not found in preferences");
         }
     }
-
-	public void setIsServiceActivated(Boolean isServiceActivated) {
-		editor.putBoolean(Keys.IS_SERVICE_ACTIVATED, isServiceActivated).commit();
-	}
-
-	public void setSilenceFreeTimeEvents(Boolean silenceFreeTimeEvents) {
-		editor.putBoolean(Keys.SILENCE_FREE_TIME, silenceFreeTimeEvents).commit();
-
-	}
-
-	public void setSilenceAllDayEvents(Boolean silenceAllDayEvents) {
-		editor.putBoolean(Keys.SILENCE_ALL_DAY, silenceAllDayEvents).commit();
-	}
-
-	public void setRingerType(int ringerType) {
-		editor.putInt(Keys.RINGER_TYPE, ringerType).commit();
-	}
-
-	public void setAdjustMedia(Boolean adjustMedia) {
-		editor.putBoolean(Keys.ADJUST_MEDIA, adjustMedia).commit();
-	}
-
-	public void setAdjustAlarm(Boolean adjustAlarm) {
-		editor.putBoolean(Keys.ADJUST_ALARM, adjustAlarm).commit();
-	}
-
-	public void setCurMediaVolume(int curMediaVolume) {
-		editor.putInt(Keys.MEDIA_VOLUME, curMediaVolume).commit();
-	}
-
-	public void setCurAlarmVolume(int curAlarmVolume) {
-		editor.putInt(Keys.ALARM_VOLUME, curAlarmVolume).commit();
-	}
-
-	public void setQuicksilenceMinutes(int quicksilenceMinutes) {
-		editor.putInt(Keys.QUICKSILENCE_MINUTES, quicksilenceMinutes).commit();
-	}
-
-	public void setQuickSilenceHours(int quickSilenceHours) {
-		editor.putInt(Keys.QUICKSILENCE_HOURS, quickSilenceHours).commit();
-	}
-
-	public void setBufferMinutes(int bufferMinutes) {
-		editor.putInt(Keys.BUFFER_MINUTES, bufferMinutes).commit();
-	}
-
-	public void setLookaheadDays(int lookaheadDays) {
-		editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays).commit();
-	}
 
 	public void setUpdatesCheckbox(boolean updatesCheckbox) {
 		editor.putBoolean(Keys.UPDATES_CHECKBOX, updatesCheckbox).commit();

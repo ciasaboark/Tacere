@@ -1,14 +1,8 @@
 /*
- * Created by Jonathan Nelson
- * 
- * Copyright 2013 Jonathan Nelson
- *
+ * Copyright (c) 2014 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-/* Provides access to a homescreen widget, currently disabled
- * within the manifest
- */
 package org.ciasaboark.tacere.provider;
 
 import org.ciasaboark.tacere.R;
@@ -24,6 +18,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
+/**
+ * Provides access to a homescreen widget, currently disabled
+ * within the manifest
+ */
 public class QuickSilenceProvider extends AppWidgetProvider {
 	@SuppressWarnings("unused")
 	private static final String TAG = "QuickSilenceProvider";

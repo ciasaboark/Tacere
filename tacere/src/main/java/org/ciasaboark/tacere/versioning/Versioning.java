@@ -1,8 +1,10 @@
+/*
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
+ */
+
 package org.ciasaboark.tacere.versioning;
 
-/**
- * Created by Jonathan Nelson on 7/7/14.
- */
 public class Versioning {
     private static final String CURRENT_RELEASE_NAME = "beta(7-3-14)";
     private static final int VERSION_MAJOR = 2;
