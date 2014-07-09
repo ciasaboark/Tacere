@@ -17,8 +17,10 @@ import android.database.Cursor;
 import android.graphics.Outline;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.CalendarContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -151,17 +153,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         quickSilenceImageButton.setEnabled(false);
 
         ServiceStateManager ssManager = new ServiceStateManager(this);
+
         if (ssManager.isQuickSilenceActive()) {
 //            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.button_ongoing));
-            Drawable d = getResources().getDrawable(R.drawable.action_button_cancel_quicksilence);
-            quickSilenceImageButton.setBackground(d);
+//            Drawable d = getResources().getDrawable(R.drawable.action_button_cancel_quicksilence);
+//            quickSilenceImageButton.setBackground(d);
             quickSilenceImageButton.setImageResource(R.drawable.ic_state_normal);
         } else {
 //            quickSilenceImageButton.setBackgroundColor(getResources().getColor(R.color.accent));
-            Drawable d = getResources().getDrawable(R.drawable.action_button_quicksilence);
-            quickSilenceImageButton.setBackground(d);
+//            Drawable d = getResources().getDrawable(R.drawable.action_button_quicksilence);
+//            quickSilenceImageButton.setBackground(d);
             quickSilenceImageButton.setImageResource(R.drawable.ic_state_silent);
         }
+
 
         //Draw a round outline on the button
         //TODO should this be done on older styles as well?  It might be better to use the normal
@@ -257,14 +261,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // app icon in action bar clicked; go home
-                Intent intent = new Intent(this, SettingsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+                settingsActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(settingsActivityIntent);
                 return true;
             case R.id.action_about:
-                Intent i = new Intent(this, AboutActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
+                Intent aboutActivityIntent = new Intent(this, AboutActivity.class);
+                aboutActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(aboutActivityIntent);
+                return true;
+            case R.id.action_add_event:
+                Uri.Builder uriBuilder = CalendarContract.Events.CONTENT_URI.buildUpon();
+                Intent addEventIntent = new Intent(Intent.ACTION_INSERT, uriBuilder.build());
+                startActivity(addEventIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -1,6 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/action_add_event"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_new"
+        android:title="@string/action_add_event" />
+
+    <item
         android:id="@+id/action_about"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
@@ -12,6 +19,7 @@
         android:showAsAction="ifRoom|withText"
         android:icon="@drawable/action_settings"
         android:title="@string/action_settings" />
+
 
 
 </menu>
