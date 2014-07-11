@@ -32,8 +32,9 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 public class AdvancedSettingsActivity extends Activity {
-	private static final String TAG = "AdvancedSettingsActivity";
-	private Prefs prefs;
+	@SuppressWarnings("unused")
+    private static final String TAG = "AdvancedSettingsActivity";
+	private final Prefs prefs;
 	private boolean silenceFreeTime;
 	private boolean silenceAllDay;
 	private int bufferMinutes;

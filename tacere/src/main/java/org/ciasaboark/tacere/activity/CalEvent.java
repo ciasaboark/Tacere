@@ -35,7 +35,7 @@ public class CalEvent {
 	public static final long MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
 	public static final long MILLISECONDS_IN_DAY 	= MILLISECONDS_IN_MINUTE * 60 * 24;
 
-	public CalEvent(Context c) {
+	public CalEvent() {
 		super();
 		this.instanceId = null;
 		this.eventId 	= null;

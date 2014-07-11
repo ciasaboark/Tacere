@@ -18,7 +18,7 @@ public class ServiceStateManager {
 	@SuppressWarnings("unused")
 	private static final String TAG = "StateManager";
 	private static final String SERVICE_STATE_KEY = "serviceState";
-	private Prefs prefs;
+	private final Prefs prefs;
 
 	public ServiceStateManager(Context ctx) {
 		this.prefs = new Prefs(ctx);

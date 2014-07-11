@@ -17,8 +17,8 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 
 public class RingerStateManager {
-	private Context context;
-	private Prefs prefs;
+	private final Context context;
+	private final Prefs prefs;
 	
 	public RingerStateManager(Context ctx) {
 		this.context = ctx;
@@ -30,22 +30,18 @@ public class RingerStateManager {
 	 * shared preferences
 	 */
 	public void storeRingerState() {
-		SharedPreferences preferences = context.getSharedPreferences(
-				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
 		// TODO this may return a state indicating that a call is ongoing, this should stop
 		// processing and wait for the call to end before adjusting volumes
 		int curRinger = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE))
 				.getRingerMode();
-		preferences.edit().putInt("curRinger", curRinger).commit();
+        prefs.storePreference("curRinger", curRinger);
 	}
 
 	/**
 	 * Remove stored ringer state from preferences
 	 */
 	public void clearStoredRingerState() {
-		SharedPreferences preferences = context.getSharedPreferences(
-				"org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-		preferences.edit().remove("curRinger").commit();
+        prefs.remove("curRinger");
 	}
 
 	/**

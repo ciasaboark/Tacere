@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion "android-L"
+    compileSdkVersion 'android-L'
     buildToolsVersion "20.0.0"
 
     defaultConfig {
         applicationId "org.ciasaboark.tacere"
-        minSdkVersion 21
-//        targetSdkVersion 14
+        minSdkVersion 14
+        targetSdkVersion 'android-L'
         //TODO get current version from versioning
         versionName "beta"
         versionCode 4

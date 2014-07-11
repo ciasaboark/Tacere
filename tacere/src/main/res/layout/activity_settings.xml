@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:paddingRight="0dp"
     android:scrollbarAlwaysDrawVerticalTrack="true"
     android:scrollbarStyle="outsideOverlay" >
 
@@ -128,6 +127,7 @@
             android:id="@+id/mediaSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             />
 
         <RelativeLayout
@@ -160,7 +160,8 @@
         <SeekBar
             android:id="@+id/alarmSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/textView7"

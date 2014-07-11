@@ -9,6 +9,7 @@
 package org.ciasaboark.tacere.activity;
 
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -17,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
@@ -42,12 +44,14 @@ import org.ciasaboark.tacere.provider.QuickSilenceProvider;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
+import java.lang.annotation.Target;
+
 
 public class SettingsActivity extends Activity {
 	@SuppressWarnings("unused")
 	private static final String TAG = "Settings";
 	private final Context context = this;
-	private Prefs prefs = new Prefs(this);
+	private final Prefs prefs = new Prefs(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,10 +137,6 @@ public class SettingsActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-    private void redrawMediaControls() {
-
-    }
 
 	private void drawAllWidgets() {
         drawServiceWidget();
@@ -251,7 +251,17 @@ public class SettingsActivity extends Activity {
         }
 
         ImageButton ringerIcon = (ImageButton)findViewById(id.settings_ringerIcon);
-        ringerIcon.setBackground(icon);
+        setImageButtonIcon(ringerIcon, icon);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @SuppressWarnings("deprecated")
+    private void setImageButtonIcon(ImageButton button, Drawable icon) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            button.setBackground(icon);
+        } else {
+            button.setBackgroundDrawable(icon);
+        }
     }
 
     private void drawMediaWidgets() {
@@ -264,6 +274,7 @@ public class SettingsActivity extends Activity {
 
         //the media volumes toggle
         Switch mediaSwitch = (Switch)findViewById(id.adjustMediaCheckBox);
+        SeekBar mediaSB = (SeekBar)findViewById(id.mediaSeekBar);
         if (prefs.getAdjustMedia()) {
             mediaSwitch.setChecked(true);
         } else {
@@ -273,7 +284,6 @@ public class SettingsActivity extends Activity {
 
 
         //the media volumes slider
-        SeekBar mediaSB = (SeekBar)findViewById(id.mediaSeekBar);
         mediaSB.setMax(VolumesManager.getMaxMediaVolume());
         mediaSB.setProgress(prefs.getCurMediaVolume());
         if (prefs.getAdjustMedia() && prefs.getIsServiceActivated()) {
@@ -301,50 +311,54 @@ public class SettingsActivity extends Activity {
         });
     }
 
+    @TargetApi(21)
     private void animateRevealView(View v) {
-        // previously invisible view
-        View myView = v;
-        myView.setVisibility(View.VISIBLE);
+        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
+            // previously invisible view
+            v.setVisibility(View.VISIBLE);
 
-        // get the center for the clipping circle
-        int cx = (myView.getLeft() + myView.getRight()) / 2;
-        int cy = (myView.getTop() + myView.getBottom()) / 2;
+            // get the center for the clipping circle
+            int cx = (v.getLeft() + v.getRight()) / 2;
+            int cy = (v.getTop() + v.getBottom()) / 2;
 
-        // get the final radius for the clipping circle
-        int finalRadius = myView.getWidth();
+            // get the final radius for the clipping circle
+            int finalRadius = v.getWidth();
 
-        // create and start the animator for this view
-        // (the start radius is zero)
-        android.animation.ValueAnimator anim =
-                android.view.ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-        anim.start();
+            // create and start the animator for this view
+            // (the start radius is zero)
+            android.animation.ValueAnimator anim =
+                    android.view.ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
+            anim.start();
+        }
     }
 
+    @TargetApi(21)
     private void animateHideView(final View v) {
-        // previously visible view
-        final View myView = v;
+        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
+            // get the center for the clipping circle
+            int cx = (v.getLeft() + v.getRight()) / 2;
+            int cy = (v.getTop() + v.getBottom()) / 2;
 
-        // get the center for the clipping circle
-        int cx = (myView.getLeft() + myView.getRight()) / 2;
-        int cy = (myView.getTop() + myView.getBottom()) / 2;
+            // get the initial radius for the clipping circle
+            int initialRadius = v.getWidth();
 
-        // get the initial radius for the clipping circle
-        int initialRadius = myView.getWidth();
+            // create the animation (the final radius is zero)
+            ValueAnimator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, initialRadius, 0);
 
-        // create the animation (the final radius is zero)
-        ValueAnimator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, initialRadius, 0);
+            // make the view invisible when the animation is done
+            anim.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(android.animation.Animator animation) {
+                    super.onAnimationEnd(animation);
+                    v.setVisibility(View.GONE);
+                }
+            });
 
-        // make the view invisible when the animation is done
-        anim.addListener(new android.animation.AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
-                super.onAnimationEnd(animation);
-                myView.setVisibility(View.GONE);
-            }
-        });
-
-        // start the animation
-        anim.start();
+            // start the animation
+            anim.start();
+        }
     }
 	
 	private void restoreDefaults() {

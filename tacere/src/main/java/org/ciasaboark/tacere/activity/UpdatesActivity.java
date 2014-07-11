@@ -23,12 +23,14 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 
 public class UpdatesActivity extends Activity {
-	private Prefs prefs = new Prefs(this);
-    private Context ctx = (Context) this;
+	private Prefs prefs;
+    private Context ctx;
     private boolean showingUpdatesFromMainScreen = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ctx = this;
+        prefs = new Prefs(this);
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.activity_updates);
         Intent i = getIntent();
@@ -87,22 +89,19 @@ public class UpdatesActivity extends Activity {
         }
     }
     private void hideChangelogForCurrentAppVersion() {
-        Prefs prefs = new Prefs(ctx);
         try {
-            prefs.storePreference(Versioning.getVersionCode(), true);
+            prefs.storePreference(Versioning.getVersionCode(), false);
         } catch (IllegalArgumentException e) {
             //boolean values are accepted, should not reach here
         }
     }
 
     private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
-        Prefs prefs = new Prefs(ctx);
+        Prefs staticPrefs = new Prefs(ctx);
         boolean shouldChangelogBeShown = false;
+        //the updates dialog should be shown if no value has been stored for the current app version
         try {
-            boolean storedValue = prefs.getBoolean(Versioning.getVersionCode());
-            if (!storedValue) {
-                shouldChangelogBeShown = true;
-            }
+            staticPrefs.getBoolean(Versioning.getVersionCode());
         } catch (IllegalArgumentException e) {
             shouldChangelogBeShown = true;
         }

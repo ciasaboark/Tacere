@@ -25,11 +25,10 @@ import android.widget.RemoteViews;
 public class QuickSilenceProvider extends AppWidgetProvider {
 	@SuppressWarnings("unused")
 	private static final String TAG = "QuickSilenceProvider";
-	private Prefs prefs;
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		prefs = new Prefs(context);
+		Prefs prefs = new Prefs(context);
 		
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context, QuickSilenceProvider.class);

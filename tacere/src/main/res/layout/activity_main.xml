@@ -7,47 +7,67 @@
     android:scrollbarStyle="outsideOverlay"
     tools:context=".MainActivity" >
 
+    <TextView
+        android:id="@+id/event_list_error"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="No calendar entries found"
+        android:visibility="gone"/>
     <ListView
         android:id="@+id/eventListView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:scrollbarStyle="outsideOverlay" >
+        android:scrollbarStyle="outsideOverlay" />
 
-    </ListView>
-
-    <ImageButton
-        android:id="@+id/quickSilenceButton"
-        android:src="@drawable/ic_state_silent"
-        android:elevation="4dp"
-        android:background="@drawable/action_button_quicksilence"
-        android:layout_width="@dimen/fab_size"
-        android:layout_height="@dimen/fab_size"
+    <ViewFlipper
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/quicksilenceFlipper"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/placeholder"
-        android:visibility="visible"/>
+        android:layout_alignParentRight="true" >
 
-    <ImageButton
-        android:id="@+id/cancel_quickSilenceButton"
-        android:src="@drawable/ic_state_normal"
-        android:elevation="4dp"
-        android:background="@drawable/action_button_cancel_quicksilence"
-        android:layout_width="@dimen/fab_size"
-        android:layout_height="@dimen/fab_size"
+        <ImageButton
+            android:id="@+id/quickSilenceButton"
+            android:src="@drawable/ic_state_silent"
+            android:elevation="4dp"
+            android:background="@drawable/action_button_quicksilence"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/placeholder"
+            android:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/cancel_quickSilenceButton"
+            android:src="@drawable/ic_state_normal"
+            android:elevation="4dp"
+            android:background="@drawable/action_button_cancel_quicksilence"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/placeholder"
+            android:visibility="gone"/>
+    </ViewFlipper>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/quicksilenceButton_compat"
+        android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/placeholder"
-        android:visibility="gone"/>
-
+        android:visibility="gone" />
 
 
 </RelativeLayout>

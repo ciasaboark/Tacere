@@ -4,9 +4,6 @@
     <!--android:versionCode="7"-->
     <!--android:versionName="2.0.4 beta"-->
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="14" />
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -57,11 +54,27 @@
         </activity>
         <activity
             android:name="org.ciasaboark.tacere.activity.UpdatesActivity"
-            android:theme="@android:style/Theme.Material.Light.Dialog" >
+            android:theme="@style/Dialog" >
         </activity>
         <activity
             android:name="org.ciasaboark.tacere.activity.DonationActivity"
-            android:theme="@android:style/Theme.Material.Light.Dialog" >
+            android:theme="@style/Dialog" >
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.AboutLicenseActivity"
+            android:label="@string/title_activity_about_activity_license"
+            android:parentActivityName="org.ciasaboark.tacere.activity.AboutActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.AboutActivity" />
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.AdvancedSettingsActivity"
+            android:label="@string/title_activity_advanced_settings"
+            android:parentActivityName="org.ciasaboark.tacere.activity.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
         </activity>
 
         <service
@@ -115,22 +128,7 @@
                 android:resource="@xml/quicksilence_widget_info" />
         </receiver> -->
 
-        <activity
-            android:name="org.ciasaboark.tacere.activity.AboutLicenseActivity"
-            android:label="@string/title_activity_about_activity_license"
-            android:parentActivityName="org.ciasaboark.tacere.activity.AboutActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.ciasaboark.tacere.activity.AboutActivity" />
-        </activity>
-        <activity
-            android:name="org.ciasaboark.tacere.activity.AdvancedSettingsActivity"
-            android:label="@string/title_activity_advanced_settings"
-            android:parentActivityName="org.ciasaboark.tacere.activity.SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
-        </activity>
+
         <provider
             android:name="org.ciasaboark.tacere.database.EventProvider"
             android:authorities="org.ciasaboark.tacere.Events"

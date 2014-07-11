@@ -1,14 +1,10 @@
 /*
- * Created by Jonathan Nelson
- *
- * Copyright 2013 Jonathan Nelson
- *
- * Released under the BSD license. For details see the COPYING file.
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
  */
 
 package org.ciasaboark.tacere.manager;
 
-import org.ciasaboark.tacere.prefs.ConstVariables;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -24,7 +20,7 @@ public class AlarmManagerWrapper {
 	private static final int RC_QUICKSILENT 	= 2;
 	private static final int RC_NOTIFICATION 	= 3;
 	
-	private Context context;
+	private final Context context;
 
 	public AlarmManagerWrapper(Context ctx) {
 		this.context = ctx;
@@ -32,10 +28,6 @@ public class AlarmManagerWrapper {
 	
 	public void scheduleNormalWakeAt(long time) {
 		scheduleAlarmAt(time, RequestTypes.NORMAL);
-	}
-	
-	public void scheduleQuickSilenceWakeAt(long time) {
-		scheduleAlarmAt(time, RequestTypes.QUICKSILENCE);
 	}
 	
 	public void scheduleCancelQuickSilenceAlarmAt(long time) {
@@ -46,7 +38,7 @@ public class AlarmManagerWrapper {
 		scheduleAlarmAt(time, RequestTypes.ACTIVITY_RESTART);
 	}
 
-	public void scheduleAlarmAt(long time, String type) {
+	private void scheduleAlarmAt(long time, String type) {
 		if (type == null) {
 			throw new IllegalArgumentException("unknown type: " + type);
 		}

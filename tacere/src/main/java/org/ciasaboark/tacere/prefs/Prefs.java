@@ -143,10 +143,6 @@ public class Prefs {
 		return DefaultPrefs.ALARM_VOLUME;
 	}
 
-	public boolean isUpdatesCheckboxChecked() {
-		return sharedPreferences.getBoolean(Keys.UPDATES_CHECKBOX, DefaultPrefs.UPDATES_CHECKBOX);
-	}
-
     public boolean getBoolean(String key) {
         if (sharedPreferences.contains(key)) {
             return sharedPreferences.getBoolean(key, true);
@@ -179,10 +175,6 @@ public class Prefs {
         }
     }
 
-	public void setUpdatesCheckbox(boolean updatesCheckbox) {
-		editor.putBoolean(Keys.UPDATES_CHECKBOX, updatesCheckbox).commit();
-	}
-
 	public <V> void storePreference(String key, V value) {
 		SharedPreferences.Editor sharedPrefEdit = sharedPreferences.edit();
 		if (value instanceof String) {
@@ -199,7 +191,7 @@ public class Prefs {
 					+ value.getClass().getName());
 		}
 
-		sharedPrefEdit.commit();
+		sharedPrefEdit.apply();
 	}
 
 	public void restoreDefaultPreferences() {
@@ -215,13 +207,16 @@ public class Prefs {
 		this.setQuicksilenceMinutes(DefaultPrefs.QUICK_SILENCE_MINUTES);
 		this.setBufferMinutes(DefaultPrefs.BUFFER_MINUTES);
 		this.setLookaheadDays(DefaultPrefs.LOOKAHEAD_DAYS);
-
-		// TODO should these values be reset? the user might not expect them to be since they do not
-		// appear in either settings or advanced settings
-		this.setUpdatesCheckbox(DefaultPrefs.UPDATES_CHECKBOX);
 	}
 
-	/**
+    public void remove(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("unable to remove null key");
+        }
+        sharedPreferences.edit().remove(key).commit();
+    }
+
+    /**
 	 * 
 	 * @author Jonathan Nelson <ciasaboark@gmail.com>
 	 * 
@@ -240,7 +235,7 @@ public class Prefs {
 		public static final String QUICKSILENCE_HOURS 	= "QUICK_SILENCE_HOURS";
 		public static final String BUFFER_MINUTES		= "BUFFER_MINUTES";
 		public static final String LOOKAHEAD_DAYS 		= "LOOKAHEAD_DAYS";
-		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
+//		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
 
 
 		//@formatter:on

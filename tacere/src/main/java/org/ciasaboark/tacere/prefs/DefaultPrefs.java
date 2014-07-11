@@ -21,7 +21,7 @@ class DefaultPrefs {
 	static final int MEDIA_VOLUME = 10;
 	static final int ALARM_VOLUME = 6;
 	static final int QUICK_SILENCE_MINUTES = 30;
-	static final int QUICK_SILENCE_HOURS = 0;;
+	static final int QUICK_SILENCE_HOURS = 0;
 	// how far in advance to begin silencing and continue silencing after event is over
 	static final int BUFFER_MINUTES = 5;
 	
@@ -35,6 +35,6 @@ class DefaultPrefs {
 	// this should be automatic
 	// static final String UPDATES_VERSION = "2.0.4";
 	// after the donate thank you activity is displayed this will be changed to false
-	static final boolean SHOW_DONATION_THANKS = true;
+	static final boolean SHOW_DONATION_THANKS = true;   //TODO is this still needed?
 	
 }

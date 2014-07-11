@@ -33,7 +33,7 @@ public class PrefsTest extends AndroidTestCase {
     public void testStoreBooleanValue() {
         Prefs prefs = new Prefs(this.getContext());
         prefs.storePreference("foo", false);
-        assert(prefs.getBoolean("foo") == false);
+        assert(!prefs.getBoolean("foo"));
     }
 
     public void testStoreLongValue() {
@@ -59,10 +59,9 @@ public class PrefsTest extends AndroidTestCase {
         assert(prefs.getRingerType() == DefaultPrefs.RINGER_TYPE);
     }
 
-    public void test
 
     public void testRestoreDefaultPreferences() throws Exception {
-
+        //TODO
     }
 
 }

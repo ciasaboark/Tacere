@@ -8,6 +8,9 @@
 
 package org.ciasaboark.tacere.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +21,7 @@ import android.graphics.Outline;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CalendarContract;
@@ -31,6 +35,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -48,10 +55,10 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
+
 //import android.content.SharedPreferences;
 
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener {
+public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
     private Context ctx;
@@ -97,55 +104,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         DonationActivity.showDonationDialogIfNeeded(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    public void onStart() {
-        super.onStart();
-        setContentView(R.layout.activity_main);
-        // start the background service
-        restartEventSilencerService();
-        drawQuicksilenceButton();
-
-
-        /***
-         * The event list was removed to test transition to material design
-         * (really we should be doing a fixed load (say two weeks, then loading
-         * more entries if the list is not full, or when the user scrolls.
-
-         // the event list title
-         TextView eventsTitle = (TextView) findViewById(R.id.eventListTitle);
-         String eventsText = getResources().getString(R.string.upcoming_events);
-         eventsTitle.setText(String.format(eventsText, prefs.getLookaheadDays()));
-         */
-
-        databaseInterface.update(prefs.getLookaheadDays());
-
-        // prune the database of old events
-        databaseInterface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) prefs.getBufferMinutes());
-
-        // since the number of days to display can change we need to
-        // + remove events beyond the lookahead period
-        databaseInterface.pruneEventsAfter(System.currentTimeMillis() + 1000 * 60 * 60 * 24
-                * (long) prefs.getLookaheadDays());
-
-        // DBIface.printEvents();
-
-        // the list of upcoming events
-        lv = (ListView) findViewById(R.id.eventListView);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemLongClickListener(this);
-        lv.setFadingEdgeLength(0);
-        cursor = databaseInterface.getCursor(Columns.BEGIN);
-        cursorAdapter = new EventCursorAdapter(this, cursor);
-        lv.setAdapter(cursorAdapter);
-    }
-
     private void drawQuicksilenceButton() {
+        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+        if (apiLevelAvailable >= 20) { //TODO this should be VERSION_NAMES.L but the preview reports its version as 20 for now
+            drawNewQuicksilenceButton();
+        } else {
+            drawCompatQuicksilenceButton();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.L)
+    private void drawNewQuicksilenceButton() {
         ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
         ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
 
@@ -183,26 +152,169 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // an intent to send to either start or stop a quick silence duration
-                Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-                i.putExtra("type", RequestTypes.QUICKSILENCE);
-                // the length of time for the pollService to sleep in minutes
-                int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-                i.putExtra("duration", duration);
-                startService(i);
+                startQuicksilence();
             }
         });
 
         cancelQuickSilenceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-                i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-                startService(i);
+                stopOngoingQuicksilence();
             }
         });
         quickSilenceImageButton.invalidate();
         cancelQuickSilenceButton.invalidate();
+    }
+
+    private void drawCompatQuicksilenceButton() {
+        Button quicksilenceButton = (Button) findViewById(R.id.quicksilenceButton_compat);
+        quicksilenceButton.setEnabled(false);
+        ServiceStateManager ssM = new ServiceStateManager(this);
+        if (ssM.isQuickSilenceActive()) {
+            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startQuicksilence();
+                }
+            });
+            quicksilenceButton.setText(R.string.startQuicksilence);
+        } else {
+            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    stopOngoingQuicksilence();
+                }
+            });
+            quicksilenceButton.setText(R.string.cancelQuicksilence);
+        }
+        quicksilenceButton.setEnabled(true);
+        quicksilenceButton.setVisibility(View.VISIBLE);
+    }
+
+    private void startQuicksilence() {
+        // an intent to send to either start or stop a quick silence duration
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.QUICKSILENCE);
+        // the length of time for the pollService to sleep in minutes
+        int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+        i.putExtra("duration", duration);
+        startService(i);
+    }
+
+    private void stopOngoingQuicksilence() {
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
+        startService(i);
+    }
+
+    private void crossfade(final ImageButton fadeOut, final ImageButton fadeIn) {
+        int mShortAnimationDuration = 500;
+        fadeOut.setEnabled(false);
+        fadeIn.setEnabled(false);
+
+        // Set the content view to 0% opacity but visible, so that it is visible
+        // (but fully transparent) during the animation.
+        fadeIn.setAlpha(0f);
+        fadeIn.setVisibility(View.VISIBLE);
+
+        // Animate the content view to 100% opacity, and clear any animation
+        // listener set on the view.
+        fadeIn.animate()
+                .alpha(1f)
+                .setDuration(mShortAnimationDuration)
+                .setListener(null);
+
+        // Animate the loading view to 0% opacity. After the animation ends,
+        // set its visibility to GONE as an optimization step (it won't
+        // participate in layout passes, etc.)
+        fadeOut.animate()
+                .alpha(0f)
+                .setDuration(mShortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        fadeOut.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    public void onStart() {
+        super.onStart();
+        setContentView(R.layout.activity_main);
+        // start the background service
+        restartEventSilencerService();
+        drawQuicksilenceButton();
+        setupListView();
+        drawEventListOrError();
+
+
+    }
+
+    private void drawEventListOrError() {
+        databaseInterface.update(prefs.getLookaheadDays());
+
+        // prune the database of old events
+        databaseInterface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) prefs.getBufferMinutes());
+
+        // since the number of days to display can change we need to
+        // + remove events beyond the lookahead period
+        databaseInterface.pruneEventsAfter(System.currentTimeMillis() + 1000 * 60 * 60 * 24
+                * (long) prefs.getLookaheadDays());
+
+
+        if (databaseInterface.isDatabaseEmpty()) {
+            hideEventList();
+            drawError();
+        } else {
+            hideError();
+            drawEventList();
+        }
+    }
+
+    private void drawError() {
+        TextView tv = (TextView) findViewById(R.id.event_list_error);
+        tv.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEventList() {
+        ListView listview = (ListView) findViewById(R.id.eventListView);
+        listview.setVisibility(View.GONE);
+    }
+
+    private void hideError() {
+        TextView tv = (TextView) findViewById(R.id.event_list_error);
+        tv.setVisibility(View.GONE);
+    }
+
+    private void setupListView() {
+        lv = (ListView) findViewById(R.id.eventListView);
+        lv.setOnItemClickListener(this);
+        lv.setOnItemLongClickListener(this);
+        lv.setFadingEdgeLength(0);
+        cursor = databaseInterface.getCursor(Columns.BEGIN);
+        cursorAdapter = new EventCursorAdapter(this, cursor);
+        lv.setAdapter(cursorAdapter);
+    }
+
+    private void drawEventList() {
+        ListView lv = (ListView)findViewById(R.id.eventListView);
+        lv.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Restarts the event silencer service
+     */
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
     }
 
     @Override
@@ -227,6 +339,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
     }
 
+    private void removeListViewEvent(View view) {
+        Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
+        anim.setDuration(500);
+        view.startAnimation(anim);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                cursor = databaseInterface.getCursor(Columns.BEGIN);
+                cursorAdapter.swapCursor(cursor);
+                cursorAdapter.notifyDataSetChanged();
+            }
+        }, anim.getDuration());
+    }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -250,15 +375,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         return result;
     }
 
-    /**
-     * Restarts the event silencer service
-     */
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
-    }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -280,20 +396,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void removeListViewEvent(View view) {
-        Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-        anim.setDuration(500);
-        view.startAnimation(anim);
-
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                cursor = databaseInterface.getCursor(Columns.BEGIN);
-                cursorAdapter.swapCursor(cursor);
-                cursorAdapter.notifyDataSetChanged();
-            }
-        }, anim.getDuration());
     }
 
     private class EventCursorAdapter extends CursorAdapter {
@@ -358,7 +460,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 // TODO find out how to animate the list items only when first displayed, this
                 // animation will fire every time the event view is replaced
                 /*
-				 * Animation viewAnim = AnimationUtils.loadAnimation(context,
+                 * Animation viewAnim = AnimationUtils.loadAnimation(context,
 				 * android.R.anim.slide_in_left); viewAnim.setDuration(500);
 				 * view.startAnimation(viewAnim);
 				 */
@@ -398,7 +500,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             return icon;
         }
 
-        private boolean eventShouldSilence(Context ctx, CalEvent event) {
+        private boolean eventShouldSilence(CalEvent event) {
             boolean eventShouldSilence = true;
             boolean silenceFreeTime = prefs.getSilenceFreeTimeEvents();
             boolean silenceAllDay = prefs.getSilenceAllDayEvents();
@@ -419,7 +521,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             Drawable icon;
             int defaultColor = 0xFFE8E8E8;
 
-            if (eventShouldSilence(ctx, event)) {
+            if (eventShouldSilence(event)) {
                 if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
                     // a custom ringer has been applied
                     icon = getRingerIcon(event.getRingerType(), event.getDisplayColor());

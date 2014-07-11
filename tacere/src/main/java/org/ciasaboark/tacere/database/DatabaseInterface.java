@@ -31,7 +31,7 @@ public class DatabaseInterface {
 	private static Context mAppContext = null;
     private static Prefs prefs = null;
 	private static final String TAG = "DatabaseInterface";
-    private static String[] projection = new String[] {
+    private static final String[] projection = new String[] {
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DTSTART,
             CalendarContract.Events.DTEND,
@@ -116,9 +116,8 @@ public class DatabaseInterface {
 	}
 
     private Cursor getCalendarCursor(long begin, long end) {
-        Cursor calendarCursor = Instances.query(mAppContext.getContentResolver(), projection,
+        return Instances.query(mAppContext.getContentResolver(), projection,
                 begin, end);
-        return calendarCursor;
     }
 
 	// removes events from the local database that can not be found in the calendar
@@ -162,6 +161,17 @@ public class DatabaseInterface {
 		}
 	}
 
+    public boolean isDatabaseEmpty() {
+        boolean isDbEmpty = true;
+        Cursor cursor = getCursor();
+        if (cursor.moveToFirst()) {
+            isDbEmpty = false;
+            cursor.close();
+        }
+        return isDbEmpty;
+    }
+
+
 	// sync the calendar and the local database for the given number of days
 	public void update(int days) {
 		days = Math.abs(days);
@@ -196,7 +206,7 @@ public class DatabaseInterface {
 				// if the event is already in the local database then we need to preserve
 				// the ringerType, all other values should be read from the system calendar
 				// database
-				CalEvent newEvent = new CalEvent(mAppContext);
+				CalEvent newEvent = new CalEvent();
 				try {
 					CalEvent oldEvent = getEvent(Integer.valueOf(event_id));
 					newEvent.setRingerType(oldEvent.getRingerType());
@@ -212,8 +222,8 @@ public class DatabaseInterface {
 				newEvent.setEnd(event_end);
 				newEvent.setDescription(event_description);
 				newEvent.setDisplayColor(event_displayColor);
-				newEvent.setIsFreeTime(event_availability == 0 ? true : false);
-				newEvent.setIsAllDay(event_allDay == 1 ? true : false);
+				newEvent.setIsFreeTime(event_availability == 0);
+				newEvent.setIsAllDay(event_allDay == 1);
 
 				// inserting an event with the same id will clobber all previous data, completing
 				// the synchronization of this event
@@ -233,7 +243,7 @@ public class DatabaseInterface {
 		Cursor cursor = cl.loadInBackground();
 		CalEvent thisEvent = null;
 		if (cursor.moveToFirst()) {
-			thisEvent = new CalEvent(mAppContext);
+			thisEvent = new CalEvent();
 			do {
 				int eventID = cursor.getInt(cursor.getColumnIndex(Columns._ID));
 				if (eventID == id) {
@@ -403,25 +413,5 @@ public class DatabaseInterface {
 	// the default sort is by the unique event ID
 	public Cursor getCursor() {
 		return getCursor(Columns._ID);
-	}
-
-	private void printEvents() {
-		Cursor c = getCursor();
-		if (c.moveToFirst()) {
-			do {
-				int id = c.getInt(c.getColumnIndex(Columns._ID));
-				try {
-					CalEvent e = getEvent(id);
-					Log.i(TAG, "Event id:" + e.getCal_id() + " Instance id:" + e.getId()
-							+ " Title:" + e.getTitle() + " Begins:" + e.getLocalBeginDate() + " - "
-							+ e.getLocalBeginTime());
-				} catch (NoSuchEventException e) {
-					Log.e(TAG,
-							"printEvents() error getting event with id " + id + ": "
-									+ e.getMessage());
-				}
-			} while (c.moveToNext());
-		}
-		c.close();
 	}
 }

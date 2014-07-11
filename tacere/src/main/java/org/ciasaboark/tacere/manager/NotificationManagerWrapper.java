@@ -30,14 +30,10 @@ public class NotificationManagerWrapper {
 	// an id to reference all notifications
 	private static final int NOTIFICATION_ID	= 1;
 	
-	private Context context;
+	private final Context context;
 	
 	public NotificationManagerWrapper(Context ctx) {
 		this.context = ctx;
-	}
-	
-	public int getNotificationId() {
-		return NOTIFICATION_ID;
 	}
 	
 	/**

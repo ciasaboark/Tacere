@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 
 public class DonationActivity extends Activity {
-	private Context context = this;
     private static final String SHOW_DONATION_THANKS = "SHOW_DONATION_THANKS";
 	
 	@Override
@@ -68,8 +67,7 @@ public class DonationActivity extends Activity {
 
     private static boolean isDonationKeyInstalled(Context ctx) {
         PackageManager manager = ctx.getPackageManager();
-        boolean isKeyInstalled = manager.checkSignatures("org.ciasaboark.tacere", "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH;
-        return isKeyInstalled;
+        return manager.checkSignatures("org.ciasaboark.tacere", "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH;
     }
 
     private static boolean hasDonationDialogAlreadyBeenShown(Context ctx) {
@@ -80,7 +78,9 @@ public class DonationActivity extends Activity {
             if (value) {
                 hasBeenShown = true;
             }
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException e) {
+            //Nothing to do here
+        }
         return hasBeenShown;
     }
 }
