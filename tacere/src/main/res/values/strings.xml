@@ -10,6 +10,7 @@
     <!-- About Activity -->
     <string name="title_activity_about">About</string>
     <string name="action_about_license">License</string>
+    <string name="about_version">Version %1$s</string>
 
     <!-- About License Activity -->
     <string name="title_activity_about_activity_license">License/Credits</string>

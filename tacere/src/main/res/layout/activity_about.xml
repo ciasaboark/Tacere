@@ -8,16 +8,69 @@
     android:paddingTop="0dp"
     tools:context=".AboutActivity" >
 
-<WebView
-    android:id="@+id/webView1"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentRight="true"
-    android:layout_alignParentTop="true"
-    android:layout_gravity="fill_horizontal"
-    android:layout_marginLeft="0dp"
-    android:layout_marginTop="0dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="64dp"
+            android:id="@+id/linearLayout"
+            android:elevation="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:id="@+id/imageView"
+                android:background="@drawable/ic_launcher"
+                />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="64dp"
+                android:paddingLeft="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Tacere"
+                    android:id="@+id/textView"
+                    android:layout_gravity="center_horizontal"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Version name"
+                    android:id="@+id/about_version_name"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/textColorDisabled"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Version X.Y.Z"
+                    android:id="@+id/about_version"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/textColorDisabled"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    <WebView
+        android:id="@+id/webView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginLeft="0dp"
+        android:layout_below="@+id/linearLayout"
+        android:elevation="0dp"/>
 
 </RelativeLayout>

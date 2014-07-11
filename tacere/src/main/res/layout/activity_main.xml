@@ -7,12 +7,6 @@
     android:scrollbarStyle="outsideOverlay"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:id="@+id/event_list_error"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="No calendar entries found"
-        android:visibility="gone"/>
     <ListView
         android:id="@+id/eventListView"
         android:layout_width="wrap_content"
@@ -20,7 +14,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:scrollbarStyle="outsideOverlay" />
+        android:scrollbarStyle="outsideOverlay"
+        android:visibility="gone"/>
 
     <ViewFlipper
         android:layout_width="wrap_content"
@@ -68,6 +63,15 @@
         android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
         android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/event_list_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No calendar entries found"
+        android:visibility="visible"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"/>
 
 
 </RelativeLayout>

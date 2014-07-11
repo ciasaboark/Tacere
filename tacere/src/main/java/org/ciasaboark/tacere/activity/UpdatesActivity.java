@@ -90,7 +90,7 @@ public class UpdatesActivity extends Activity {
     }
     private void hideChangelogForCurrentAppVersion() {
         try {
-            prefs.storePreference(Versioning.getVersionCode(), false);
+            prefs.storePreference(new Versioning(this).getVersionCode(), false);
         } catch (IllegalArgumentException e) {
             //boolean values are accepted, should not reach here
         }
@@ -101,7 +101,7 @@ public class UpdatesActivity extends Activity {
         boolean shouldChangelogBeShown = false;
         //the updates dialog should be shown if no value has been stored for the current app version
         try {
-            staticPrefs.getBoolean(Versioning.getVersionCode());
+            staticPrefs.getBoolean(new Versioning(ctx).getVersionCode());
         } catch (IllegalArgumentException e) {
             shouldChangelogBeShown = true;
         }

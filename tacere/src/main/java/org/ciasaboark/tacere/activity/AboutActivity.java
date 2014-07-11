@@ -13,8 +13,10 @@ import org.ciasaboark.tacere.R.drawable;
 import org.ciasaboark.tacere.R.id;
 import org.ciasaboark.tacere.R.layout;
 import org.ciasaboark.tacere.R.menu;
+import org.ciasaboark.tacere.versioning.Versioning;
 
 import android.app.Activity;
+import android.util.Log;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,8 +25,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class AboutActivity extends Activity {
+    private static final String TAG = "AboutActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +45,28 @@ public class AboutActivity extends Activity {
 		setupActionBar();
 
 		WebView wv = (WebView) findViewById(R.id.webView1);
-		wv.loadUrl("file:///android_asset/about.html");
+        String htmlData = "";
+        try {
+//            FileInputStream fis = new FileInputStream("file:///android_asset/about.html");
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("about.html")));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                htmlData += line;
+            }
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        int colorInt = getResources().getColor(R.color.accent);
+        String hexColor = String.format("#%06X", (0xFFFFFF & colorInt));
+        while (htmlData.contains("LINKCOLOR")) {
+            htmlData = htmlData.replace("LINKCOLOR", hexColor);
+        }
+
+        wv.loadData(htmlData, "text/html", "UTF8");
 
 		// All links should open in the default browser, not this WebView
 		// NOTE: this does not seem to work for POST links.
@@ -50,6 +82,14 @@ public class AboutActivity extends Activity {
 
         wv.setBackgroundColor(0x00000000);
         wv.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+
+        TextView versionName = (TextView)findViewById(id.about_version_name);
+        versionName.setText(new Versioning(this).getReleaseName());
+
+        TextView versionText = (TextView)findViewById(id.about_version);
+        String formattedVersion = String.format(getString(R.string.about_version), new Versioning(this).getVersionCode());
+        versionText.setText(formattedVersion);
+
 	}
 
 	/**
