@@ -1,9 +1,6 @@
 /*
- * Created by Jonathan Nelson
- * 
- * Copyright 2013 Jonathan Nelson
- * 
- * Released under the BSD license. For details see the COPYING file.
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
  */
 
 package org.ciasaboark.tacere.activity;
@@ -304,7 +301,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
         int lookaheadDays = prefs.getLookaheadDays();
         DateConverter dateConverter = new DateConverter(lookaheadDays);
-
         String errorText = String.format(getString(R.string.no_events), dateConverter.toString());
         noEventsTv.setText(errorText);
     }

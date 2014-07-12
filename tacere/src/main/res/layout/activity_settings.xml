@@ -112,7 +112,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:clickable="false"
-                android:onClick="onClickAdjustMedia" />
+                 />
 
             <TextView
                 android:id="@+id/settings_mediaText"
@@ -146,7 +146,7 @@
                 android:layout_centerHorizontal="false"
                 android:layout_centerVertical="true"
                 android:clickable="false"
-                android:onClick="onClickAdjustAlarm" />
+                 />
 
             <TextView
                 android:id="@+id/settings_alarmText"

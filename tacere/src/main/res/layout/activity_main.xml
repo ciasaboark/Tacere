@@ -27,10 +27,11 @@
         <ImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:id="@+id/imageView"
+            android:id="@+id/calendar_icon"
             android:background="@drawable/calendar_icon"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="16dp"/>
+            android:layout_marginRight="16dp"
+            android:tint="@color/primary"/>
 
         <TextView
             android:id="@+id/event_list_error"
@@ -87,7 +88,7 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="@string/placeholder"
         android:id="@+id/quicksilenceButton_compat"
         android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"

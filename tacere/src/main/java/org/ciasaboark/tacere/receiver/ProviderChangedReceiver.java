@@ -5,21 +5,21 @@
 
 package org.ciasaboark.tacere.receiver;
 
-import org.ciasaboark.tacere.service.EventSilencerService;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class ProviderChangedReceiver extends BroadcastReceiver {
-	private static final String TAG = "ProviderChangedReceiver";
+import org.ciasaboark.tacere.service.EventSilencerService;
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		Log.d(TAG, "received broadcast intent, waking service");
-		Intent i = new Intent(context, EventSilencerService.class);
-		i.putExtra("type", "providerChanged");
-		context.startService(i);
-	}
+public class ProviderChangedReceiver extends BroadcastReceiver {
+    private static final String TAG = "ProviderChangedReceiver";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "received broadcast intent, waking service");
+        Intent i = new Intent(context, EventSilencerService.class);
+        i.putExtra("type", "providerChanged");
+        context.startService(i);
+    }
 }

@@ -5,21 +5,21 @@
 
 package org.ciasaboark.tacere.receiver;
 
-import org.ciasaboark.tacere.service.EventSilencerService;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import org.ciasaboark.tacere.service.EventSilencerService;
+
 public class BootCompletedReceiver extends BroadcastReceiver {
 
-	// private static final String TAG = "PollServiceReceiver";
+    // private static final String TAG = "PollServiceReceiver";
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		Intent i = new Intent(context, EventSilencerService.class);
-		i.putExtra("type", "firstWake");
-		context.startService(i);
-	}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Intent i = new Intent(context, EventSilencerService.class);
+        i.putExtra("type", "firstWake");
+        context.startService(i);
+    }
 
 }

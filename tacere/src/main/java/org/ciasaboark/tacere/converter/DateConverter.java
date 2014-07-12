@@ -17,33 +17,33 @@ public class DateConverter {
     }
 
     public int getWeeks() {
-        int weeks =  numberOfDays / 7;
+        int weeks = numberOfDays / 7;
         return weeks;
     }
 
     public int getMonths() {
-        int months =  numberOfDays / 30;   //generic 30 day month
+        int months = numberOfDays / 30;   //generic 30 day month
         return months;
     }
 
     public int getYears() {
-        int years =  numberOfDays / 365;  //leap years are a lie
+        int years = numberOfDays / 365;  //leap years are a lie
         return years;
     }
 
     public String toString() {
         int days = numberOfDays;
-        int years = getYears();
+        int years = days / 365;
         if (years != 0) {
             days = days % 365;
         }
 
-        int months = getMonths();
+        int months = days / 30;
         if (months != 0) {
             days = days % 30;
         }
 
-        int weeks = getWeeks();
+        int weeks = days / 7;
         if (weeks != 0) {
             days = days % 7;
         }
