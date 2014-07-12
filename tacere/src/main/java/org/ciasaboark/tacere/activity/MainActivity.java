@@ -47,6 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
@@ -102,13 +103,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);
-    }
-
-    private void setupErrorMessage() {
-        TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
-        int lookaheadDays = prefs.getLookaheadDays();
-        String errorText = String.format(getString(R.string.no_events), lookaheadDays);
-        noEventsTv.setText(errorText);
     }
 
     private void drawQuicksilenceButton() {
@@ -263,6 +257,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
     }
 
+    /**
+     * Restarts the event silencer service
+     */
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
+    }
+
     private void drawEventListOrError() {
         setupListView();
         setupErrorMessage();
@@ -287,21 +290,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         }
     }
 
-    private void drawError() {
-        TextView tv = (TextView) findViewById(R.id.event_list_error);
-        tv.setVisibility(View.VISIBLE);
-    }
-
-    private void hideEventList() {
-        ListView listview = (ListView) findViewById(R.id.eventListView);
-        listview.setVisibility(View.GONE);
-    }
-
-    private void hideError() {
-        TextView tv = (TextView) findViewById(R.id.event_list_error);
-        tv.setVisibility(View.GONE);
-    }
-
     private void setupListView() {
         lv = (ListView) findViewById(R.id.eventListView);
         lv.setOnItemClickListener(this);
@@ -312,18 +300,33 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         lv.setAdapter(cursorAdapter);
     }
 
+    private void setupErrorMessage() {
+        TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
+        int lookaheadDays = prefs.getLookaheadDays();
+        DateConverter dateConverter = new DateConverter(lookaheadDays);
+
+        String errorText = String.format(getString(R.string.no_events), dateConverter.toString());
+        noEventsTv.setText(errorText);
+    }
+
+    private void hideEventList() {
+        ListView listview = (ListView) findViewById(R.id.eventListView);
+        listview.setVisibility(View.GONE);
+    }
+
+    private void drawError() {
+        TextView tv = (TextView) findViewById(R.id.event_list_error);
+        tv.setVisibility(View.VISIBLE);
+    }
+
+    private void hideError() {
+        TextView tv = (TextView) findViewById(R.id.event_list_error);
+        tv.setVisibility(View.GONE);
+    }
+
     private void drawEventList() {
         ListView lv = (ListView) findViewById(R.id.eventListView);
         lv.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Restarts the event silencer service
-     */
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
     }
 
     @Override
