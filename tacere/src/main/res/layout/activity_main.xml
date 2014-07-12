@@ -17,12 +17,41 @@
         android:scrollbarStyle="outsideOverlay"
         android:visibility="gone"/>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="400dp"
+        android:layout_height="96dp"
+        android:layout_margin="16dp"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/imageView"
+            android:background="@drawable/calendar_icon"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"/>
+
+        <TextView
+            android:id="@+id/event_list_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder"
+            android:visibility="visible"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_vertical"
+            />
+
+    </LinearLayout>
+
     <ViewFlipper
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/quicksilenceFlipper"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true" >
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp">
 
         <ImageButton
             android:id="@+id/quickSilenceButton"
@@ -64,14 +93,7 @@
         android:layout_alignParentBottom="true"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/event_list_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No calendar entries found"
-        android:visibility="visible"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"/>
+
 
 
 </RelativeLayout>

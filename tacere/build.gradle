@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def APP_VERSION_NAME = "magic mongoose"
+def DEBUG_VERSION_NAME = "beta"
+def VERSION_CODE = 5
+
 android {
     compileSdkVersion 'android-L'
     buildToolsVersion "20.0.0"
@@ -9,8 +13,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 'android-L'
         //TODO get current version from versioning
-        versionName "foo"
-        versionCode 5
+        versionCode VERSION_CODE
+        versionName APP_VERSION_NAME
     }
     buildTypes {
         release {
@@ -19,17 +23,15 @@ android {
             buildConfigField "int", "APP_VERSION_MAJOR", "2"
             buildConfigField "int", "APP_VERSION_MINOR", "0"
             buildConfigField "int", "APP_VERSION_RELEASE", "5"
-//            buildConfigField "String", "VERSION_NAME", "magic mongoose"
-//            buildConfigField "int", "VERSION_CODE", "5"
+//            buildConfigField "String", "APP_VERSION_NAME", APP_VERSION_NAME
         }
         debug {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "int", "APP_VERSION_MAJOR", "2"
-            buildConfigField "int", "APP_VERSION_MINOR", "0"
-            buildConfigField "int", "APP_VERSION_RELEASE", "5"
-//            buildConfigField "String", "VERSION_NAME", "magic mongoose"
-//            buildConfigField "int", "VERSION_CODE", "5"
+            buildConfigField "int", "APP_VERSION_MINOR", "1"
+            buildConfigField "int", "APP_VERSION_RELEASE", "0"
+//            buildConfigField "String", "APP_VERSION_NAME", DEBUG_VERSION_NAME
         }
     }
 }

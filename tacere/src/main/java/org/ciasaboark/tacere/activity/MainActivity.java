@@ -104,6 +104,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         DonationActivity.showDonationDialogIfNeeded(this);
     }
 
+    private void setupErrorMessage() {
+        TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
+        int lookaheadDays = prefs.getLookaheadDays();
+        String errorText = String.format(getString(R.string.no_events), lookaheadDays);
+        noEventsTv.setText(errorText);
+    }
+
     private void drawQuicksilenceButton() {
         int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
         if (apiLevelAvailable >= 20) { //TODO this should be VERSION_NAMES.L but the preview reports its version as 20 for now
@@ -251,13 +258,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         // start the background service
         restartEventSilencerService();
         drawQuicksilenceButton();
-        setupListView();
         drawEventListOrError();
 
 
     }
 
     private void drawEventListOrError() {
+        setupListView();
+        setupErrorMessage();
+
         databaseInterface.update(prefs.getLookaheadDays());
 
         // prune the database of old events
@@ -304,7 +313,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     }
 
     private void drawEventList() {
-        ListView lv = (ListView)findViewById(R.id.eventListView);
+        ListView lv = (ListView) findViewById(R.id.eventListView);
         lv.setVisibility(View.VISIBLE);
     }
 

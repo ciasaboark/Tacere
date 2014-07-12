@@ -26,13 +26,13 @@ public class Versioning {
     }
 
     public String getVersionCode() {
-        return new String(BuildConfig.APP_VERSION_MAJOR + "."
+        return BuildConfig.APP_VERSION_MAJOR + "."
                 + BuildConfig.APP_VERSION_MINOR + "."
-                + BuildConfig.APP_VERSION_RELEASE);
+                + BuildConfig.APP_VERSION_RELEASE;
     }
 
     public  String getReleaseName() {
-        return new String(BuildConfig.VERSION_NAME);
+        return BuildConfig.VERSION_NAME;
     }
 
     public  int getReleaseNumber() {
