@@ -18,5 +18,8 @@
     </style>
 
     <style name="Dialog" parent="android:Theme.Holo.Light.Dialog" />
+    <style name="Header" parent="AppTheme">
+        <item name="android:colorBackground">@color/windowBackground</item>
+    </style>
 
 </resources>

@@ -4,7 +4,7 @@
     <item name="primary_dark" type="color">#0288d1</item>
     <!-- Yellow accent color-->
     <!--<item name="accent" type="color">#ffff00</item>-->
-    <item name="button_ongoing" type="color">#f50057</item>
+    <item name="button_ongoing" type="color">#ff9100</item>
     <item name="accent" type="color">#ffab40</item>
     <item name="textcolor" type="color">#ff000000</item>
     <item name="textColorPrimary" type="color">#ff000000</item>

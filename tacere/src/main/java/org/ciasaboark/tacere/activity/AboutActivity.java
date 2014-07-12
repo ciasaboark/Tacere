@@ -16,6 +16,7 @@ import org.ciasaboark.tacere.R.menu;
 import org.ciasaboark.tacere.versioning.Versioning;
 
 import android.app.Activity;
+import android.graphics.Outline;
 import android.util.Log;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -89,7 +91,6 @@ public class AboutActivity extends Activity {
         TextView versionText = (TextView)findViewById(id.about_version);
         String formattedVersion = String.format(getString(R.string.about_version), new Versioning(this).getVersionCode());
         versionText.setText(formattedVersion);
-
 	}
 
 	/**

@@ -12,13 +12,15 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="64dp"
-            android:id="@+id/linearLayout"
+            android:layout_height="96dp"
+            android:id="@+id/about_header"
             android:elevation="4dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="8dp">
+            android:background="@drawable/myrect"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp"
+            >
 
             <ImageView
                 android:layout_width="64dp"
@@ -67,7 +69,7 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="fill_horizontal"
         android:layout_marginLeft="0dp"
-        android:layout_below="@+id/linearLayout"
-        android:elevation="0dp"/>
+        android:elevation="0dp"
+        android:layout_below="@+id/about_header"/>
 
 </RelativeLayout>
