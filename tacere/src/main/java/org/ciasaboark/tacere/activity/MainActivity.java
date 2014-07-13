@@ -38,10 +38,12 @@ import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Parcelable;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.converter.DateConverter;
@@ -64,8 +66,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     private EventCursorAdapter cursorAdapter;
     private Cursor cursor;
     private DatabaseInterface databaseInterface;
-    private ListView lv = null;
+    private ListView eventListview = null;
+    private int listViewIndex = 0;
     private Prefs prefs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +83,16 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
             @Override
             public void onReceive(Context context, Intent intent) {
+                Parcelable listviewState = null;
+                listviewState = eventListview.onSaveInstanceState();
+
                 cursorAdapter.notifyDataSetChanged();
                 Log.d(TAG, "got a notification from the service, updating adpater and views");
-                cursor = databaseInterface.getCursor(Columns.BEGIN);
+                cursor = databaseInterface.getEventCursor();
                 cursorAdapter = new EventCursorAdapter(ctx, cursor);
-                lv.setAdapter(cursorAdapter);
-                lv.invalidateViews(); //TODO test that this forces the listview to redraw
+                eventListview.setAdapter(cursorAdapter);
+                eventListview.invalidateViews(); //TODO test that this forces the listview to redraw
+                eventListview.onRestoreInstanceState(listviewState);
 
                 //redraw the widgets
                 drawQuicksilenceButton();
@@ -243,6 +251,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         return true;
     }
 
+    @Override
     public void onStart() {
         super.onStart();
         setContentView(R.layout.activity_main);
@@ -250,8 +259,18 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         restartEventSilencerService();
         drawQuicksilenceButton();
         drawEventListOrError();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        listViewIndex = eventListview.getFirstVisiblePosition();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        eventListview.setSelectionFromTop(listViewIndex, 0);
     }
 
     /**
@@ -288,13 +307,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     }
 
     private void setupListView() {
-        lv = (ListView) findViewById(R.id.eventListView);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemLongClickListener(this);
-        lv.setFadingEdgeLength(0);
-        cursor = databaseInterface.getCursor(Columns.BEGIN);
+        eventListview = (ListView) findViewById(R.id.eventListView);
+        eventListview.setOnItemClickListener(this);
+        eventListview.setOnItemLongClickListener(this);
+        eventListview.setFadingEdgeLength(0);
+        cursor = databaseInterface.getEventCursor();
         cursorAdapter = new EventCursorAdapter(this, cursor);
-        lv.setAdapter(cursorAdapter);
+        eventListview.setAdapter(cursorAdapter);
     }
 
     private void setupErrorMessage() {
@@ -311,13 +330,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     }
 
     private void drawError() {
-        TextView tv = (TextView) findViewById(R.id.event_list_error);
-        tv.setVisibility(View.VISIBLE);
+        LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
+        errorBox.setVisibility(View.VISIBLE);
     }
 
     private void hideError() {
-        TextView tv = (TextView) findViewById(R.id.event_list_error);
-        tv.setVisibility(View.GONE);
+        LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
+        errorBox.setVisibility(View.GONE);
     }
 
     private void drawEventList() {
@@ -334,7 +353,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 nextRingerType = CalEvent.RINGER.NORMAL;
             }
             databaseInterface.setRingerType((int) id, nextRingerType);
-            lv.getAdapter().getView(position, view, lv);
+            eventListview.getAdapter().getView(position, view, eventListview);
 
             // since the database has changed we need to wake the service
             restartEventSilencerService();
@@ -354,7 +373,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                cursor = databaseInterface.getCursor(Columns.BEGIN);
+                cursor = databaseInterface.getEventCursor();
                 cursorAdapter.swapCursor(cursor);
                 cursorAdapter.notifyDataSetChanged();
             }
@@ -368,7 +387,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         try {
             CalEvent thisEvent = databaseInterface.getEvent((int) id);
             databaseInterface.setRingerType((int) id, CalEvent.RINGER.UNDEFINED);
-            lv.getAdapter().getView(position, view, lv);
+            eventListview.getAdapter().getView(position, view, eventListview);
             Toast.makeText(parent.getContext(), thisEvent.getTitle() + " reset to default ringer",
                     Toast.LENGTH_SHORT).show();
 
@@ -461,9 +480,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 eventIV.setContentDescription(getBaseContext().getString(
                         R.string.icon_alt_text_normal));
 
-                Animation iconAnim = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
-                iconAnim.setDuration(500);
-                eventIV.startAnimation(iconAnim);
+                //this animation does not play well with the new android l onclick ripple animation
+//                Animation iconAnim = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
+//                iconAnim.setDuration(500);
+//                eventIV.startAnimation(iconAnim);
 
                 // TODO find out how to animate the list items only when first displayed, this
                 // animation will fire every time the event view is replaced
@@ -527,12 +547,12 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
         private Drawable getEventIcon(CalEvent event, Context ctx) {
             Drawable icon;
-            int defaultColor = 0xFFE8E8E8;
+            int defaultColor = getResources().getColor(R.color.icon_accent);
 
             if (eventShouldSilence(event)) {
                 if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
                     // a custom ringer has been applied
-                    icon = getRingerIcon(event.getRingerType(), event.getDisplayColor());
+                    icon = getRingerIcon(event.getRingerType(), getResources().getColor(R.color.primary));
                 } else {
                     icon = getRingerIcon(CalEvent.RINGER.UNDEFINED, defaultColor);
                 }

@@ -28,6 +28,8 @@
 
     <string name="pref_service">Service</string>
     <string name="pref_ringer_type_title">Ringer Type</string>
+    <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
+    <string name="pref_do_not_disturb_description">Only available in Android 5.0+</string>
     <string name="pref_media_volume">Adjust Media Volume</string>
     <string name="pref_alarm_volume">Adust Alarm Volume</string>
     <string name="pref_quick_silence">Quick Silence</string>
@@ -44,8 +46,8 @@
     
     <!-- Advanced Settings Activity -->
     <string name="title_activity_advanced_settings">Advanced Settings</string>
-    <string name="pref_events_header">EVENTS</string>
-    <string name="pref_battery_header">BATTERY</string>
+    <string name="pref_events_header">Events</string>
+    <string name="pref_battery_header">Battery</string>
     
     <string name="pref_silence_free_time_title">Available Events</string>
     <string name="pref_silence_all_day_title">All Day Events</string>

@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -77,16 +78,16 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(View view) {
                 prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
-                //if the service has been reactivated then we should restart it
-                if (prefs.getIsServiceActivated()) {
-                    Intent i = new Intent(context, EventSilencerService.class);
-                    i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-                    startService(i);
-                }
+
+                Intent i = new Intent(context, EventSilencerService.class);
+                i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+                startService(i);
+
                 drawServiceWidget();
                 drawMediaWidgets();
                 drawAlarmWidgets();
                 drawRingerWidgets();
+                drawDoNotDisturbWidgets();
             }
         });
 
@@ -112,11 +113,7 @@ public class SettingsActivity extends Activity {
 
         //the alarm volumes toggle
         Switch alarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
-        if (prefs.getAdjustAlarm()) {
-            alarmSwitch.setChecked(true);
-        } else {
-            alarmSwitch.setChecked(false);
-        }
+        alarmSwitch.setChecked(prefs.getAdjustAlarm());
         alarmSwitch.setEnabled(prefs.getIsServiceActivated());
 
         //the alarm volumes slider
@@ -231,7 +228,7 @@ public class SettingsActivity extends Activity {
 
 
         if (prefs.getIsServiceActivated()) {
-            int iconColor = getResources().getColor(R.color.accent);
+            int iconColor = getResources().getColor(R.color.primary);
             icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
             ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
             ringerTV.setTextColor(getResources().getColor(R.color.textcolor));
@@ -249,9 +246,42 @@ public class SettingsActivity extends Activity {
     private void drawAllWidgets() {
         drawServiceWidget();
         drawRingerWidgets();
+        drawDoNotDisturbWidgets();
         drawMediaWidgets();
         drawAlarmWidgets();
         drawQuickSilenceWidget();
+    }
+
+    private void drawDoNotDisturbWidgets() {
+        Switch doNotDisturbSwitch = (Switch)findViewById(id.doNotDisturbSwitch);
+        doNotDisturbSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.setDoNotDisturb(!prefs.getDoNotDisturb());
+            }
+        });
+        doNotDisturbSwitch.setChecked(prefs.getDoNotDisturb());
+        doNotDisturbSwitch.setEnabled(prefs.getIsServiceActivated());
+
+        TextView doNotDisturbHeader = (TextView) findViewById(id.do_not_disturb_header);
+        TextView doNotDisturbDescription = (TextView) findViewById(id.do_not_disturb_description);
+        if (prefs.getIsServiceActivated()) {
+            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textcolor));
+            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textcolor));
+        } else {
+            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
+
+        int apiLevelAvailable = Build.VERSION.SDK_INT;
+        RelativeLayout layout = (RelativeLayout) findViewById(id.do_not_disturb_box);
+        if (apiLevelAvailable >= 20) { //TODO this should be 21
+            layout.setVisibility(View.VISIBLE);
+        } else {
+            layout.setVisibility(View.GONE);
+        }
+
+
     }
 
     @TargetApi(21)

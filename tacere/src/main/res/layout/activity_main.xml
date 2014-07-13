@@ -2,8 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     android:scrollbarStyle="outsideOverlay"
     tools:context=".MainActivity" >
 
@@ -11,7 +9,7 @@
         android:id="@+id/eventListView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:scrollbarStyle="outsideOverlay"
@@ -21,8 +19,12 @@
         android:orientation="horizontal"
         android:layout_width="400dp"
         android:layout_height="96dp"
-        android:layout_margin="16dp"
-        android:layout_centerInParent="true">
+        android:id="@+id/error_box"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="100dp">
 
         <ImageView
             android:layout_width="64dp"
@@ -57,7 +59,7 @@
         <ImageButton
             android:id="@+id/quickSilenceButton"
             android:src="@drawable/ic_state_silent"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:background="@drawable/action_button_quicksilence"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"
@@ -72,7 +74,7 @@
         <ImageButton
             android:id="@+id/cancel_quickSilenceButton"
             android:src="@drawable/ic_state_normal"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:background="@drawable/action_button_cancel_quicksilence"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"

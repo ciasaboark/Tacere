@@ -12,6 +12,8 @@ package org.ciasaboark.tacere.database;
  */
 public class Columns {
     public static final String _ID = "_id";
+    public static final String EVENT_ID = "event_id";
+    public static final String INSTANCE_ID = "instance_id";
     public static final String TITLE = "title";
     public static final String CAL_ID = "cal_id";
     public static final String DESCRIPTION = "description";

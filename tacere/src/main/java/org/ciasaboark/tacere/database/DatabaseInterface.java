@@ -5,11 +5,13 @@
 
 package org.ciasaboark.tacere.database;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Instances;
@@ -25,23 +27,47 @@ import java.util.Deque;
 public class DatabaseInterface {
     private static final String TAG = "DatabaseInterface";
     private static final String[] projection = new String[]{
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND,
-            CalendarContract.Events.DESCRIPTION,
-            CalendarContract.Events.EVENT_COLOR,
-            CalendarContract.Events.ALL_DAY,
-            CalendarContract.Events.AVAILABILITY,
-            CalendarContract.Events.ORIGINAL_ID,
-            CalendarContract.Events.ORIGINAL_SYNC_ID
+            Instances.TITLE,
+            Instances.BEGIN,
+            Instances.END,
+            Instances.DESCRIPTION,
+            Instances.EVENT_COLOR,
+            Instances.ALL_DAY,
+            Instances.AVAILABILITY,
+            Instances._ID
     };
     private static DatabaseInterface mInstance;
     private static Context mAppContext = null;
     private static Prefs prefs = null;
 
 
+    //imported
+    private static final int EVENTS = 1;
+    private static final int EVENT_ID = 2;
+    private static final String PROVIDER_NAME = "org.ciasaboark.tacere.Events";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/event");
+    private static final UriMatcher uriMatcher;
+    private Context context;
+
+    static {
+        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(PROVIDER_NAME, "event", EVENTS);
+        uriMatcher.addURI(PROVIDER_NAME, "event/#", EVENT_ID);
+    }
+
+    private static final String DB_NAME = "events.sqlite";
+    private static final int VERSION = 1;
+    private static final String TABLE_EVENTS = "events";
+    //Database values
+    private SQLiteDatabase eventsDB;
+
+    //end imported
+
+
     private DatabaseInterface(Context context) {
         mAppContext = context;
+        EventDatabaseHelper dbHelper = new EventDatabaseHelper(context);
+        this.eventsDB = dbHelper.getWritableDatabase();
     }
 
     public static DatabaseInterface getInstance(Context context) {
@@ -62,19 +88,14 @@ public class DatabaseInterface {
     }
 
     public void pruneEventsAfter(long cutoff) {
-        Cursor c;
-        Uri allEvents = Uri.parse("content://org.ciasaboark.tacere.Events/events");
-        CursorLoader cl = new CursorLoader(mAppContext, allEvents, null, null, null,
-                Columns._ID);
-        c = cl.loadInBackground();
+        Cursor c = getEventCursor(0, cutoff);
+
         if (c.moveToFirst()) {
             do {
                 int id = c.getInt(c.getColumnIndex(Columns._ID));
                 long begin = c.getLong(c.getColumnIndex(Columns.BEGIN));
                 if (begin > cutoff) {
-                    ContentResolver cr = mAppContext.getContentResolver();
-                    cr.delete(EventProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(id))
-                            .build(), null, null);
+                    deleteEventWithId(id);
                 }
             } while (c.moveToNext());
         }
@@ -82,31 +103,13 @@ public class DatabaseInterface {
     }
 
     public boolean isDatabaseEmpty() {
-        boolean isDbEmpty = true;
-        Cursor cursor = getCursor();
-        if (cursor.moveToFirst()) {
-            isDbEmpty = false;
-            cursor.close();
+        boolean isEmpty = false;
+        Cursor cursor = getEventCursor();
+        if (cursor.getCount() == 0) {
+            isEmpty = true;
         }
-        return isDbEmpty;
-    }
-
-    // the default sort is by the unique event ID
-    public Cursor getCursor() {
-        return getCursor(Columns._ID);
-    }
-
-    // Return a cursor, sorting by the column given.
-    // + See EventProvider for valid column names
-    public Cursor getCursor(String sortBy) {
-        Uri allEvents = Uri.parse("content://org.ciasaboark.tacere.Events/events");
-        if (sortBy == null) {
-            throw new IllegalArgumentException(
-                    "DatabaseInterface:getCursor(String) given a null value");
-        } else {
-            return new CursorLoader(mAppContext, allEvents, null, null, null, sortBy)
-                    .loadInBackground();
-        }
+        cursor.close();
+        return isEmpty;
     }
 
     public void setRingerType(int eventId, int ringerType) {
@@ -114,8 +117,19 @@ public class DatabaseInterface {
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
-        mAppContext.getContentResolver().update(EventProvider.CONTENT_URI, values,
-                mSelectionClause, mSelectionArgs);
+        eventsDB.update(TABLE_EVENTS, values,
+                mSelectionClause, mSelectionArgs); //TODO test
+    }
+
+
+    public Cursor getEventCursor() {
+        Cursor cursor = getOrderedEventCursor(Columns.BEGIN);
+        return cursor;
+    }
+
+    private Cursor getOrderedEventCursor(String order) {
+        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, null, null, null, null, order, null);
+        return cursor;
     }
 
     public Deque<CalEvent> allActiveEvents() {
@@ -123,9 +137,8 @@ public class DatabaseInterface {
         syncCalendarDb();
 
         Deque<CalEvent> events = new ArrayDeque<CalEvent>();
-
-        Cursor cursor = getCursor(Columns.BEGIN);
-
+        Cursor cursor = getEventCursor();
+        //TODO test cursor works
         long beginTime = System.currentTimeMillis()
                 - (CalEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
         long endTime = System.currentTimeMillis()
@@ -168,10 +181,8 @@ public class DatabaseInterface {
 
     // returns the event that matches the given Instance id, null if no match
     public CalEvent getEvent(int id) throws NoSuchEventException {
-        Uri thisEventUri = Uri.parse("content://org.ciasaboark.tacere.Events/events");
-        CursorLoader cl = new CursorLoader(mAppContext, thisEventUri.buildUpon()
-                .appendPath(String.valueOf(id)).build(), null, null, null, Columns._ID);
-        Cursor cursor = cl.loadInBackground();
+        //TODO test
+        Cursor cursor = getEventCursor();
         CalEvent thisEvent = null;
         if (cursor.moveToFirst()) {
             thisEvent = new CalEvent();
@@ -233,7 +244,6 @@ public class DatabaseInterface {
             int col_allDay = calendarCursor.getColumnIndex(projection[5]);
             int col_availability = calendarCursor.getColumnIndex(projection[6]);
             int col_id = calendarCursor.getColumnIndex(projection[7]);
-            int col_cal_id = calendarCursor.getColumnIndex(projection[8]);
 
             do {
                 // the cursor
@@ -244,23 +254,22 @@ public class DatabaseInterface {
                 int event_displayColor = calendarCursor.getInt(col_displayColor);
                 int event_allDay = calendarCursor.getInt(col_allDay);
                 int event_availability = calendarCursor.getInt(col_availability);
-                int event_id = calendarCursor.getInt(col_id);
-                int event_cal_id = calendarCursor.getInt(col_cal_id);
+                int id = calendarCursor.getInt(col_id);
 
                 // if the event is already in the local database then we need to preserve
                 // the ringerType, all other values should be read from the system calendar
                 // database
                 CalEvent newEvent = new CalEvent();
                 try {
-                    CalEvent oldEvent = getEvent(event_id);
+                    CalEvent oldEvent = getEvent(id);
                     newEvent.setRingerType(oldEvent.getRingerType());
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
                 }
 
-                newEvent.setId(event_id);
-                newEvent.setCal_id(event_cal_id);
+                newEvent.setId(id);
+                newEvent.setCal_id(id);
                 newEvent.setTitle(event_title);
                 newEvent.setBegin(event_begin);
                 newEvent.setEnd(event_end);
@@ -282,31 +291,29 @@ public class DatabaseInterface {
     // remove all events from the database with an ending date
     // + before the given time
     public void pruneEventsBefore(long cutoff) {
-        /*-
-		 * this should work, but doesn't
-		 * ContentResolver cr = mAppContext.getContentResolver();
-		 * String[] selectionArgs = new String[] {String.valueOf(cutoff)};
-		 * cr.delete(EventProvider.CONTENT_URI, EventProvider.END + "<?", selectionArgs);
-		 */
-
-        // doing things the long way
-        Cursor c;
-        Uri allEvents = Uri.parse("content://org.ciasaboark.tacere.Events/events");
-        CursorLoader cl = new CursorLoader(mAppContext, allEvents, null, null, null,
-                Columns._ID);
-        c = cl.loadInBackground();
+        Cursor c = getEventCursor(0, cutoff);
         if (c.moveToFirst()) {
             do {
                 int id = c.getInt(c.getColumnIndex(Columns._ID));
                 long end = c.getLong(c.getColumnIndex(Columns.END));
                 if (end <= cutoff) {
-                    ContentResolver cr = mAppContext.getContentResolver();
-                    cr.delete(EventProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(id))
-                            .build(), null, null);
+                    deleteEventWithId(id);
                 }
             } while (c.moveToNext());
         }
         c.close();
+    }
+
+    private void deleteEventWithId(long id) {
+        String selection = Columns._ID + " = ?";
+        eventsDB.delete(TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
+    }
+
+    private Cursor getEventCursor(long begin, long end) {
+        String[] args = {String.valueOf(begin), String.valueOf(end)};
+        String selection = Columns.BEGIN + " >= ? AND " + Columns.END + " <= ?";
+        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
+        return cursor;
     }
 
     private Cursor getCalendarCursor(long begin, long end) {
@@ -336,7 +343,8 @@ public class DatabaseInterface {
             }
             cv.put(Columns.CAL_ID, e.getCal_id());
 
-            mAppContext.getContentResolver().insert(EventProvider.CONTENT_URI, cv);
+            long rowID = eventsDB.insertWithOnConflict(TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
         } else {
             throw new IllegalArgumentException(
                     "DatabaseInterface:insertEvent given an event with blank values");
@@ -366,20 +374,12 @@ public class DatabaseInterface {
         }
         cal_cursor.close();
 
-        Cursor loc_cursor = getCursor(Columns._ID);
+        Cursor loc_cursor = getEventCursor();
         if (loc_cursor.moveToFirst()) {
             do {
                 long loc_id = loc_cursor.getLong(loc_cursor.getColumnIndex(Columns._ID));
                 if (!cal_ids.contains(loc_id)) {
-                    // String loc_title =
-                    // loc_cursor.getString(loc_cursor.getColumnIndex(EventProvider.TITLE));
-                    // Log.d(TAG, "Event with id:" + loc_id + " and title: " + loc_title +
-                    // " not found in calendar DB, removing");
-                    ContentResolver cr = mAppContext.getContentResolver();
-                    cr.delete(
-                            EventProvider.CONTENT_URI.buildUpon()
-                                    .appendPath(String.valueOf(loc_id)).build(), null, null
-                    );
+                    deleteEventWithId(loc_id);
                 }
             } while (loc_cursor.moveToNext());
         }
@@ -396,18 +396,41 @@ public class DatabaseInterface {
         syncCalendarDb();
         CalEvent nextEvent = null;
 
-        Cursor cursor = getCursor(Columns.BEGIN);
+        Cursor cursor = getOrderedEventCursor(Columns.BEGIN);
         if (cursor.moveToFirst()) {
             int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
             try {
                 nextEvent = getEvent(id);
             } catch (NoSuchEventException e) {
-                Log.e(TAG, "unable to retreive event with id of " + id
+                Log.e(TAG, "unable to retrieve event with id of " + id
                         + " even though a record with this id exists in the database");
             }
         }
         cursor.close();
 
         return nextEvent;
+    }
+
+    private class EventDatabaseHelper extends SQLiteOpenHelper {
+
+
+        public EventDatabaseHelper(Context context) {
+            super(context, DB_NAME, null, VERSION);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + Columns._ID + " integer primary key," +
+                    Columns.TITLE + " varchar(100)," + Columns.DESCRIPTION + " varchar(100)," +
+                    Columns.BEGIN + " integer," + Columns.END + " integer," +
+                    Columns.IS_ALLDAY + " integer," + Columns.IS_FREETIME + " integer," +
+                    Columns.RINGER_TYPE + " integer," + Columns.DISPLAY_COLOR + " integer," +
+                    Columns.CAL_ID + " integer)");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
+            // TODO Add code to update the database from a previous version
+        }
     }
 }

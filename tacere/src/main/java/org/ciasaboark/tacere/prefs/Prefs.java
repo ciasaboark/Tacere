@@ -130,6 +130,14 @@ public class Prefs {
         editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays).commit();
     }
 
+    public void setDoNotDisturb(boolean doNotDisturb) {
+        editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb);
+    }
+
+    public boolean getDoNotDisturb() {
+        return sharedPreferences.getBoolean(Keys.DO_NOT_DISTURB, DefaultPrefs.DO_NOT_DISTURB);
+    }
+
     public int getDefaultRinger() {
         return DefaultPrefs.RINGER_TYPE;
     }
@@ -232,6 +240,7 @@ public class Prefs {
         public static final String QUICKSILENCE_HOURS = "QUICK_SILENCE_HOURS";
         public static final String BUFFER_MINUTES = "BUFFER_MINUTES";
         public static final String LOOKAHEAD_DAYS = "LOOKAHEAD_DAYS";
+        public static final String DO_NOT_DISTURB = "DO_NOT_DISTURB";
 //		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
 
 

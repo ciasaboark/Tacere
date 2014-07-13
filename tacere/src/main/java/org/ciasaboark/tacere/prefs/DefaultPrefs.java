@@ -37,4 +37,5 @@ class DefaultPrefs {
     // after the donate thank you activity is displayed this will be changed to false
     static final boolean SHOW_DONATION_THANKS = true;   //TODO is this still needed?
 
+    public static final boolean DO_NOT_DISTURB = false;
 }

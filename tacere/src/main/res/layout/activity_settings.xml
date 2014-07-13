@@ -1,230 +1,276 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView2"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:scrollbarStyle="outsideOverlay" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearlayout5"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:clickable="true"
+        android:theme="@style/Header_Switch"
+        android:padding="16dp"
+        >
 
-        <TextView
-            android:id="@+id/eventTime"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pref_general_header"
-            android:textColor="@color/textColorHeading"/>
+            android:orientation="vertical" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="false"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp">
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/activateServiceDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:text="@string/pref_service_enabled"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/header_text_color"/>
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/activateServiceDescription"
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/activateServiceSwitch"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:checked="true" />
+
+    </RelativeLayout>
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbarStyle="outsideOverlay" >
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+
+
+            <TextView
+                android:id="@+id/eventTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_general_header"
+                android:textColor="@color/textColorHeading"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onClickRingerType"
+                android:clickable="true">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:id="@+id/ringerTypeBox">
+
+                    <TextView
+                        android:id="@+id/settings_ringerTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_ringer_type_title"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <TextView
+                        android:id="@+id/ringerTypeDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:text="@string/placeholder"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/settings_ringerIcon"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_state_silent"
+                    android:layout_alignParentEnd="true"
+                    android:onClick="onClickRingerType" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:id="@+id/do_not_disturb_box">
+
+                <Switch
+                    android:id="@+id/doNotDisturbSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/pref_service_enabled"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-            </LinearLayout>
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:clickable="false"
+                    android:checked="false"
+                    android:layout_alignTop="@+id/do_not_disturb_header"/>
 
-            <Switch
+                <TextView
+                    android:id="@+id/do_not_disturb_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_do_not_disturb"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/pref_do_not_disturb_description"
+                    android:id="@+id/do_not_disturb_description"
+                    android:layout_below="@+id/do_not_disturb_header"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/activateServiceSwitch"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:checked="true" />
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_volumes_header"
+                android:textColor="@color/textColorHeading"/>
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onClickRingerType"
-            android:clickable="true">
+                <Switch
+                    android:id="@+id/adjustMediaCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:clickable="false"
+                     />
+
+                <TextView
+                    android:id="@+id/settings_mediaText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_media_volume"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </RelativeLayout>
+
+            <SeekBar
+                android:id="@+id/mediaSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:id="@+id/settings_alarmBox">
+
+                <Switch
+                    android:id="@+id/adjustAlarmCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerHorizontal="false"
+                    android:layout_centerVertical="true"
+                    android:clickable="false"
+                     />
+
+                <TextView
+                    android:id="@+id/settings_alarmText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_alarm_volume"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </RelativeLayout>
+
+            <SeekBar
+                android:id="@+id/alarmSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_quick_silence_header"
+                android:textColor="@color/textColorHeading" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
+                android:onClick="onClickQuickSilence"
                 android:orientation="vertical"
                 android:paddingBottom="10dp"
-                android:paddingTop="6dp"
-                android:id="@+id/ringerTypeBox">
+                android:paddingTop="10dp">
 
                 <TextView
-                    android:id="@+id/settings_ringerTitle"
+                    android:id="@+id/textView9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/pref_ringer_type_title"
+                    android:text="@string/pref_quick_silence"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
-                    android:id="@+id/ringerTypeDescription"
+                    android:id="@+id/quickSilenceDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
                     android:text="@string/placeholder"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
 
-            <ImageButton
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:id="@+id/settings_ringerIcon"
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_state_silent"
-                android:layout_alignParentEnd="true"
-                android:onClick="onClickRingerType" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/pref_volumes_header"
-            android:textColor="@color/textColorHeading"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp" >
-
-            <Switch
-                android:id="@+id/adjustMediaCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:clickable="false"
-                 />
-
             <TextView
-                android:id="@+id/settings_mediaText"
+                android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_media_volume"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:text="@string/pref_advance_header"
+                android:textColor="@color/textColorHeading"/>
 
-        </RelativeLayout>
-
-        <SeekBar
-            android:id="@+id/mediaSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp"
-            android:id="@+id/settings_alarmBox">
-
-            <Switch
-                android:id="@+id/adjustAlarmCheckBox"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerHorizontal="false"
-                android:layout_centerVertical="true"
-                android:clickable="false"
-                 />
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="onClickAdvancedSettings"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
-            <TextView
-                android:id="@+id/settings_alarmText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_alarm_volume"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_advanced_title"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_advanced_sub"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
 
-        <SeekBar
-            android:id="@+id/alarmSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/pref_quick_silence_header"
-            android:textColor="@color/textColorHeading" />
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:onClick="onClickQuickSilence"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="6dp">
-
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_quick_silence"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/quickSilenceDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pref_advance_header"
-            android:textColor="@color/textColorHeading"/>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:onClick="onClickAdvancedSettings"
-            android:orientation="vertical"
-            android:paddingTop="6dp">
-
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_advanced_title"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_advanced_sub"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
-
-    </LinearLayout>
 
 </ScrollView>
+</LinearLayout>

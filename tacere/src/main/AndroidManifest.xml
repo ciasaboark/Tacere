@@ -127,13 +127,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/quicksilence_widget_info" />
         </receiver> -->
-
-
-        <provider
-            android:name="org.ciasaboark.tacere.database.EventProvider"
-            android:authorities="org.ciasaboark.tacere.Events"
-            android:exported="false">
-        </provider>
     </application>
 
 </manifest>
