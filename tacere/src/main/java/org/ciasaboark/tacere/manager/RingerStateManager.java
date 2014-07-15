@@ -26,7 +26,7 @@ public class RingerStateManager {
      * Store the current ringer state (vibrate, silent, or normal). Ringer state is stored into
      * shared preferences
      */
-    public void storeRingerState() {
+    private void storeRingerState() {
         // TODO this may return a state indicating that a call is ongoing, this should stop
         // processing and wait for the call to end before adjusting volumes
         int curRinger = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE))
@@ -58,9 +58,6 @@ public class RingerStateManager {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         switch (ringerType) {
-            case CalEvent.RINGER.NORMAL:
-                audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
             case CalEvent.RINGER.VIBRATE:
                 audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 break;
@@ -68,8 +65,29 @@ public class RingerStateManager {
                 audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 break;
             case CalEvent.RINGER.IGNORE:
+                //ignore this event
+                break;
+            default:
                 audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 break;
+
         }
+    }
+
+    public void storeRingerStateIfNeeded() {
+        // only store the current ringer state if we are not transitioning from one event to the
+        // next and we are not in a quick silence period
+        ServiceStateManager stateManager = new ServiceStateManager(context);
+        if (stateManager.getServiceState().equals(ServiceStateManager.ServiceStates.NOT_ACTIVE)) {
+            storeRingerState();
+        }
+    }
+
+    public void restorePhoneRinger() {
+        int storedRinger = getStoredRingerState();
+        if (storedRinger == CalEvent.RINGER.UNDEFINED) {
+            storedRinger = CalEvent.RINGER.NORMAL;
+        }
+        setPhoneRinger(storedRinger);
     }
 }

@@ -62,7 +62,7 @@ public class VolumesManager {
     }
 
 
-    public void adjustMediaAndAlarmVolumes() {
+    public void adjustMediaAndAlarmVolumesIfNeeded() {
         // change media volume, and alarm volume
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (prefs.getAdjustMedia()) {

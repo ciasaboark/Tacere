@@ -86,10 +86,10 @@ public class EventSilencerService extends IntentService {
             cancelQuickSilence();
         } else if (requestType.equals(RequestTypes.ACTIVITY_RESTART)
                 || requestType.equals(RequestTypes.PROVIDER_CHANGED)) {
-            syncDbAndRestart();
+            scheduleServiceRestart();
         } else if (requestType.equals(RequestTypes.NORMAL)) {
             if (prefs.getIsServiceActivated()) {
-                checkForActiveEvents();
+                checkForActiveEventsAndSilence();
             } else { // normal wake requests (but service is marked to be inactive)
                 shutdownService();
             }
@@ -111,18 +111,11 @@ public class EventSilencerService extends IntentService {
         alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
     }
 
-    /**
-     * Set the phone ringer to silent for the given duration
-     *
-     * @param durationMinutes
-     */
     private void quickSilence(int durationMinutes) {
         // quick silence requests can occur during three states, either no event is active, an event
         // is active, or a previous quick silence request is still ongoing. If this request occurred
         // while no event was active, then save the current ringer state so it can be restored later
-        if (stateManager.getServiceState().equals(ServiceStates.NOT_ACTIVE)) {
-            ringerState.storeRingerState();
-        }
+        ringerState.storeRingerStateIfNeeded();
 
         stateManager.setServiceState(ServiceStates.QUICKSILENCE);
 
@@ -156,50 +149,32 @@ public class EventSilencerService extends IntentService {
         alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
     }
 
-    /**
-     * Syncs the apps internal database with the system calendar database then schedules an
-     * immediate restart to look for active events (unless a quick silence request is ongoing)
-     */
-    private void syncDbAndRestart() {
-        databaseInterface.syncCalendarDb();
-
+    private void scheduleServiceRestart() {
         // schedule an immediate wakeup only if we aren't in a quick silence period
         if (!stateManager.getServiceState().equals(ServiceStates.QUICKSILENCE)) {
             alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
         }
     }
 
-    private void checkForActiveEvents() {
+    private void checkForActiveEventsAndSilence() {
         databaseInterface.syncCalendarDb();
-        Deque<CalEvent> events = databaseInterface.allActiveEvents();
-        CalEvent event = events.peek();
-        if (event != null && shouldEventSilence(event)) {
-            // only store the current ringer state if we are not transitioning from one event to the
-            // next and we are not in a quick silence period
-            if (stateManager.getServiceState().equals(ServiceStates.NOT_ACTIVE)) {
-                ringerState.storeRingerState();
+        Deque<CalEvent> events = databaseInterface.getAllActiveEvents();
+        boolean foundEvent = false;
+        for (CalEvent event : events) {
+            if (shouldEventSilence(event)) {
+                foundEvent = true;
+                silenceEventAndShowNotification(event);
             }
-            ringerState.setPhoneRinger(event.getRingerType());
-            volumesManager.adjustMediaAndAlarmVolumes();
-            if (event.getRingerType() == CalEvent.RINGER.SILENT
-                    || event.getRingerType() == CalEvent.RINGER.VIBRATE) {
-                vibrate();
-            }
-            stateManager.setServiceState(ServiceStates.EVENT_ACTIVE);
-            notificationManager.displayEventNotification(event);
-            // the extra ten seconds is to make sure that the event ending is pushed into the
-            // correct minute
-            long wakeAt = event.getEnd()
-                    + (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
-            alarmManager.scheduleNormalWakeAt(wakeAt);
-        } else {
+        }
+
+        if (!foundEvent) {
             // there are no events currently active
-            if (stateManager.getServiceState().equals(ServiceStates.EVENT_ACTIVE)) {
+            if (stateManager.isEventActive()) {
                 vibrate();
                 stateManager.setServiceState(ServiceStates.NOT_ACTIVE);
                 notificationManager.cancelAllNotifications();
                 volumesManager.restoreVolumes();
-                ringerState.setPhoneRinger(ringerState.getStoredRingerState());
+                ringerState.restorePhoneRinger();
             }
 
             // Sleep the service until the start of the next
@@ -214,6 +189,33 @@ public class EventSilencerService extends IntentService {
             }
             alarmManager.scheduleNormalWakeAt(wakeAt);
         }
+    }
+
+    private int getBestRingerType(CalEvent e) {
+        int eventRingerType = e.getRingerType();
+        if (eventRingerType == CalEvent.RINGER.UNDEFINED) {
+            eventRingerType = prefs.getRingerType();
+        }
+        return eventRingerType;
+    }
+
+    private void silenceEventAndShowNotification(CalEvent event) {
+        ringerState.storeRingerStateIfNeeded();
+        ringerState.setPhoneRinger(getBestRingerType(event));
+
+        volumesManager.adjustMediaAndAlarmVolumesIfNeeded();
+        //only vibrate if we are transitioning from no event active to an active event
+        if (!stateManager.isEventActive()) {
+            vibrate();
+        }
+
+        stateManager.setServiceState(ServiceStates.EVENT_ACTIVE);
+        notificationManager.displayEventNotification(event);
+        // the extra ten seconds is to make sure that the event ending is pushed into the
+        // correct minute
+        long wakeAt = event.getEnd()
+                + (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
+        alarmManager.scheduleNormalWakeAt(wakeAt);
     }
 
     /**
@@ -279,6 +281,11 @@ public class EventSilencerService extends IntentService {
 
         if (busy_notAllDay || allDay || free_notAllDay || isCustomRingerSet) {
             eventMatches = true;
+        }
+
+        //all of this is negated if the event has been marked to be ignored
+        if (event.getRingerType() == CalEvent.RINGER.IGNORE) {
+            eventMatches = false;
         }
 
         return eventMatches;

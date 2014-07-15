@@ -10,8 +10,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +26,6 @@ import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
@@ -39,7 +36,6 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
 import org.ciasaboark.tacere.manager.VolumesManager;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.provider.QuickSilenceProvider;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
@@ -70,7 +66,6 @@ public class SettingsActivity extends Activity {
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
-        getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setIcon(R.drawable.action_settings);
     }
 
@@ -103,18 +98,21 @@ public class SettingsActivity extends Activity {
 
         Drawable icon;
         switch (prefs.getRingerType()) {
-            case 1:
+            case CalEvent.RINGER.NORMAL:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
                 icon = getResources().getDrawable(R.drawable.ic_state_normal);
                 break;
-            case 2:
+            case CalEvent.RINGER.VIBRATE:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
                 icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                 break;
-            default:
+            case CalEvent.RINGER.SILENT:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
                 icon = getResources().getDrawable(R.drawable.ic_state_silent);
                 break;
+            default:
+                throw new IllegalStateException("Saved default ringer is of unknown type: "
+                        + prefs.getRingerType());
         }
 
 
@@ -355,6 +353,12 @@ public class SettingsActivity extends Activity {
         drawMediaWidgets();
     }
 
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -379,7 +383,6 @@ public class SettingsActivity extends Activity {
                 //
                 // http://developer.android.com/design/patterns/navigation.html#up-vs-back
                 //
-                saveSettings();
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
         }
@@ -391,43 +394,38 @@ public class SettingsActivity extends Activity {
         drawAllWidgets();
     }
 
-    private void saveSettings() {
-        //we also need to notify any active widgets of the settings change so
-        //+ that they can redraw
-        AppWidgetManager wManager = AppWidgetManager.getInstance(this.getApplicationContext());
-        ComponentName qsWidget = new ComponentName(getApplicationContext(), QuickSilenceProvider.class);
-        RemoteViews remoteViews = new RemoteViews(this.getPackageName(), R.layout.quicksilence_widget_layout);
-        int[] widgets = wManager.getAppWidgetIds(qsWidget);
-        wManager.updateAppWidget(widgets, remoteViews);
-    }
-
     public void onPause() {
         super.onPause();
     }
 
     public void onClickRingerType(View v) {
+        //TODO this is a fragile connection to the ringer types, should be replaced with an enum
+        String[] ringerTypes = {
+                "Normal",
+                "Vibrate",
+                "Silent",
+        };
+
         AlertDialog alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.pref_ringer_type)
-                .setSingleChoiceItems(R.array.ringer_types, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(ringerTypes, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         prefs.setRingerType(which + 1);
-                        saveSettings();
                         drawRingerWidgets();
+                        restartEventSilencerService();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //do nothing
-
                     }
                 })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //do nothing
-
                     }
                 })
                 .create();
@@ -479,7 +477,6 @@ public class SettingsActivity extends Activity {
             public void onClick(DialogInterface dialog, int id) {
                 prefs.setQuickSilenceHours(hourP.getValue() - 1);
                 prefs.setQuicksilenceMinutes(minP.getValue() - 1);
-                saveSettings();
                 drawQuickSilenceWidget();
             }
         });

@@ -7,13 +7,9 @@ package org.ciasaboark.tacere.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
@@ -36,70 +32,66 @@ public class DatabaseInterface {
             Instances.AVAILABILITY,
             Instances._ID
     };
-    private static DatabaseInterface mInstance;
-    private static Context mAppContext = null;
-    private static Prefs prefs = null;
-
-
-    //imported
-    private static final int EVENTS = 1;
-    private static final int EVENT_ID = 2;
-    private static final String PROVIDER_NAME = "org.ciasaboark.tacere.Events";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/event");
-    private static final UriMatcher uriMatcher;
-    private Context context;
-
-    static {
-        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "event", EVENTS);
-        uriMatcher.addURI(PROVIDER_NAME, "event/#", EVENT_ID);
-    }
 
     private static final String DB_NAME = "events.sqlite";
     private static final int VERSION = 1;
     private static final String TABLE_EVENTS = "events";
-    //Database values
+    private static final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
+    private static DatabaseInterface instance;
+    private static Context context = null;
+    private static Prefs prefs = null;
     private SQLiteDatabase eventsDB;
-
-    //end imported
 
 
     private DatabaseInterface(Context context) {
-        mAppContext = context;
+        DatabaseInterface.context = context;
         EventDatabaseHelper dbHelper = new EventDatabaseHelper(context);
         this.eventsDB = dbHelper.getWritableDatabase();
     }
 
-    public static DatabaseInterface getInstance(Context context) {
-        if (context == null) {
+    public static DatabaseInterface getInstance(Context ctx) {
+        if (ctx == null) {
             throw new IllegalArgumentException("Context can not be null");
         }
-
-        if (mInstance == null) {
-            mInstance = new DatabaseInterface(context);
+        context = ctx;
+        if (instance == null) {
+            instance = new DatabaseInterface(context);
         }
         if (prefs == null) {
             prefs = new Prefs(context);
         }
-        if (mAppContext == null) {
-            mAppContext = context;
-        }
-        return mInstance;
+
+        return instance;
     }
 
-    public void pruneEventsAfter(long cutoff) {
-        Cursor c = getEventCursor(0, cutoff);
+//    public void pruneEventsAfter(long cutoff) {
+//        Cursor c = getEventCursor(0, cutoff);   //TODO this will pull in all events, find a better way
+//
+//        if (c.moveToFirst()) {
+//            do {
+//                int id = c.getInt(c.getColumnIndex(Columns._ID));
+//                long begin = c.getLong(c.getColumnIndex(Columns.BEGIN));
+//                if (begin > cutoff) {
+//                    deleteEventWithId(id);
+//                }
+//            } while (c.moveToNext());
+//        }
+//        c.close();
+//    }
 
-        if (c.moveToFirst()) {
-            do {
-                int id = c.getInt(c.getColumnIndex(Columns._ID));
-                long begin = c.getLong(c.getColumnIndex(Columns.BEGIN));
-                if (begin > cutoff) {
-                    deleteEventWithId(id);
-                }
-            } while (c.moveToNext());
-        }
-        c.close();
+    private Cursor getEventCursor(long begin, long end) {
+        assert begin >= 0;
+        assert end >= 0;
+
+        String[] args = {String.valueOf(begin), String.valueOf(end)};
+        String selection = Columns.BEGIN + " >= ? AND " + Columns.END + " <= ?";
+        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
+        return cursor;
+    }
+
+    private void deleteEventWithId(int id) {
+        String selection = Columns._ID + " = ?";
+        eventsDB.delete(TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
     }
 
     public boolean isDatabaseEmpty() {
@@ -112,27 +104,29 @@ public class DatabaseInterface {
         return isEmpty;
     }
 
+    public Cursor getEventCursor() {
+        return getOrderedEventCursor(Columns.BEGIN);
+    }
+
+    private Cursor getOrderedEventCursor(String order) {
+        return eventsDB.query(TABLE_EVENTS, null, null, null, null, null, order, null);
+    }
+
     public void setRingerType(int eventId, int ringerType) {
+        if (ringerType != CalEvent.RINGER.IGNORE && ringerType != CalEvent.RINGER.NORMAL
+                && ringerType != CalEvent.RINGER.SILENT && ringerType != CalEvent.RINGER.UNDEFINED
+                && ringerType != CalEvent.RINGER.VIBRATE) {
+            throw new IllegalArgumentException("unknown ringer type: " + ringerType);
+        }
         String mSelectionClause = Columns._ID + " = ?";
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
         eventsDB.update(TABLE_EVENTS, values,
-                mSelectionClause, mSelectionArgs); //TODO test
+                mSelectionClause, mSelectionArgs);
     }
 
-
-    public Cursor getEventCursor() {
-        Cursor cursor = getOrderedEventCursor(Columns.BEGIN);
-        return cursor;
-    }
-
-    private Cursor getOrderedEventCursor(String order) {
-        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, null, null, null, null, order, null);
-        return cursor;
-    }
-
-    public Deque<CalEvent> allActiveEvents() {
+    public Deque<CalEvent> getAllActiveEvents() {
         // sync the db and prune old events
         syncCalendarDb();
 
@@ -229,9 +223,12 @@ public class DatabaseInterface {
 
     // sync the calendar and the local database for the given number of days
     public void update(int days) {
-        days = Math.abs(days);
+        if (days < 0) {
+            throw new IllegalArgumentException("can not sync for a negative period of days: " + days);
+        }
+
         long begin = System.currentTimeMillis();
-        long end = begin + 1000 * 60 * 60 * 24 * (long) days; // pull all events n days from now
+        long end = begin + MILLISECONDS_IN_DAY * (long) days; // pull all events n days from now
 
         Cursor calendarCursor = getCalendarCursor(begin, end);
 
@@ -304,20 +301,8 @@ public class DatabaseInterface {
         c.close();
     }
 
-    private void deleteEventWithId(long id) {
-        String selection = Columns._ID + " = ?";
-        eventsDB.delete(TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
-    }
-
-    private Cursor getEventCursor(long begin, long end) {
-        String[] args = {String.valueOf(begin), String.valueOf(end)};
-        String selection = Columns.BEGIN + " >= ? AND " + Columns.END + " <= ?";
-        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
-        return cursor;
-    }
-
     private Cursor getCalendarCursor(long begin, long end) {
-        return Instances.query(mAppContext.getContentResolver(), projection,
+        return Instances.query(context.getContentResolver(), projection,
                 begin, end);
     }
 
@@ -363,12 +348,12 @@ public class DatabaseInterface {
 
         Cursor cal_cursor = getCalendarCursor(begin, end);
 
-        ArrayList<Long> cal_ids = new ArrayList<Long>();
+        ArrayList<Integer> cal_ids = new ArrayList<Integer>();
 
         if (cal_cursor.moveToFirst()) {
             int col_id = cal_cursor.getColumnIndex(projection[7]);
             do {
-                long event_id = Long.valueOf(cal_cursor.getString(col_id));
+                int event_id = Integer.valueOf(cal_cursor.getString(col_id));
                 cal_ids.add(event_id);
             } while (cal_cursor.moveToNext());
         }
@@ -377,7 +362,7 @@ public class DatabaseInterface {
         Cursor loc_cursor = getEventCursor();
         if (loc_cursor.moveToFirst()) {
             do {
-                long loc_id = loc_cursor.getLong(loc_cursor.getColumnIndex(Columns._ID));
+                int loc_id = loc_cursor.getInt(loc_cursor.getColumnIndex(Columns._ID));
                 if (!cal_ids.contains(loc_id)) {
                     deleteEventWithId(loc_id);
                 }

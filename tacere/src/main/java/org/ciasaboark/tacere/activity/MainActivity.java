@@ -6,9 +6,7 @@
 package org.ciasaboark.tacere.activity;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,9 +17,9 @@ import android.graphics.Outline;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.CalendarContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -35,7 +33,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -44,7 +41,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Parcelable;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.converter.DateConverter;
@@ -62,8 +58,6 @@ import org.ciasaboark.tacere.service.RequestTypes;
 public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
-    private Context ctx;
-
     private EventCursorAdapter cursorAdapter;
     private Cursor cursor;
     private DatabaseInterface databaseInterface;
@@ -76,24 +70,23 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ctx = this;
         setContentView(R.layout.activity_main);
-        databaseInterface = DatabaseInterface.getInstance(this);
+        databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
         prefs = new Prefs(this);
         BroadcastReceiver messageReceiver = new BroadcastReceiver() {
             private static final String TAG = "messageReceiver";
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                Parcelable listviewState = null;
-                listviewState = eventListview.onSaveInstanceState();
+                //save the current position of the listview
+                Parcelable listviewState = eventListview.onSaveInstanceState();
 
-                cursorAdapter.notifyDataSetChanged();
                 Log.d(TAG, "got a notification from the service, updating adpater and views");
                 cursor = databaseInterface.getEventCursor();
-                cursorAdapter = new EventCursorAdapter(ctx, cursor);
-                eventListview.setAdapter(cursorAdapter);
-                eventListview.invalidateViews(); //TODO test that this forces the listview to redraw
+                cursorAdapter.changeCursor(cursor);
+                cursorAdapter.notifyDataSetChanged();
+
+                //restore the last position of the list view
                 eventListview.onRestoreInstanceState(listviewState);
 
                 //redraw the widgets
@@ -283,37 +276,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         startService(i);
     }
 
-    private void crossfade(final ImageButton fadeOut, final ImageButton fadeIn) {
-        int mShortAnimationDuration = 500;
-        fadeOut.setEnabled(false);
-        fadeIn.setEnabled(false);
-
-        // Set the content view to 0% opacity but visible, so that it is visible
-        // (but fully transparent) during the animation.
-        fadeIn.setAlpha(0f);
-        fadeIn.setVisibility(View.VISIBLE);
-
-        // Animate the content view to 100% opacity, and clear any animation
-        // listener set on the view.
-        fadeIn.animate()
-                .alpha(1f)
-                .setDuration(mShortAnimationDuration)
-                .setListener(null);
-
-        // Animate the loading view to 0% opacity. After the animation ends,
-        // set its visibility to GONE as an optimization step (it won't
-        // participate in layout passes, etc.)
-        fadeOut.animate()
-                .alpha(0f)
-                .setDuration(mShortAnimationDuration)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        fadeOut.setVisibility(View.GONE);
-                    }
-                });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -363,9 +325,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
         // since the number of days to display can change we need to
         // + remove events beyond the lookahead period
-        databaseInterface.pruneEventsAfter(System.currentTimeMillis() + 1000 * 60 * 60 * 24
+        //TODO do we really need to do this?
+        /*System.currentTimeMillis() + 1000 * 60 * 60 * 24
                 * (long) prefs.getLookaheadDays());
-
+        */
 
         if (databaseInterface.isDatabaseEmpty()) {
             hideEventList();
@@ -545,7 +508,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
                 // an image button to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
-                eventIV.setImageDrawable(this.getEventIcon(thisEvent, context));
+                eventIV.setImageDrawable(this.getEventIcon(thisEvent));
                 eventIV.setContentDescription(getBaseContext().getString(
                         R.string.icon_alt_text_normal));
 
@@ -614,7 +577,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             return eventShouldSilence;
         }
 
-        private Drawable getEventIcon(CalEvent event, Context ctx) {
+        private Drawable getEventIcon(CalEvent event) {
             Drawable icon;
             int defaultColor = getResources().getColor(R.color.icon_accent);
 
