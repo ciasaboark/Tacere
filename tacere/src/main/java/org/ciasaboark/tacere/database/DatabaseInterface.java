@@ -144,7 +144,7 @@ public class DatabaseInterface {
                 try {
                     CalEvent e = getEvent(id);
                     if (e.isActiveBetween(beginTime, endTime)) {
-                        events.add(e);
+                        events.addLast(e);
                     }
                 } catch (NoSuchEventException e) {
                     // this should only be reachable if the database has become corrupted

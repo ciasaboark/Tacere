@@ -164,6 +164,7 @@ public class EventSilencerService extends IntentService {
             if (shouldEventSilence(event)) {
                 foundEvent = true;
                 silenceEventAndShowNotification(event);
+                break;
             }
         }
 
