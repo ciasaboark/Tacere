@@ -14,6 +14,7 @@ import android.util.Log;
 
 import org.ciasaboark.tacere.activity.CalEvent;
 import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.NotificationManagerWrapper;
 import org.ciasaboark.tacere.manager.RingerStateManager;
@@ -163,6 +164,7 @@ public class EventSilencerService extends IntentService {
         for (CalEvent event : events) {
             if (shouldEventSilence(event)) {
                 foundEvent = true;
+                ActiveEventManager.setActiveEvent(event);
                 silenceEventAndShowNotification(event);
                 break;
             }
@@ -170,6 +172,7 @@ public class EventSilencerService extends IntentService {
 
         if (!foundEvent) {
             // there are no events currently active
+            ActiveEventManager.removeActiveEvent();
             if (stateManager.isEventActive()) {
                 vibrate();
                 stateManager.setServiceState(ServiceStates.NOT_ACTIVE);

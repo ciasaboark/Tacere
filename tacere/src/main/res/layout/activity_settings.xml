@@ -1,16 +1,22 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<LinearLayout
     android:id="@+id/linearlayout5"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/settings_serviceBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:theme="@style/Header_Switch"
         android:padding="16dp"
-        android:id="@+id/settings_serviceBox"
+        android:theme="@style/Header_Switch"
         >
 
         <LinearLayout
@@ -28,11 +34,11 @@
         </LinearLayout>
 
         <Switch
+            android:id="@+id/activateServiceSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/activateServiceSwitch"
-            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:checked="true"
             android:clickable="false"/>
 
@@ -57,71 +63,72 @@
                 android:id="@+id/eventTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_general_header"
-                android:textColor="@color/section_text_color"
+                android:background="@color/section_background"
                 android:padding="16dp"
-                android:background="@color/section_background"/>
+                android:text="@string/pref_general_header"
+                android:textColor="@color/section_text_color"/>
 
             <RelativeLayout
+                android:id="@+id/settings_ringerBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onClickRingerType"
+                android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
+                android:onClick="onClickRingerType"
                 android:orientation="horizontal"
-                android:padding="16dp"
-                android:id="@+id/settings_ringerBox">
+                android:padding="16dp">
 
                 <ImageButton
+                    android:id="@+id/settings_ringerIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:id="@+id/settings_ringerIcon"
-                    android:background="@drawable/ic_state_silent"
-                    android:clickable="false"
+                    android:layout_centerVertical="true"
                     android:layout_gravity="center"
                     android:layout_marginRight="16dp"
-                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_state_silent"
+                    android:clickable="false"
                     android:paddingLeft="16dp"/>
 
                 <TextView
                     android:id="@+id/settings_ringerTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/pref_ringer_type_title"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginLeft="50dp"
                     android:clickable="false"
-                    android:layout_marginLeft="50dp"/>
+                    android:text="@string/pref_ringer_type_title"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <TextView
                     android:id="@+id/ringerTypeDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:clickable="false"
+                    android:layout_below="@id/settings_ringerTitle"
                     android:layout_marginLeft="50dp"
-                    android:layout_below="@id/settings_ringerTitle"/>
+                    android:clickable="false"
+                    android:text="@string/placeholder"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/do_not_disturb_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:id="@+id/do_not_disturb_box"
-                android:padding="16dp"
                 android:clickable="true"
+                android:nestedScrollingEnabled="false"
                 android:onClick="onClickDoNotDisturb"
-                android:nestedScrollingEnabled="false">
+                android:padding="16dp">
 
                 <Switch
                     android:id="@+id/doNotDisturbSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/do_not_disturb_header"
                     android:layout_centerVertical="true"
-                    android:clickable="false"
                     android:checked="false"
-                    android:layout_alignTop="@+id/do_not_disturb_header"/>
+                    android:clickable="false"/>
 
                 <TextView
                     android:id="@+id/do_not_disturb_header"
@@ -130,32 +137,25 @@
                     android:text="@string/pref_do_not_disturb"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/pref_do_not_disturb_description"
-                    android:id="@+id/do_not_disturb_description"
-                    android:layout_below="@+id/do_not_disturb_header"/>
             </RelativeLayout>
 
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_volumes_header"
-                android:textColor="@color/section_text_color"
+                android:background="@color/section_background"
                 android:padding="16dp"
-                android:background="@color/section_background"/>
+                android:text="@string/pref_volumes_header"
+                android:textColor="@color/section_text_color"/>
 
             <RelativeLayout
+                android:id="@+id/settings_mediaBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:padding="16dp"
-                android:id="@+id/settings_mediaBox"
                 android:clickable="true"
-                android:onClick="onClickAdjustMedia">
+                android:onClick="onClickAdjustMedia"
+                android:padding="16dp">
 
                 <Switch
                     android:id="@+id/adjustMediaCheckBox"
@@ -183,13 +183,13 @@
                 />
 
             <RelativeLayout
+                android:id="@+id/settings_alarmBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:id="@+id/settings_alarmBox"
-                android:padding="16dp"
                 android:clickable="true"
-                android:onClick="onClickAdjustAlarm">
+                android:onClick="onClickAdjustAlarm"
+                android:padding="16dp">
 
                 <Switch
                     android:id="@+id/adjustAlarmCheckBox"
@@ -205,9 +205,9 @@
                     android:id="@+id/settings_alarmText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="false"
                     android:text="@string/pref_alarm_volume"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:clickable="false"/>
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             </RelativeLayout>
 
@@ -221,19 +221,19 @@
                 android:id="@+id/textView7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_quick_silence_header"
-                android:textColor="@color/section_text_color"
                 android:background="@color/section_background"
-                android:padding="16dp"/>
+                android:padding="16dp"
+                android:text="@string/pref_quick_silence_header"
+                android:textColor="@color/section_text_color"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
                 android:onClick="onClickQuickSilence"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:clickable="true">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/textView9"
@@ -254,18 +254,18 @@
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
                 android:text="@string/pref_advance_header"
-                android:textColor="@color/textColorHeading"
-                android:paddingLeft="16dp"/>
+                android:textColor="@color/textColorHeading"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
                 android:onClick="onClickAdvancedSettings"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:clickable="true">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/textView11"

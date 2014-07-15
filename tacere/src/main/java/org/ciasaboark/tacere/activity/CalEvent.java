@@ -130,16 +130,16 @@ public class CalEvent {
         return end;
     }
 
+    public void setEnd(Long end) {
+        this.end = end;
+    }
+
     public Long getBegin() {
         return begin;
     }
 
     public void setBegin(Long begin) {
         this.begin = begin;
-    }
-
-    public void setEnd(Long end) {
-        this.end = end;
     }
 
     public void setValuesFrom(CalEvent event) {
@@ -163,6 +163,10 @@ public class CalEvent {
         return descr;
     }
 
+    public void setDescription(String description) {
+        this.descr = description;
+    }
+
     public Integer getDisplayColor() {
         return dispColor;
     }
@@ -173,6 +177,10 @@ public class CalEvent {
 
     public Integer getId() {
         return instanceId;
+    }
+
+    public void setId(Integer id) {
+        this.instanceId = id;
     }
 
     public Integer getInstanceId() {
@@ -217,12 +225,14 @@ public class CalEvent {
         this.title = title;
     }
 
-    public void setId(Integer id) {
-        this.instanceId = id;
-    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CalEvent)) {
+            return false;
+        }
 
-    public void setDescription(String description) {
-        this.descr = description;
+        return getId().equals(((CalEvent) o).getId())
+                && getInstanceId().equals(((CalEvent) o).getInstanceId());
     }
 
     public class RINGER {

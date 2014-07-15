@@ -52,7 +52,7 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
         // Show the Up button in the action bar.
         setupActionBar();
-        RelativeLayout serviceToggleBox = (RelativeLayout)findViewById(id.settings_serviceBox);
+        RelativeLayout serviceToggleBox = (RelativeLayout) findViewById(id.settings_serviceBox);
         serviceToggleBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,13 +141,10 @@ public class SettingsActivity extends Activity {
         findViewById(id.do_not_disturb_box).setEnabled(prefs.getIsServiceActivated());
 
         TextView doNotDisturbHeader = (TextView) findViewById(id.do_not_disturb_header);
-        TextView doNotDisturbDescription = (TextView) findViewById(id.do_not_disturb_description);
         if (prefs.getIsServiceActivated()) {
             doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textcolor));
-            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
             doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textColorDisabled));
-            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textColorDisabled));
         }
 
         int apiLevelAvailable = Build.VERSION.SDK_INT;

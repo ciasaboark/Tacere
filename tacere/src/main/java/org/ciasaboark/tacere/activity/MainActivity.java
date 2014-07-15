@@ -47,10 +47,14 @@ import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 //import android.content.SharedPreferences;
@@ -512,18 +516,26 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 eventIV.setContentDescription(getBaseContext().getString(
                         R.string.icon_alt_text_normal));
 
-                //this animation does not play well with the new android l onclick ripple animation
-//                Animation iconAnim = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
-//                iconAnim.setDuration(500);
-//                eventIV.startAnimation(iconAnim);
+                Calendar calendarDate = new GregorianCalendar();
+                calendarDate.set(Calendar.HOUR_OF_DAY, 0);
+                calendarDate.set(Calendar.MINUTE, 0);
+                calendarDate.set(Calendar.SECOND, 0);
+                calendarDate.set(Calendar.MILLISECOND, 0);
+                calendarDate.add(Calendar.DAY_OF_MONTH, 1);
 
-                // TODO find out how to animate the list items only when first displayed, this
-                // animation will fire every time the event view is replaced
-                /*
-                 * Animation viewAnim = AnimationUtils.loadAnimation(context,
-				 * android.R.anim.slide_in_left); viewAnim.setDuration(500);
-				 * view.startAnimation(viewAnim);
-				 */
+                long tomorrowMidnight = calendarDate.getTimeInMillis();
+                long eventBegin = thisEvent.getBegin();
+
+                if (ActiveEventManager.isActiveEvent(thisEvent)) {
+                    view.setBackgroundColor(getResources()
+                            .getColor(R.color.event_list_active_event));
+                } else if (eventBegin > tomorrowMidnight) {
+                    view.setBackgroundColor(getResources()
+                            .getColor(R.color.event_list_dark_background));
+                } else {
+                    view.setBackgroundColor(getResources()
+                            .getColor(R.color.windowBackground));
+                }
             } catch (NoSuchEventException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
             }
