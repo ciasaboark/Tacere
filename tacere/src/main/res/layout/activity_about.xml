@@ -15,12 +15,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/about_header"
             android:elevation="4dp"
-            android:theme="@style/Header_Switch"
             android:measureWithLargestChild="false"
-            android:paddingLeft="16dp"
-            android:paddingTop="16dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="10dp">
+            android:background="@color/header_background"
+            android:padding="16dp">
 
             <ImageView
                 android:layout_width="64dp"

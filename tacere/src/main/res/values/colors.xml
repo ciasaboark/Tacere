@@ -4,7 +4,7 @@
     <item name="primary_dark" type="color">#263238</item>
     <item name="primary" type="color">#37474f</item>
     <item name="header_background" type="color">#616161</item>
-    <item name="header_text_color" type="color">#9e9e9e</item>
+    <item name="header_text_color" type="color">#cfd8dc</item>
     <item name="header_accent" type="color">#84ffff</item>
     <item name="button_ongoing" type="color">#00bfa5</item>
     <item name="cancel_quicksilence" type="color">@color/primary</item>
@@ -19,6 +19,9 @@
     <item name="windowBackground" type="color">#eceff1</item>
     <item name="menu_background" type="color">#ffffff</item>
     <item name="menu_text" type="color">#000000</item>
+    <item name="icon_tint" type="color">@color/accent</item>
+    <item name="section_background" type="color">#e0e0e0</item>
+    <item name="section_text_color" type="color">#607d8b</item>
 </resources>
 
 

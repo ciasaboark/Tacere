@@ -55,11 +55,12 @@
 
             <TextView
                 android:id="@+id/eventTime"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/pref_general_header"
-                android:textColor="@color/textColorHeading"
-                android:paddingLeft="16dp"/>
+                android:textColor="@color/section_text_color"
+                android:padding="16dp"
+                android:background="@color/section_background"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -140,12 +141,12 @@
 
             <TextView
                 android:id="@+id/textView4"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="@string/pref_volumes_header"
-                android:textColor="@color/textColorHeading"
-                android:paddingLeft="16dp"/>
+                android:textColor="@color/section_text_color"
+                android:padding="16dp"
+                android:background="@color/section_background"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -218,12 +219,12 @@
 
             <TextView
                 android:id="@+id/textView7"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="@string/pref_quick_silence_header"
-                android:textColor="@color/textColorHeading"
-                android:paddingLeft="16dp"/>
+                android:textColor="@color/section_text_color"
+                android:background="@color/section_background"
+                android:padding="16dp"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
