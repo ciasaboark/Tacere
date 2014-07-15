@@ -121,8 +121,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         cancelQuickSilenceButton.setVisibility(View.GONE);
 
         //Draw a round outline on the buttons
-        //TODO should this be done on older styles as well?  It might be better to use the normal
-        //rectangular button instead
         int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
         outline = new Outline();
         outline.setOval(0, 0, size, size);
@@ -326,13 +324,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
         // prune the database of old events
         databaseInterface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) prefs.getBufferMinutes());
-
-        // since the number of days to display can change we need to
-        // + remove events beyond the lookahead period
-        //TODO do we really need to do this?
-        /*System.currentTimeMillis() + 1000 * 60 * 60 * 24
-                * (long) prefs.getLookaheadDays());
-        */
 
         if (databaseInterface.isDatabaseEmpty()) {
             hideEventList();

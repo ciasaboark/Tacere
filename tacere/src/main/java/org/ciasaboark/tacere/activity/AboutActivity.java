@@ -119,8 +119,7 @@ public class AboutActivity extends Activity {
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
             case R.id.action_about_updates:
-                Intent updatesIntent = new Intent(getApplicationContext(), UpdatesActivity.class);
-                startActivity(updatesIntent);
+                UpdatesActivity.showUpdatesDialog(getApplication());
                 return true;
         }
         return super.onOptionsItemSelected(item);

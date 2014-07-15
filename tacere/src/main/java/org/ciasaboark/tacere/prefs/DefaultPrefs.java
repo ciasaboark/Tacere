@@ -6,6 +6,7 @@
 package org.ciasaboark.tacere.prefs;
 
 class DefaultPrefs {
+    public static final boolean DO_NOT_DISTURB = false;
     // whether or not the service should run
     static final Boolean IS_ACTIVATED = true;
     // events marked as free time (or available) will be silenced
@@ -24,18 +25,6 @@ class DefaultPrefs {
     static final int QUICK_SILENCE_HOURS = 0;
     // how far in advance to begin silencing and continue silencing after event is over
     static final int BUFFER_MINUTES = 5;
-
     // how many days to merge when a calendar change is detected
     static final int LOOKAHEAD_DAYS = 7;
-    // when the app is updated an activity listing all changes is displayed,
-    // by default this dialog will be displayed every time the app is started
-    static final boolean UPDATES_CHECKBOX = true;
-    // the release version of this app
-    // TODO the release version needs to be updated within assets/about.html and the manifest,
-    // this should be automatic
-    // static final String UPDATES_VERSION = "2.0.4";
-    // after the donate thank you activity is displayed this will be changed to false
-    static final boolean SHOW_DONATION_THANKS = true;   //TODO is this still needed?
-
-    public static final boolean DO_NOT_DISTURB = false;
 }

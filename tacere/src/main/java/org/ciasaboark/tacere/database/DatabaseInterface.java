@@ -64,21 +64,6 @@ public class DatabaseInterface {
         return instance;
     }
 
-//    public void pruneEventsAfter(long cutoff) {
-//        Cursor c = getEventCursor(0, cutoff);   //TODO this will pull in all events, find a better way
-//
-//        if (c.moveToFirst()) {
-//            do {
-//                int id = c.getInt(c.getColumnIndex(Columns._ID));
-//                long begin = c.getLong(c.getColumnIndex(Columns.BEGIN));
-//                if (begin > cutoff) {
-//                    deleteEventWithId(id);
-//                }
-//            } while (c.moveToNext());
-//        }
-//        c.close();
-//    }
-
     private Cursor getEventCursor(long begin, long end) {
         assert begin >= 0;
         assert end >= 0;
@@ -132,7 +117,6 @@ public class DatabaseInterface {
 
         Deque<CalEvent> events = new ArrayDeque<CalEvent>();
         Cursor cursor = getEventCursor();
-        //TODO test cursor works
         long beginTime = System.currentTimeMillis()
                 - (CalEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
         long endTime = System.currentTimeMillis()
@@ -175,7 +159,6 @@ public class DatabaseInterface {
 
     // returns the event that matches the given Instance id, null if no match
     public CalEvent getEvent(int id) throws NoSuchEventException {
-        //TODO test
         Cursor cursor = getEventCursor();
         CalEvent thisEvent = null;
         if (cursor.moveToFirst()) {
@@ -306,34 +289,43 @@ public class DatabaseInterface {
                 begin, end);
     }
 
-    public void insertEvent(CalEvent e) {
-        if (e.isValid()) {    //TODO event validity should be checked here, not within the event
-            ContentValues cv = new ContentValues();
-            cv.put(Columns._ID, e.getId());
-            cv.put(Columns.TITLE, e.getTitle());
-            cv.put(Columns.BEGIN, e.getBegin());
-            cv.put(Columns.END, e.getEnd());
-            cv.put(Columns.DESCRIPTION, e.getDescription());
-            cv.put(Columns.RINGER_TYPE, e.getRingerType());
-            cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
-            if (e.isAllDay()) {
-                cv.put(Columns.IS_ALLDAY, 1);
-            } else {
-                cv.put(Columns.IS_ALLDAY, 0);
-            }
-            if (e.isFreeTime()) {
-                cv.put(Columns.IS_FREETIME, 0);
-            } else {
-                cv.put(Columns.IS_FREETIME, 1);
-            }
-            cv.put(Columns.CAL_ID, e.getCal_id());
+    private boolean isEventValidToInsert(CalEvent e) {
+        boolean eventIsValid = false;
+        if (e.getTitle() != null && e.getId() != null && e.getBegin() != null && e.getEnd() != null
+                && e.isFreeTime() != null && e.isAllDay() != null) {
+            eventIsValid = true;
+        }
+        return eventIsValid;
+    }
 
-            long rowID = eventsDB.insertWithOnConflict(TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-            Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
-        } else {
+    public void insertEvent(CalEvent e) {
+        if (!isEventValidToInsert(e)) {
             throw new IllegalArgumentException(
                     "DatabaseInterface:insertEvent given an event with blank values");
         }
+
+        ContentValues cv = new ContentValues();
+        cv.put(Columns._ID, e.getId());
+        cv.put(Columns.TITLE, e.getTitle());
+        cv.put(Columns.BEGIN, e.getBegin());
+        cv.put(Columns.END, e.getEnd());
+        cv.put(Columns.DESCRIPTION, e.getDescription());
+        cv.put(Columns.RINGER_TYPE, e.getRingerType());
+        cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
+        if (e.isAllDay()) {
+            cv.put(Columns.IS_ALLDAY, 1);
+        } else {
+            cv.put(Columns.IS_ALLDAY, 0);
+        }
+        if (e.isFreeTime()) {
+            cv.put(Columns.IS_FREETIME, 0);
+        } else {
+            cv.put(Columns.IS_FREETIME, 1);
+        }
+        cv.put(Columns.CAL_ID, e.getCal_id());
+
+        long rowID = eventsDB.insertWithOnConflict(TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
     }
 
     // removes events from the local database that can not be found in the calendar

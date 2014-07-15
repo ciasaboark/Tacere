@@ -32,6 +32,11 @@ public class UpdatesActivity extends Activity {
         }
     }
 
+    public static void showUpdatesDialog(Context ctx) {
+        Intent updatesIntent = new Intent(ctx, UpdatesActivity.class);
+        ctx.startActivity(updatesIntent);
+    }
+
     private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
         Prefs staticPrefs = new Prefs(ctx);
         boolean shouldChangelogBeShown = false;

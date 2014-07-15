@@ -75,7 +75,7 @@ public class CalEvent {
         // according to the android calendar all day events start at
         // + 8 PM the day before the event is scheduled. This can
         // + result in a wrong date being returned.
-        if (isAllDay) {
+        if (isAllDay != null && isAllDay()) {
             // shift ahead by one full day
             date = new Date(begin + MILLISECONDS_IN_DAY);
         } else {
@@ -100,14 +100,6 @@ public class CalEvent {
         return title + ", ends " + fdate;
     }
 
-    public boolean isValid() {
-        boolean result = false;
-        if (title != null && instanceId != null && begin != null && end != null
-                && isFreeTime != null && isAllDay != null) {
-            result = true;
-        }
-        return result;
-    }
 
     /**
      * Check if this CalEvent is ongoing between the given times
@@ -142,23 +134,6 @@ public class CalEvent {
         this.begin = begin;
     }
 
-    public void setValuesFrom(CalEvent event) {
-        if (event == null) {
-            throw new IllegalArgumentException("given calendar event must not be null");
-        }
-
-        this.begin = event.getBegin();
-        this.descr = event.getDescription();
-        this.dispColor = event.getDisplayColor();
-        this.end = event.getEnd();
-        this.eventId = event.getId();
-        this.instanceId = event.getInstanceId();
-        this.isAllDay = event.isAllDay();
-        this.isFreeTime = event.isFreeTime();
-        this.ringerType = event.getRingerType();
-        this.title = event.getTitle();
-    }
-
     public String getDescription() {
         return descr;
     }
@@ -183,14 +158,6 @@ public class CalEvent {
         this.instanceId = id;
     }
 
-    public Integer getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Integer instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public Boolean isAllDay() {
         return isAllDay;
     }
@@ -200,11 +167,7 @@ public class CalEvent {
     }
 
     public Integer getRingerType() {
-        Integer result = ringerType;
-        if (result == null) {
-            result = 0;
-        }
-        return result;
+        return ringerType;
     }
 
     public void setRingerType(Integer ringerType) {
@@ -231,8 +194,7 @@ public class CalEvent {
             return false;
         }
 
-        return getId().equals(((CalEvent) o).getId())
-                && getInstanceId().equals(((CalEvent) o).getInstanceId());
+        return getId().equals(((CalEvent) o).getId());
     }
 
     public class RINGER {

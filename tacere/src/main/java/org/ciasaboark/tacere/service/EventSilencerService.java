@@ -89,7 +89,7 @@ public class EventSilencerService extends IntentService {
                 || requestType.equals(RequestTypes.PROVIDER_CHANGED)) {
             scheduleServiceRestart();
         } else if (requestType.equals(RequestTypes.NORMAL)) {
-            if (prefs.getIsServiceActivated()) {
+            if (prefs.getIsServiceActivated() && !stateManager.isQuickSilenceActive()) {
                 checkForActiveEventsAndSilence();
             } else { // normal wake requests (but service is marked to be inactive)
                 shutdownService();
@@ -120,11 +120,8 @@ public class EventSilencerService extends IntentService {
 
         stateManager.setServiceState(ServiceStates.QUICKSILENCE);
 
-        // when the quick silence duration is over the device should wake regardless
-        // + of the user settings
-        // TODO use the given duration instead of using quickSilenceMinutes and hours
-        long wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_MINUTE
-                * (prefs.getQuicksilenceMinutes() + (prefs.getQuickSilenceHours() * 60));
+        long wakeAt = System.currentTimeMillis() + (CalEvent.MILLISECONDS_IN_MINUTE
+                * durationMinutes);
         // TODO check here to make sure scheduling is working
         alarmManager.scheduleCancelQuickSilenceAlarmAt(wakeAt);
 

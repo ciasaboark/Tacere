@@ -49,8 +49,6 @@ public class RingerStateManager {
     public int getStoredRingerState() {
         SharedPreferences preferences = context.getSharedPreferences(
                 "org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-        // TODO this may return a state indicating that a call is ongoing, this should stop
-        // processing and wait for the call to end before adjusting volumes
         return preferences.getInt("curRinger", CalEvent.RINGER.UNDEFINED);
     }
 
