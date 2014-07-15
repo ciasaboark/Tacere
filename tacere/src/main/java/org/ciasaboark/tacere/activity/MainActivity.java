@@ -7,6 +7,7 @@ package org.ciasaboark.tacere.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -69,6 +70,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     private ListView eventListview = null;
     private int listViewIndex = 0;
     private Prefs prefs;
+    private Outline outline;
 
 
     @Override
@@ -95,7 +97,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 eventListview.onRestoreInstanceState(listviewState);
 
                 //redraw the widgets
-                drawQuicksilenceButton();
+                setupAndDrawActionButtons();
             }
         };
 
@@ -110,20 +112,115 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         DonationActivity.showDonationDialogIfNeeded(this);
     }
 
-    private void drawQuicksilenceButton() {
-        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-        if (apiLevelAvailable >= 20) { //TODO this should be VERSION_NAMES.L but the preview reports its version as 20 for now
-            drawNewQuicksilenceButton();
-        } else {
-            drawCompatQuicksilenceButton();
-        }
+    private void setupAndDrawActionButtons() {
+        setupActionButtons();
+        drawActionButton();
     }
 
-    @TargetApi(Build.VERSION_CODES.L)
-    private void drawNewQuicksilenceButton() {
+    private void setupActionButtons() {
+        final ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
+        final ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
+        quickSilenceImageButton.setVisibility(View.GONE);
+        cancelQuickSilenceButton.setVisibility(View.GONE);
+
+        //Draw a round outline on the buttons
+        //TODO should this be done on older styles as well?  It might be better to use the normal
+        //rectangular button instead
+        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
+        outline = new Outline();
+        outline.setOval(0, 0, size, size);
+        quickSilenceImageButton.setOutline(outline);
+        cancelQuickSilenceButton.setOutline(outline);
+
+        quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quickSilenceImageButton.setEnabled(false);
+                flipInAndOut(cancelQuickSilenceButton, quickSilenceImageButton);
+                startQuicksilence();
+                quickSilenceImageButton.setEnabled(true);
+            }
+        });
+
+        cancelQuickSilenceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelQuickSilenceButton.setEnabled(false);
+                flipInAndOut(quickSilenceImageButton, cancelQuickSilenceButton);
+                stopOngoingQuicksilence();
+                cancelQuickSilenceButton.setEnabled(true);
+            }
+        });
+    }
+
+    private void flipInAndOut(final ImageButton flipInImageButton, final ImageButton flipOutImageButton) {
+        flipInImageButton.setAlpha(0f);
+        flipOutImageButton.setAlpha(1f);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(flipOutImageButton, "alpha", 1f, 0f);
+        animator.setDuration(1000);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+//                flipOutImageButton.setOutline(null);
+                flipOutImageButton.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                flipOutImageButton.setVisibility(View.GONE);
+//                flipOutImageButton.setOutline(outline);
+                flipOutImageButton.setAlpha(1f);
+                flipIn(flipInImageButton);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator.start();
+    }
+
+
+    private void flipIn(final ImageButton button) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
+        animator.setDuration(1000);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                button.setAlpha(0f);
+                button.setVisibility(View.VISIBLE);
+//                button.setOutline(null);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+//                button.setOutline(outline);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator.start();
+
+
+    }
+
+    private void drawActionButton() {
         ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
         ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
-
 
         ServiceStateManager ssManager = new ServiceStateManager(this);
 
@@ -134,68 +231,41 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             quickSilenceImageButton.setVisibility(View.VISIBLE);
             cancelQuickSilenceButton.setVisibility(View.GONE);
         }
-
-
-        //Draw a round outline on the button
-        //TODO should this be done on older styles as well?  It might be better to use the normal
-        //rectangular button instead
-        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
-        Outline outline = new Outline();
-        outline.setOval(0, 0, size, size);
-        quickSilenceImageButton.setOutline(outline);
-        cancelQuickSilenceButton.setOutline(outline);
-
-        //only the quicksilence button should be hidden, we may still need to be able to cancel
-        //an ongoing quicksilence duration
-        if (prefs.getQuickSilenceHours() == 0 && prefs.getQuicksilenceMinutes() == 0) {
-            quickSilenceImageButton.setEnabled(false);
-            quickSilenceImageButton.setVisibility(View.GONE);
-        } else {
-            quickSilenceImageButton.setEnabled(true);
-            quickSilenceImageButton.setVisibility(View.VISIBLE);
-        }
-
-        quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startQuicksilence();
-            }
-        });
-
-        cancelQuickSilenceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopOngoingQuicksilence();
-            }
-        });
-        quickSilenceImageButton.invalidate();
-        cancelQuickSilenceButton.invalidate();
     }
 
-    private void drawCompatQuicksilenceButton() {
-        Button quicksilenceButton = (Button) findViewById(R.id.quicksilenceButton_compat);
-        quicksilenceButton.setEnabled(false);
-        ServiceStateManager ssM = new ServiceStateManager(this);
-        if (ssM.isQuickSilenceActive()) {
-            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    startQuicksilence();
-                }
-            });
-            quicksilenceButton.setText(R.string.startQuicksilence);
-        } else {
-            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    stopOngoingQuicksilence();
-                }
-            });
-            quicksilenceButton.setText(R.string.cancelQuicksilence);
-        }
-        quicksilenceButton.setEnabled(true);
-        quicksilenceButton.setVisibility(View.VISIBLE);
-    }
+//    private void drawQuicksilenceButton() {
+//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+//        if (apiLevelAvailable >= 20) { //TODO this should be VERSION_NAMES.L but the preview reports its version as 20 for now
+//            drawNewQuicksilenceButton();
+//        } else {
+//            drawCompatQuicksilenceButton();
+//        }
+//    }
+
+//    private void drawCompatQuicksilenceButton() {
+//        Button quicksilenceButton = (Button) findViewById(R.id.quicksilenceButton_compat);
+//        quicksilenceButton.setEnabled(false);
+//        ServiceStateManager ssM = new ServiceStateManager(this);
+//        if (ssM.isQuickSilenceActive()) {
+//            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    startQuicksilence();
+//                }
+//            });
+//            quicksilenceButton.setText(R.string.startQuicksilence);
+//        } else {
+//            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    stopOngoingQuicksilence();
+//                }
+//            });
+//            quicksilenceButton.setText(R.string.cancelQuicksilence);
+//        }
+//        quicksilenceButton.setEnabled(true);
+//        quicksilenceButton.setVisibility(View.VISIBLE);
+//    }
 
     private void startQuicksilence() {
         // an intent to send to either start or stop a quick silence duration
@@ -257,7 +327,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         setContentView(R.layout.activity_main);
         // start the background service
         restartEventSilencerService();
-        drawQuicksilenceButton();
+        setupAndDrawActionButtons();
         drawEventListOrError();
     }
 
@@ -428,7 +498,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     private class EventCursorAdapter extends CursorAdapter {
         private final LayoutInflater layoutInflator;
 
-        @SuppressWarnings("deprecation")
         public EventCursorAdapter(Context ctx, Cursor c) {
             super(ctx, c);
             layoutInflator = LayoutInflater.from(ctx);
@@ -502,10 +571,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
             switch (ringerType) {
                 case CalEvent.RINGER.NORMAL:
-                    icon = getResources().getDrawable(R.drawable.ic_state_normal);
+                    icon = getResources().getDrawable(R.drawable.ringer_on);
                     break;
                 case CalEvent.RINGER.SILENT:
-                    icon = getResources().getDrawable(R.drawable.ic_state_silent);
+                    icon = getResources().getDrawable(R.drawable.do_not_disturb);
                     break;
                 case CalEvent.RINGER.VIBRATE:
                     icon = getResources().getDrawable(R.drawable.ic_state_vibrate);

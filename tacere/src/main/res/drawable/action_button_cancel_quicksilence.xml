@@ -6,8 +6,8 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="?android:colorControlHighlight">
     <item>
         <shape android:shape="oval">
-            <solid  android:color="@color/button_ongoing"
-                android:background="@drawable/ic_state_normal" />
+            <solid  android:color="@color/cancel_quicksilence"
+                android:background="@drawable/ringer_on" />
         </shape>
     </item>
 </ripple>

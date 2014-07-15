@@ -7,7 +7,7 @@
     <item>
         <shape android:shape="oval">
             <solid  android:color="@color/accent"
-                android:background="@drawable/ic_state_silent"/>
+                android:background="@drawable/do_not_disturb"/>
         </shape>
     </item>
 </ripple>

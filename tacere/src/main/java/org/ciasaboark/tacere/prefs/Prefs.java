@@ -131,7 +131,7 @@ public class Prefs {
     }
 
     public void setDoNotDisturb(boolean doNotDisturb) {
-        editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb);
+        editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb).commit();
     }
 
     public boolean getDoNotDisturb() {

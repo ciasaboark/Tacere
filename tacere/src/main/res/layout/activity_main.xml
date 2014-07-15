@@ -58,13 +58,11 @@
 
         <ImageButton
             android:id="@+id/quickSilenceButton"
-            android:src="@drawable/ic_state_silent"
+            android:src="@drawable/do_not_disturb"
             android:elevation="2dp"
             android:background="@drawable/action_button_quicksilence"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_gravity="bottom|right"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
@@ -73,13 +71,11 @@
 
         <ImageButton
             android:id="@+id/cancel_quickSilenceButton"
-            android:src="@drawable/ic_state_normal"
+            android:src="@drawable/ringer_on"
             android:elevation="2dp"
             android:background="@drawable/action_button_cancel_quicksilence"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_gravity="bottom|right"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"

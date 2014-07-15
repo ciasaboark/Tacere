@@ -6,7 +6,8 @@
 package org.ciasaboark.tacere.activity;
 
 import android.animation.ValueAnimator;
-import android.annotation.*;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -55,43 +56,13 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
         // Show the Up button in the action bar.
         setupActionBar();
-        Switch adjustAlarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
-        adjustAlarmSwitch.setOnClickListener(new View.OnClickListener() {
+        RelativeLayout serviceToggleBox = (RelativeLayout)findViewById(id.settings_serviceBox);
+        serviceToggleBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefs.setAdjustAlarm(!prefs.getAdjustAlarm());
-                drawAlarmWidgets();
+                onClickToggleService(view);
             }
         });
-
-        Switch adjustMediaSwitch = (Switch) findViewById(id.adjustMediaCheckBox);
-        adjustMediaSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.setAdjustMedia(!prefs.getAdjustMedia());
-                drawMediaWidgets();
-            }
-        });
-
-        Switch serviceSwitch = (Switch) findViewById(id.activateServiceSwitch);
-        serviceSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
-
-                Intent i = new Intent(context, EventSilencerService.class);
-                i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-                startService(i);
-
-                drawServiceWidget();
-                drawMediaWidgets();
-                drawAlarmWidgets();
-                drawRingerWidgets();
-                drawDoNotDisturbWidgets();
-            }
-        });
-
-
         drawAllWidgets();
     }
 
@@ -103,46 +74,99 @@ public class SettingsActivity extends Activity {
         getActionBar().setIcon(R.drawable.action_settings);
     }
 
-    private void drawAlarmWidgets() {
-        TextView alarmTV = (TextView) findViewById(id.settings_alarmText);
+    private void drawAllWidgets() {
+        drawServiceWidget();
+        drawRingerWidgets();
+        drawDoNotDisturbWidgets();
+        drawMediaWidgets();
+        drawAlarmWidgets();
+        drawQuickSilenceWidget();
+    }
+
+    private void drawServiceWidget() {
+        //the service state toggle
+        Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
+        TextView serviceTV = (TextView) findViewById(id.activateServiceDescription);
         if (prefs.getIsServiceActivated()) {
-            alarmTV.setTextColor(getResources().getColor(R.color.textcolor));
+            serviceActivatedSwitch.setChecked(true);
+            serviceTV.setText(R.string.pref_service_enabled);
         } else {
-            alarmTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            serviceActivatedSwitch.setChecked(false);
+            serviceTV.setText(R.string.pref_service_disabled);
+        }
+    }
+
+    private void drawRingerWidgets() {
+        //the ringer type description
+        TextView ringerDescriptionTV = (TextView) findViewById(id.ringerTypeDescription);
+        TextView ringerTV = (TextView) findViewById(id.settings_ringerTitle);
+
+        Drawable icon;
+        switch (prefs.getRingerType()) {
+            case 1:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
+                icon = getResources().getDrawable(R.drawable.ic_state_normal);
+                break;
+            case 2:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
+                icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
+                break;
+            default:
+                ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
+                icon = getResources().getDrawable(R.drawable.ic_state_silent);
+                break;
         }
 
-        //the alarm volumes toggle
-        Switch alarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
-        alarmSwitch.setChecked(prefs.getAdjustAlarm());
-        alarmSwitch.setEnabled(prefs.getIsServiceActivated());
 
-        //the alarm volumes slider
-        SeekBar alarmSB = (SeekBar) findViewById(id.alarmSeekBar);
-        alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
-        alarmSB.setProgress(prefs.getCurAlarmVolume());
-        if (prefs.getAdjustAlarm() && prefs.getIsServiceActivated()) {
-            this.animateRevealView(alarmSB);
-            alarmSB.setEnabled(true);
+        if (prefs.getIsServiceActivated()) {
+            int iconColor = getResources().getColor(R.color.primary);
+            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
+            ringerTV.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
-            alarmSB.setEnabled(false);
-            this.animateHideView(alarmSB);
+            int iconColor = getResources().getColor(android.R.color.darker_gray);
+            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            ringerTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
         }
-        alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                prefs.setCurAlarmVolume(progress);
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
+        ImageButton ringerIcon = (ImageButton) findViewById(id.settings_ringerIcon);
+        setImageButtonIcon(ringerIcon, icon);
+        findViewById(id.settings_ringerBox).setEnabled(prefs.getIsServiceActivated());
+    }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
-        });
+    private void drawDoNotDisturbWidgets() {
+        Switch doNotDisturbSwitch = (Switch) findViewById(id.doNotDisturbSwitch);
+        boolean isDoNotDisturbEnabled = prefs.getDoNotDisturb();
+        doNotDisturbSwitch.setChecked(isDoNotDisturbEnabled);
+        doNotDisturbSwitch.setEnabled(prefs.getIsServiceActivated());
+        findViewById(id.do_not_disturb_box).setEnabled(prefs.getIsServiceActivated());
+
+        TextView doNotDisturbHeader = (TextView) findViewById(id.do_not_disturb_header);
+        TextView doNotDisturbDescription = (TextView) findViewById(id.do_not_disturb_description);
+        if (prefs.getIsServiceActivated()) {
+            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textcolor));
+            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textcolor));
+        } else {
+            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
+
+        int apiLevelAvailable = Build.VERSION.SDK_INT;
+        RelativeLayout layout = (RelativeLayout) findViewById(id.do_not_disturb_box);
+        if (apiLevelAvailable >= 20) { //TODO this should be 21
+            layout.setVisibility(View.VISIBLE);
+        } else {
+            layout.setVisibility(View.GONE);
+        }
+
+
+    }
+
+    public void onClickDoNotDisturb(View v) {
+        boolean doNotDisturbEnabled = prefs.getDoNotDisturb();
+        prefs.setDoNotDisturb(!doNotDisturbEnabled);
+        drawDoNotDisturbWidgets();
     }
 
     private void drawMediaWidgets() {
@@ -162,6 +186,7 @@ public class SettingsActivity extends Activity {
             mediaSwitch.setChecked(false);
         }
         mediaSwitch.setEnabled(prefs.getIsServiceActivated());
+        findViewById(id.settings_mediaBox).setEnabled(prefs.getIsServiceActivated());
 
 
         //the media volumes slider
@@ -192,96 +217,68 @@ public class SettingsActivity extends Activity {
         });
     }
 
-    private void drawServiceWidget() {
-        //the service state toggle
-        Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
-        TextView serviceTV = (TextView) findViewById(id.activateServiceDescription);
+    private void drawAlarmWidgets() {
+        TextView alarmTV = (TextView) findViewById(id.settings_alarmText);
         if (prefs.getIsServiceActivated()) {
-            serviceActivatedSwitch.setChecked(true);
-            serviceTV.setText(R.string.pref_service_enabled);
+            alarmTV.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
-            serviceActivatedSwitch.setChecked(false);
-            serviceTV.setText(R.string.pref_service_disabled);
-        }
-    }
-
-    private void drawRingerWidgets() {
-        //the ringer type description
-        TextView ringerDescriptionTV = (TextView) findViewById(id.ringerTypeDescription);
-        TextView ringerTV = (TextView) findViewById(id.settings_ringerTitle);
-
-        Drawable icon;
-        switch (prefs.getRingerType()) {
-            case 1:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
-                icon = getResources().getDrawable(R.drawable.ringer_normal_cropped);
-                break;
-            case 2:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
-                icon = getResources().getDrawable(R.drawable.ringer_vibrate_cropped);
-                break;
-            default:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
-                icon = getResources().getDrawable(R.drawable.ringer_silent_cropped);
-                break;
+            alarmTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
         }
 
+        //the alarm volumes toggle
+        Switch alarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
+        alarmSwitch.setChecked(prefs.getAdjustAlarm());
+        alarmSwitch.setEnabled(prefs.getIsServiceActivated());
+        findViewById(id.settings_alarmBox).setEnabled(prefs.getIsServiceActivated());
 
-        if (prefs.getIsServiceActivated()) {
-            int iconColor = getResources().getColor(R.color.primary);
-            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
-            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
-            ringerTV.setTextColor(getResources().getColor(R.color.textcolor));
+        //the alarm volumes slider
+        SeekBar alarmSB = (SeekBar) findViewById(id.alarmSeekBar);
+        alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
+        alarmSB.setProgress(prefs.getCurAlarmVolume());
+        if (prefs.getAdjustAlarm() && prefs.getIsServiceActivated()) {
+            this.animateRevealView(alarmSB);
+            alarmSB.setEnabled(true);
         } else {
-            int iconColor = getResources().getColor(android.R.color.darker_gray);
-            icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
-            ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
-            ringerTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            alarmSB.setEnabled(false);
+            this.animateHideView(alarmSB);
         }
-
-        ImageButton ringerIcon = (ImageButton) findViewById(id.settings_ringerIcon);
-        setImageButtonIcon(ringerIcon, icon);
-    }
-
-    private void drawAllWidgets() {
-        drawServiceWidget();
-        drawRingerWidgets();
-        drawDoNotDisturbWidgets();
-        drawMediaWidgets();
-        drawAlarmWidgets();
-        drawQuickSilenceWidget();
-    }
-
-    private void drawDoNotDisturbWidgets() {
-        Switch doNotDisturbSwitch = (Switch)findViewById(id.doNotDisturbSwitch);
-        doNotDisturbSwitch.setOnClickListener(new View.OnClickListener() {
+        alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
-            public void onClick(View view) {
-                prefs.setDoNotDisturb(!prefs.getDoNotDisturb());
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.setCurAlarmVolume(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //required stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //required stub
             }
         });
-        doNotDisturbSwitch.setChecked(prefs.getDoNotDisturb());
-        doNotDisturbSwitch.setEnabled(prefs.getIsServiceActivated());
+    }
 
-        TextView doNotDisturbHeader = (TextView) findViewById(id.do_not_disturb_header);
-        TextView doNotDisturbDescription = (TextView) findViewById(id.do_not_disturb_description);
-        if (prefs.getIsServiceActivated()) {
-            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textcolor));
-            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textcolor));
-        } else {
-            doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textColorDisabled));
-            doNotDisturbDescription.setTextColor(getResources().getColor(R.color.textColorDisabled));
+    private void drawQuickSilenceWidget() {
+        //the quick silence button
+        TextView quickTV = (TextView) findViewById(id.quickSilenceDescription);
+        String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
+        String hrs = "";
+        if (prefs.getQuickSilenceHours() > 0) {
+            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
         }
+        quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
+    }
 
-        int apiLevelAvailable = Build.VERSION.SDK_INT;
-        RelativeLayout layout = (RelativeLayout) findViewById(id.do_not_disturb_box);
-        if (apiLevelAvailable >= 20) { //TODO this should be 21
-            layout.setVisibility(View.VISIBLE);
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @SuppressWarnings("deprecation")
+    private void setImageButtonIcon(ImageButton button, Drawable icon) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            button.setBackground(icon);
         } else {
-            layout.setVisibility(View.GONE);
+            button.setBackgroundDrawable(icon);
         }
-
-
     }
 
     @TargetApi(21)
@@ -334,25 +331,28 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @SuppressWarnings("deprecation")
-    private void setImageButtonIcon(ImageButton button, Drawable icon) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            button.setBackground(icon);
-        } else {
-            button.setBackgroundDrawable(icon);
-        }
+    public void onClickAdjustAlarm(View v) {
+        prefs.setAdjustAlarm(!prefs.getAdjustAlarm());
+        drawAlarmWidgets();
     }
 
-    private void drawQuickSilenceWidget() {
-        //the quick silence button
-        TextView quickTV = (TextView) findViewById(id.quickSilenceDescription);
-        String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
-        String hrs = "";
-        if (prefs.getQuickSilenceHours() > 0) {
-            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
-        }
-        quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
+    public void onClickToggleService(View v) {
+        prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
+
+        Intent i = new Intent(context, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
+
+        drawServiceWidget();
+        drawMediaWidgets();
+        drawAlarmWidgets();
+        drawRingerWidgets();
+        drawDoNotDisturbWidgets();
+    }
+
+    public void onClickAdjustMedia(View v) {
+        prefs.setAdjustMedia(!prefs.getAdjustMedia());
+        drawMediaWidgets();
     }
 
     @Override
