@@ -20,12 +20,12 @@ public class Prefs {
     private static SharedPreferences.Editor editor;
 
     public Prefs(Context ctx) {
-        if (sharedPreferences == null) {
-            sharedPreferences = ctx.getSharedPreferences(PREFERENCES_NAME,
+        if (Prefs.sharedPreferences == null) {
+            Prefs.sharedPreferences = ctx.getSharedPreferences(PREFERENCES_NAME,
                     Context.MODE_PRIVATE);
         }
 
-        if (editor == null) {
+        if (Prefs.editor == null) {
             editor = sharedPreferences.edit();
         }
 
@@ -130,12 +130,12 @@ public class Prefs {
         editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays).commit();
     }
 
-    public void setDoNotDisturb(boolean doNotDisturb) {
-        editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb).commit();
-    }
-
     public boolean getDoNotDisturb() {
         return sharedPreferences.getBoolean(Keys.DO_NOT_DISTURB, DefaultPrefs.DO_NOT_DISTURB);
+    }
+
+    public void setDoNotDisturb(boolean doNotDisturb) {
+        editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb).commit();
     }
 
     public int getDefaultRinger() {

@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,9 +53,12 @@ public class AdvancedSettingsActivity extends Activity {
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setIcon(R.drawable.action_settings);
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setIcon(R.drawable.action_settings);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
 
     }
 

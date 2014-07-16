@@ -30,7 +30,7 @@ public class AlarmManagerWrapper {
     }
 
     private void scheduleAlarmAt(long time, String type) {
-        if (type == null) {
+        if (null == type) {
             throw new IllegalArgumentException("unknown type: " + type);
         }
 

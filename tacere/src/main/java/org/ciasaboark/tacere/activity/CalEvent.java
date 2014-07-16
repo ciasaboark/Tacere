@@ -15,45 +15,27 @@ public class CalEvent {
     public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
     @SuppressWarnings("unused")
     private static final String TAG = "CalEvent";
-    private Integer instanceId;
-    private Integer eventId;
+    private int instanceId;
     private String title;
-    private Long begin;
-    private Long end; // in milliseconds from epoch
-    private String descr;
+    private long begin;
+    private long end; // in milliseconds from epoch
+    private String description;
     private int ringerType;
-    private Integer dispColor;
-    private Boolean isFreeTime;
-    private Boolean isAllDay;
+    private int dispColor;
+    private boolean isFreeTime;
+    private boolean isAllDay;
 
-    public CalEvent() {
-        super();
-        this.instanceId = null;
-        this.eventId = null;
-        this.title = null;
-        this.begin = null;
-        this.end = null;
-        this.descr = null;
-        this.ringerType = CalEvent.RINGER.UNDEFINED;
-        this.dispColor = null;
-        this.isFreeTime = null;
-        this.isAllDay = null;
-    }
 
-    public void setIsFreeTime(Boolean isFreeTime) {
+    public CalEvent(int instanceId, String title, long begin, long end, String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+        this.instanceId = instanceId;
+        this.title = title;
+        this.begin = begin;
+        this.end = end;
+        this.description = description;
+        this.dispColor = displayColor;
         this.isFreeTime = isFreeTime;
-    }
-
-    public void setIsAllDay(Boolean isAllDay) {
         this.isAllDay = isAllDay;
-    }
-
-    public Integer getCal_id() {
-        return eventId;
-    }
-
-    public void setCal_id(Integer cal_id) {
-        this.eventId = cal_id;
+        this.ringerType = RINGER.UNDEFINED;
     }
 
     public String getLocalBeginTime() {
@@ -75,7 +57,7 @@ public class CalEvent {
         // according to the android calendar all day events start at
         // + 8 PM the day before the event is scheduled. This can
         // + result in a wrong date being returned.
-        if (isAllDay != null && isAllDay()) {
+        if (this.isAllDay) {
             // shift ahead by one full day
             date = new Date(begin + MILLISECONDS_IN_DAY);
         } else {
@@ -122,41 +104,22 @@ public class CalEvent {
         return end;
     }
 
-    public void setEnd(Long end) {
-        this.end = end;
-    }
-
     public Long getBegin() {
         return begin;
     }
 
-    public void setBegin(Long begin) {
-        this.begin = begin;
-    }
-
     public String getDescription() {
-        return descr;
-    }
-
-    public void setDescription(String description) {
-        this.descr = description;
+        return description;
     }
 
     public Integer getDisplayColor() {
         return dispColor;
     }
 
-    public void setDisplayColor(Integer displayColor) {
-        this.dispColor = displayColor;
-    }
-
     public Integer getId() {
         return instanceId;
     }
 
-    public void setId(Integer id) {
-        this.instanceId = id;
-    }
 
     public Boolean isAllDay() {
         return isAllDay;
@@ -182,10 +145,6 @@ public class CalEvent {
             result = title;
         }
         return result;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @Override

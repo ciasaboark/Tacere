@@ -87,9 +87,12 @@ public class AboutActivity extends Activity {
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setIcon(R.drawable.info_icon);
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setIcon(R.drawable.info_icon);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
 
     }
 

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
 <resources>
     <string name="app_name">Tacere</string>
 
@@ -8,7 +13,7 @@
     <string name="upcoming_events">Events in the next %1$d days</string>
     <string name="no_events">No calendar events found for the next %1$s.</string>
 
-    
+
     <!-- About Activity -->
     <string name="title_activity_about">About</string>
     <string name="action_about_license">License</string>
@@ -16,7 +21,7 @@
 
     <!-- About License Activity -->
     <string name="title_activity_about_activity_license">License/Credits</string>
-    
+
     <!-- Settings Activity -->
     <string name="title_activity_settings">Settings</string>
     <string name="action_settings_restore">Restore Defaults</string>
@@ -29,45 +34,40 @@
     <string name="pref_service">Service</string>
     <string name="pref_ringer_type_title">Ringer Type</string>
     <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
-    <string name="pref_do_not_disturb_description">Only available in Android 5.0+</string>
     <string name="pref_media_volume">Adjust Media Volume</string>
-    <string name="pref_alarm_volume">Adust Alarm Volume</string>
-    <string name="pref_quick_silence">Quick Silence</string>
+    <string name="pref_alarm_volume">Adjust Alarm Volume</string>
+    <string name="pref_quick_silence">Adjust Quick Silence Duration</string>
     <string name="pref_advanced_title">Advanced Settings</string>
-    
+
     <string name="pref_service_enabled">Automatic Silencing</string>
     <string name="pref_service_disabled">Automatic Silencing</string>
     <string name="pref_ringer_type_normal">Phone will ring as normal</string>
     <string name="pref_ringer_type_vibrate">Phone will vibrate</string>
     <string name="pref_ringer_type_silent">Phone will silence</string>
-    <string name="pref_quicksilent_duration">Silence for %1$s%2$d minutes</string>
+    <string name="pref_quicksilent_duration">Quick silencing will last for %1$s%2$d minutes</string>
     <string name="pref_advanced_sub">Proceed at your own risk</string>
-    
-    
+
+
     <!-- Advanced Settings Activity -->
     <string name="title_activity_advanced_settings">Advanced Settings</string>
     <string name="pref_events_header">Events</string>
-    <string name="pref_battery_header">Battery</string>
-    
+
     <string name="pref_silence_free_time_title">Available Events</string>
     <string name="pref_silence_all_day_title">All Day Events</string>
     <string name="pref_refresh_interval">Refresh Interval</string>
     <string name="pref_buffer_minutes_title">Event Buffer</string>
     <string name="pref_list_days_title">Lookahead</string>
     <string name="pref_wake_device_title">Wake Device</string>
-    
-	<string name="pref_silence_free_enabled">Events marked as available will be silenced</string>
-	<string name="pref_silence_free_disabled">Events marked as available will be ignored</string>
-	<string name="pref_all_day_enabled">All day events will be silenced</string>
-	<string name="pref_all_day_disabled">All day events will be ignored</string>
-	<string name="pref_refresh_interval_length">Service will refresh every %1$d minutes</string>
-	<string name="pref_buffer_minutes">Events will trigger %1$d minutes early and last %1$d minutes after the event ends</string>
-	<string name="pref_wakeup_enabled">Tacere will force a wakeup every %1$d minutes. This may cause battery drain</string>
-	<string name="pref_wakeup_disabled">Tacere will wait for the device to wake normally before performing checks</string>
-	<string name="pref_list_days">Events for the next %1$d days will be fetched</string>
-	
-	<!-- Generics -->
-	<string name="placeholder">Placeholder String</string>
+
+    <string name="pref_silence_free_enabled">Events marked as available will be silenced</string>
+    <string name="pref_silence_free_disabled">Events marked as available will be ignored</string>
+    <string name="pref_all_day_enabled">All day events will be silenced</string>
+    <string name="pref_all_day_disabled">All day events will be ignored</string>
+    <string name="pref_buffer_minutes">Events will trigger %1$d minutes early and last %1$d minutes after the event ends</string>
+    <string name="pref_list_days">Events for the next %1$d days will be fetched</string>
+
+    <!-- Generics -->
+    <string name="placeholder">Placeholder String</string>
     <string name="hours">Hours</string>
     <string name="hours_lower">hours</string>
     <string name="hour">Hour</string>
@@ -80,32 +80,32 @@
     <string name="years">years</string>
     <string name="weeks">weeks</string>
     <string name="days">days</string>
-    
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+
     <!-- Event List Item -->
     <string name="icon_alt_text_normal">normal ringer icon</string>
     <string name="icon_alt_text_vibrate">vibrate ringer icon</string>
     <string name="icon_alt_text_silent">silent ringer icon</string>
     <string name="all_day">All Day</string>
-    
+
     <!-- Dialog Event Details -->
     <string name="ring">Ring</string>
     <string name="vibrate">Vibrate</string>
     <string name="silent">Silent</string>
-    
+
     <!-- Updates Dialog -->
     <string name="updates_title">Recent Updates</string>
     <string name="hide_updates">Hide until next update</string>
-    
+
     <!-- Donation Thank You Dialog -->
     <string name="donation_title">Thank You!</string>
     <string name="donation_text">Thanks for your donation.  Your support is greatly appreciated.</string>
-    
+
     <!-- Quick Silence Widget -->
     <string name="widget_quicksilence">Quick Silence</string>
     <string name="widget_duration">%1$s%2$d minutes</string>
     <string name="action_add_event">Add Event</string>
-    <string name="cancel">Cancel</string>
-    <string name="ok">OK</string>
     <string name="notification_quicksilence_title">Quick Silence</string>
     <string name="pref_ringer_type">Ringer Type</string>
     <string name="settings_restored">Settings have been restored to defaults</string>
@@ -119,5 +119,5 @@
     <string name="startQuicksilence">Quicksilence</string>
     <string name="cancelQuicksilence">Cancel quicksilence</string>
     <!-- first parameter is string for hour length and "hour" -->
-	
+
 </resources>

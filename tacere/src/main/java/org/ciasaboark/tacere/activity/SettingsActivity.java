@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,7 +67,11 @@ public class SettingsActivity extends Activity {
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
-        getActionBar().setIcon(R.drawable.action_settings);
+        try {
+            getActionBar().setIcon(R.drawable.action_settings);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
     }
 
     private void drawAllWidgets() {
@@ -443,17 +448,17 @@ public class SettingsActivity extends Activity {
         final NumberPicker minP = (NumberPicker) view.findViewById(R.id.minutePicker);
 
         String[] hours = new String[25];
-        String[] minutes = new String[61];
+        String[] minutes = new String[60];
 
         for (int i = 0; i < hours.length; i++) {
             hours[i] = Integer.toString(i);
         }
 
-        for (int i = 0; i < minutes.length; i++) {
+        for (int i = 1; i < minutes.length - 1; i++) {
             StringBuilder sb = new StringBuilder(Integer.toString(i));
-            if (i < 10) {
-                sb.insert(0, "0");
-            }
+//            if (i < 10) {
+//                sb.insert(0, "0");
+//            }
             minutes[i] = sb.toString();
         }
 

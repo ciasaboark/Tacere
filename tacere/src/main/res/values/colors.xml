@@ -22,7 +22,8 @@
     <item name="textColorDisabled" type="color">#ff777777</item>
     <item name="textColorMenu" type="color">#ffffffff</item>
     <item name="windowBackground" type="color">#eceff1</item>
-    <item name="event_list_dark_background" type="color">#ffe6e9eb</item>
+    <item name="event_list_future_background" type="color">#ffe6e9eb</item>
+    <item name="event_list_future_text" type="color">#ff4c4c4c</item>
     <item name="event_list_active_event" type="color">#ffd4f1da</item>
     <item name="menu_background" type="color">#ffffff</item>
     <item name="menu_text" type="color">#000000</item>

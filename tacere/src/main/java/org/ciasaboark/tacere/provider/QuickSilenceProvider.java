@@ -11,7 +11,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
 import org.ciasaboark.tacere.R;
@@ -35,8 +34,6 @@ public class QuickSilenceProvider extends AppWidgetProvider {
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
         // read quicksilence preferences
-        SharedPreferences preferences = context.getSharedPreferences(
-                "org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
         int quickSilenceMinutes = prefs.getQuicksilenceMinutes();
         int quickSilenceHours = prefs.getQuickSilenceHours();
 

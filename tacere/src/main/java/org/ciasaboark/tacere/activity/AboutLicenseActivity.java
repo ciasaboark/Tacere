@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -18,6 +19,7 @@ import android.webkit.WebViewClient;
 import org.ciasaboark.tacere.R;
 
 public class AboutLicenseActivity extends Activity {
+    private static final String TAG = "AboutLicenseActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +48,12 @@ public class AboutLicenseActivity extends Activity {
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setIcon(R.drawable.copyright_icon);
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setIcon(R.drawable.copyright_icon);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
 
     }
 

@@ -40,7 +40,6 @@ public class EventSilencerService extends IntentService {
         super(TAG);
     }
 
-    @Override
     /**
      * Looks for four different types of intents, one to start a
      * quick silence request, one to stop an ongoing quick silence request,
@@ -49,6 +48,7 @@ public class EventSilencerService extends IntentService {
      * the extra info "type" to one of the enumerated types in RequestTypes.
      * Normal request either have no extra info, or equate to RequestTypes.NORMAL
      */
+    @Override
     public void onHandleIntent(Intent intent) {
         Log.d(TAG, "waking");
 
@@ -91,12 +91,13 @@ public class EventSilencerService extends IntentService {
         } else if (requestType.equals(RequestTypes.NORMAL)) {
             if (prefs.getIsServiceActivated() && !stateManager.isQuickSilenceActive()) {
                 checkForActiveEventsAndSilence();
+                notifyCursorAdapterDataChanged();
             } else { // normal wake requests (but service is marked to be inactive)
                 shutdownService();
             }
         }
 
-        notifyCursorAdapterDataChanged();
+
     }
 
     /**
@@ -155,8 +156,7 @@ public class EventSilencerService extends IntentService {
     }
 
     private void checkForActiveEventsAndSilence() {
-        databaseInterface.syncCalendarDb();
-        Deque<CalEvent> events = databaseInterface.getAllActiveEvents();
+        Deque<CalEvent> events = databaseInterface.syncAndGetAllActiveEvents();
         boolean foundEvent = false;
         for (CalEvent event : events) {
             if (shouldEventSilence(event)) {
@@ -178,16 +178,23 @@ public class EventSilencerService extends IntentService {
                 ringerState.restorePhoneRinger();
             }
 
-            // Sleep the service until the start of the next
-            // event, or for 24 hours if there are no more events
-            CalEvent nextEvent = databaseInterface.nextEvent();
+            //if no events are active, then we should sleep until the start of the next inactive
+            //event, else sleep until the end of the last active event
             long wakeAt;
-            if (nextEvent != null) {
-                wakeAt = nextEvent.getBegin()
-                        - (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes());
+
+            if (!events.isEmpty()) {
+                CalEvent lastActiveEvent = events.getLast();
+                wakeAt = lastActiveEvent.getEnd();
             } else {
-                wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_DAY;
+                CalEvent nextInactiveEvent = databaseInterface.nextEvent();
+                if (nextInactiveEvent != null) {
+                    wakeAt = nextInactiveEvent.getBegin() - (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes());
+                } else {
+                    wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_DAY;
+
+                }
             }
+
             alarmManager.scheduleNormalWakeAt(wakeAt);
         }
     }

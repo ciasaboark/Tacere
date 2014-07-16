@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<array name="ringer_types">
-	    <item>Normal</item>
-	    <item>Vibrate</item>
-	    <item>Silent</item>
-	</array>    
-</resources>

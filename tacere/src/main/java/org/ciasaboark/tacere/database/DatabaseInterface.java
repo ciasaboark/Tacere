@@ -111,7 +111,7 @@ public class DatabaseInterface {
                 mSelectionClause, mSelectionArgs);
     }
 
-    public Deque<CalEvent> getAllActiveEvents() {
+    public Deque<CalEvent> syncAndGetAllActiveEvents() {
         // sync the db and prune old events
         syncCalendarDb();
 
@@ -162,36 +162,20 @@ public class DatabaseInterface {
         Cursor cursor = getEventCursor();
         CalEvent thisEvent = null;
         if (cursor.moveToFirst()) {
-            thisEvent = new CalEvent();
             do {
                 int eventID = cursor.getInt(cursor.getColumnIndex(Columns._ID));
                 if (eventID == id) {
-                    // this event matched
-                    thisEvent.setCal_id(cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID)));
-                    thisEvent.setId(cursor.getInt(cursor.getColumnIndex(Columns._ID)));
-                    thisEvent
-                            .setTitle(cursor.getString(cursor.getColumnIndex(Columns.TITLE)));
-                    thisEvent.setBegin(cursor.getLong(cursor.getColumnIndex(Columns.BEGIN)));
-                    thisEvent.setEnd(cursor.getLong(cursor.getColumnIndex(Columns.END)));
-                    thisEvent.setDescription(cursor.getString(cursor
-                            .getColumnIndex(Columns.DESCRIPTION)));
-                    thisEvent.setRingerType(cursor.getInt(cursor
-                            .getColumnIndex(Columns.RINGER_TYPE)));
-                    thisEvent.setDisplayColor(cursor.getInt(cursor
-                            .getColumnIndex(Columns.DISPLAY_COLOR)));
-                    int isFreeTime = cursor
-                            .getInt(cursor.getColumnIndex(Columns.IS_FREETIME));
-                    if (isFreeTime == 1) {
-                        thisEvent.setIsFreeTime(true);
-                    } else {
-                        thisEvent.setIsFreeTime(false);
-                    }
-                    int isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY));
-                    if (isAllDay == 1) {
-                        thisEvent.setIsAllDay(true);
-                    } else {
-                        thisEvent.setIsAllDay(false);
-                    }
+                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
+                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
+                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+                    int ringerType = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
+                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
+                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
+                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+
+                    thisEvent = new CalEvent(eventID, title, begin, end, description, displayColor, isFreeTime, isAllDay);
+                    thisEvent.setRingerType(ringerType);
                     break;
                 }
             } while (cursor.moveToNext());
@@ -239,7 +223,12 @@ public class DatabaseInterface {
                 // if the event is already in the local database then we need to preserve
                 // the ringerType, all other values should be read from the system calendar
                 // database
-                CalEvent newEvent = new CalEvent();
+
+
+                CalEvent newEvent = new CalEvent(id, event_title, event_begin, event_end,
+                        event_description, event_displayColor, (event_availability == 0),
+                        (event_allDay == 1));
+
                 try {
                     CalEvent oldEvent = getEvent(id);
                     newEvent.setRingerType(oldEvent.getRingerType());
@@ -247,16 +236,6 @@ public class DatabaseInterface {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
                 }
-
-                newEvent.setId(id);
-                newEvent.setCal_id(id);
-                newEvent.setTitle(event_title);
-                newEvent.setBegin(event_begin);
-                newEvent.setEnd(event_end);
-                newEvent.setDescription(event_description);
-                newEvent.setDisplayColor(event_displayColor);
-                newEvent.setIsFreeTime(event_availability == 0);
-                newEvent.setIsAllDay(event_allDay == 1);
 
                 // inserting an event with the same id will clobber all previous data, completing
                 // the synchronization of this event
@@ -322,7 +301,6 @@ public class DatabaseInterface {
         } else {
             cv.put(Columns.IS_FREETIME, 1);
         }
-        cv.put(Columns.CAL_ID, e.getCal_id());
 
         long rowID = eventsDB.insertWithOnConflict(TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
@@ -335,7 +313,7 @@ public class DatabaseInterface {
         // + be ongoing due to the event buffer
         int bufferMinutes = prefs.getBufferMinutes();
         long begin = System.currentTimeMillis() - (1000 * 60 * (long) bufferMinutes);
-        long end = begin + 1000 * 60 * 60 * 24 * (long) cutoff; // pull all events n days from now
+        long end = begin + 1000 * 60 * 60 * 24 * cutoff; // pull all events n days from now
 
 
         Cursor cal_cursor = getCalendarCursor(begin, end);

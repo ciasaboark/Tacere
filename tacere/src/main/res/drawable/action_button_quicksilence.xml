@@ -3,11 +3,13 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="?android:colorControlHighlight">
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+        android:color="?android:colorControlHighlight">
     <item>
         <shape android:shape="oval">
-            <solid  android:color="@color/accent"
-                android:background="@drawable/do_not_disturb"/>
+            <solid
+                android:background="@drawable/ic_state_silent"
+                android:color="@color/accent"/>
         </shape>
     </item>
 </ripple>

@@ -58,7 +58,7 @@ public class UpdatesActivity extends Activity {
         Bundle b = i.getExtras();
         if (b != null) {
             String startedFrom = b.getString("initiator");
-            if (startedFrom != null || startedFrom.equals("main")) {
+            if ("main".equals(startedFrom)) {
                 showingUpdatesFromMainScreen = true;
             }
         }

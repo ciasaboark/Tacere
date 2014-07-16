@@ -56,9 +56,6 @@ import org.ciasaboark.tacere.service.RequestTypes;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-
-//import android.content.SharedPreferences;
-
 public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
@@ -227,40 +224,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             cancelQuickSilenceButton.setVisibility(View.GONE);
         }
     }
-
-//    private void drawQuicksilenceButton() {
-//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-//        if (apiLevelAvailable >= 20) { //TODO this should be VERSION_NAMES.L but the preview reports its version as 20 for now
-//            drawNewQuicksilenceButton();
-//        } else {
-//            drawCompatQuicksilenceButton();
-//        }
-//    }
-
-//    private void drawCompatQuicksilenceButton() {
-//        Button quicksilenceButton = (Button) findViewById(R.id.quicksilenceButton_compat);
-//        quicksilenceButton.setEnabled(false);
-//        ServiceStateManager ssM = new ServiceStateManager(this);
-//        if (ssM.isQuickSilenceActive()) {
-//            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    startQuicksilence();
-//                }
-//            });
-//            quicksilenceButton.setText(R.string.startQuicksilence);
-//        } else {
-//            quicksilenceButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    stopOngoingQuicksilence();
-//                }
-//            });
-//            quicksilenceButton.setText(R.string.cancelQuicksilence);
-//        }
-//        quicksilenceButton.setEnabled(true);
-//        quicksilenceButton.setVisibility(View.VISIBLE);
-//    }
 
     private void startQuicksilence() {
         // an intent to send to either start or stop a quick silence duration
@@ -473,10 +436,11 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 CalEvent thisEvent = databaseInterface.getEvent(id);
                 // a text view to show the event title
                 TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
-                descriptionTV.setText(thisEvent.getTitle());
+                if (descriptionTV != null) {
+                    descriptionTV.setText(thisEvent.getTitle());
+                }
 
                 // a text view to show the event date span
-                TextView dateTV = (TextView) view.findViewById(R.id.eventDate);
                 String begin = thisEvent.getLocalBeginDate();
                 String end = thisEvent.getLocalEndDate();
                 String date;
@@ -485,27 +449,35 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 } else {
                     date = begin + " - " + end;
                 }
-                dateTV.setText(date);
+                TextView dateTV = (TextView) view.findViewById(R.id.eventDate);
+                if (dateTV != null) {
+                    dateTV.setText(date);
+                }
 
                 // a text view to show the beginning and ending times for the event
                 TextView timeTV = (TextView) view.findViewById(R.id.eventTime);
-                StringBuilder timeSB = new StringBuilder(thisEvent.getLocalBeginTime() + " - "
-                        + thisEvent.getLocalEndTime());
+                if (timeTV != null) {
+                    StringBuilder timeSB = new StringBuilder(thisEvent.getLocalBeginTime() + " - "
+                            + thisEvent.getLocalEndTime());
 
-                if (thisEvent.isAllDay()) {
-                    timeSB = new StringBuilder(getBaseContext().getString(R.string.all_day));
+                    if (thisEvent.isAllDay()) {
+                        timeSB = new StringBuilder(getBaseContext().getString(R.string.all_day));
+                    }
+                    timeTV.setText(timeSB.toString());
                 }
-                timeTV.setText(timeSB.toString());
 
                 // a color box to match the calendar color
                 RelativeLayout calColorBox = (RelativeLayout) view.findViewById(R.id.calendarColor);
-                calColorBox.setBackgroundColor(thisEvent.getDisplayColor());
+                if (calColorBox != null)
+                    calColorBox.setBackgroundColor(thisEvent.getDisplayColor());
 
                 // an image button to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
-                eventIV.setImageDrawable(this.getEventIcon(thisEvent));
-                eventIV.setContentDescription(getBaseContext().getString(
-                        R.string.icon_alt_text_normal));
+                if (eventIV != null) {
+                    eventIV.setImageDrawable(this.getEventIcon(thisEvent));
+                    eventIV.setContentDescription(getBaseContext().getString(
+                            R.string.icon_alt_text_normal));
+                }
 
                 Calendar calendarDate = new GregorianCalendar();
                 calendarDate.set(Calendar.HOUR_OF_DAY, 0);
@@ -513,20 +485,27 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 calendarDate.set(Calendar.SECOND, 0);
                 calendarDate.set(Calendar.MILLISECOND, 0);
                 calendarDate.add(Calendar.DAY_OF_MONTH, 1);
+                TextView[] textElements = {descriptionTV, dateTV, timeTV};
+                int backgroundColor = getResources().getColor(R.color.windowBackground);
+                int textColor = getResources().getColor(R.color.textcolor);
 
                 long tomorrowMidnight = calendarDate.getTimeInMillis();
                 long eventBegin = thisEvent.getBegin();
 
                 if (ActiveEventManager.isActiveEvent(thisEvent)) {
-                    view.setBackgroundColor(getResources()
-                            .getColor(R.color.event_list_active_event));
-                } else if (eventBegin > tomorrowMidnight) {
-                    view.setBackgroundColor(getResources()
-                            .getColor(R.color.event_list_dark_background));
-                } else {
-                    view.setBackgroundColor(getResources()
-                            .getColor(R.color.windowBackground));
+                    backgroundColor = getResources()
+                            .getColor(R.color.event_list_active_event);
+                } else if (eventBegin >= tomorrowMidnight) {
+                    backgroundColor = getResources()
+                            .getColor(R.color.event_list_future_background);
+                    textColor = getResources().getColor(R.color.event_list_future_text);
                 }
+
+                view.setBackgroundColor(backgroundColor);
+                for (TextView v : textElements) {
+                    v.setTextColor(textColor);
+                }
+
             } catch (NoSuchEventException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
             }
@@ -537,10 +516,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
             switch (ringerType) {
                 case CalEvent.RINGER.NORMAL:
-                    icon = getResources().getDrawable(R.drawable.ringer_on);
+                    icon = getResources().getDrawable(R.drawable.ic_state_normal);
                     break;
                 case CalEvent.RINGER.SILENT:
-                    icon = getResources().getDrawable(R.drawable.do_not_disturb);
+                    icon = getResources().getDrawable(R.drawable.ic_state_silent);
                     break;
                 case CalEvent.RINGER.VIBRATE:
                     icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
