@@ -338,11 +338,7 @@ public class SettingsActivity extends Activity {
 
     public void onClickToggleService(View v) {
         prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
-
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
-
+        restartEventSilencerService();
         drawServiceWidget();
         drawMediaWidgets();
         drawAlarmWidgets();

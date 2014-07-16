@@ -8,6 +8,7 @@ package org.ciasaboark.tacere.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.prefs.Prefs;
+import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 // import android.util.Log;
 
@@ -63,17 +66,27 @@ public class AdvancedSettingsActivity extends Activity {
     }
 
     private void refreshDisplay() {
-        // the silence free time state toggle
-        CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
-        TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
-        if (silenceFreeTime) {
-            freeCB.setChecked(true);
-            freeTV.setText(R.string.pref_silence_free_enabled);
-        } else {
-            freeCB.setChecked(false);
-            freeTV.setText(R.string.pref_silence_free_disabled);
-        }
+        drawFreeTimeWidgets();
+        drawSilenceAllDayWidgets();
+        drawEventBufferWidgets();
+        drawLookaheadWidgets();
+    }
 
+    private void drawLookaheadWidgets() {
+        // the lookahead interval button
+        TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
+        String lookaheadText = getResources().getString(R.string.pref_list_days);
+        lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
+    }
+
+    private void drawEventBufferWidgets() {
+        // the event buffer button
+        TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
+        String bufferText = getResources().getString(R.string.pref_buffer_minutes);
+        bufferTV.setText(String.format(bufferText, bufferMinutes));
+    }
+
+    private void drawSilenceAllDayWidgets() {
         // the silence all day state toggle
         CheckBox dayCB = (CheckBox) findViewById(R.id.silenceAllDayCheckBox);
         TextView dayTV = (TextView) findViewById(R.id.silenceAllDayDescription);
@@ -84,16 +97,19 @@ public class AdvancedSettingsActivity extends Activity {
             dayCB.setChecked(false);
             dayTV.setText(R.string.pref_all_day_disabled);
         }
+    }
 
-        // the event buffer button
-        TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
-        String bufferText = getResources().getString(R.string.pref_buffer_minutes);
-        bufferTV.setText(String.format(bufferText, bufferMinutes));
-
-        // the lookahead interval button
-        TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
-        String lookaheadText = getResources().getString(R.string.pref_list_days);
-        lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
+    private void drawFreeTimeWidgets() {
+        // the silence free time state toggle
+        CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
+        TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
+        if (silenceFreeTime) {
+            freeCB.setChecked(true);
+            freeTV.setText(R.string.pref_silence_free_enabled);
+        } else {
+            freeCB.setChecked(false);
+            freeTV.setText(R.string.pref_silence_free_disabled);
+        }
     }
 
     @Override
@@ -120,27 +136,30 @@ public class AdvancedSettingsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
     public void onPause() {
         // save all changes to the preferences
-        saveSettings();
         super.onPause();
     }
 
-    private void saveSettings() {
-        prefs.setSilenceFreeTimeEvents(silenceFreeTime);
-        prefs.setSilenceAllDayEvents(silenceAllDay);
-        prefs.setBufferMinutes(bufferMinutes);
-        prefs.setLookaheadDays(lookaheadDays);
-    }
+//    private void saveSettings() {
+//        prefs.setSilenceFreeTimeEvents(silenceFreeTime);
+//        prefs.setSilenceAllDayEvents(silenceAllDay);
+//        prefs.setBufferMinutes(bufferMinutes);
+//        prefs.setLookaheadDays(lookaheadDays);
+//    }
 
     public void onClickSilenceFreeTime(View v) {
         silenceFreeTime = !silenceFreeTime;
-        refreshDisplay();
+        prefs.setSilenceFreeTimeEvents(!prefs.getSilenceFreeTimeEvents());
+        drawFreeTimeWidgets();
+        restartEventSilencerService();
     }
 
     public void onClickSilenceAllDay(View v) {
-        silenceAllDay = !silenceAllDay;
-        refreshDisplay();
+        prefs.setSilenceAllDayEvents(!prefs.getSilenceAllDayEvents());
+        drawSilenceAllDayWidgets();
+        restartEventSilencerService();
     }
 
     public void onClickBufferMinutes(View v) {
@@ -162,8 +181,9 @@ public class AdvancedSettingsActivity extends Activity {
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 bufferMinutes = number.getValue() - 1;
-                saveSettings();
-                refreshDisplay();
+                prefs.setBufferMinutes(bufferMinutes);
+                drawEventBufferWidgets();
+                restartEventSilencerService();
             }
         });
 
@@ -175,6 +195,12 @@ public class AdvancedSettingsActivity extends Activity {
 
         alert.setView(number);
         alert.show();
+    }
+
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
     }
 
     public void onClickListDays(View v) {
@@ -196,8 +222,8 @@ public class AdvancedSettingsActivity extends Activity {
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 lookaheadDays = number.getValue();
-                saveSettings();
-                refreshDisplay();
+                prefs.setLookaheadDays(lookaheadDays);
+                drawLookaheadWidgets();
             }
         });
 
