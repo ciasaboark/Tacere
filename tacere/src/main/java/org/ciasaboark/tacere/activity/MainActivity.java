@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.graphics.Outline;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -407,8 +406,9 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 startActivity(aboutActivityIntent);
                 return true;
             case R.id.action_add_event:
-                Uri.Builder uriBuilder = CalendarContract.Events.CONTENT_URI.buildUpon();
-                Intent addEventIntent = new Intent(Intent.ACTION_INSERT, uriBuilder.build());
+                Intent addEventIntent = new Intent(Intent.ACTION_INSERT,
+                        CalendarContract.Events.CONTENT_URI);
+                addEventIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(addEventIntent);
                 return true;
             default:
@@ -542,28 +542,51 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             return icon;
         }
 
-        private boolean eventShouldSilence(CalEvent event) {
-            boolean eventShouldSilence = true;
-            boolean silenceFreeTime = prefs.getSilenceFreeTimeEvents();
-            boolean silenceAllDay = prefs.getSilenceAllDayEvents();
+        private boolean shouldEventSilence(CalEvent event) {
+            boolean eventMatches = false;
 
-            // if a custom ringer is set then the event should silence, otherwise it depends on the
-            // event type and settings
-            if (event.getRingerType() == CalEvent.RINGER.UNDEFINED) {
-                if ((event.isAllDay() && !silenceAllDay)
-                        || (event.isFreeTime() && !silenceFreeTime)) {
-                    eventShouldSilence = false;
-                }
+            // if the event is marked as busy (but is not an all day event)
+            // + then we need no further tests
+            boolean busy_notAllDay = false;
+            if (!event.isFreeTime() && !event.isAllDay()) {
+                busy_notAllDay = true;
             }
 
-            return eventShouldSilence;
+            // all day events
+            boolean allDay = false;
+            if (prefs.getSilenceAllDayEvents() && event.isAllDay()) {
+                allDay = true;
+            }
+
+            // events marked as 'free' or 'available'
+            boolean free_notAllDay = false;
+            if (prefs.getSilenceFreeTimeEvents() && event.isFreeTime() && !event.isAllDay()) {
+                free_notAllDay = true;
+            }
+
+            // events with a custom ringer set should always use that ringer
+            boolean isCustomRingerSet = false;
+            if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
+                isCustomRingerSet = true;
+            }
+
+            if (busy_notAllDay || allDay || free_notAllDay || isCustomRingerSet) {
+                eventMatches = true;
+            }
+
+            //all of this is negated if the event has been marked to be ignored
+            if (event.getRingerType() == CalEvent.RINGER.IGNORE) {
+                eventMatches = false;
+            }
+
+            return eventMatches;
         }
 
         private Drawable getEventIcon(CalEvent event) {
             Drawable icon;
             int defaultColor = getResources().getColor(R.color.icon_accent);
 
-            if (eventShouldSilence(event)) {
+            if (shouldEventSilence(event)) {
                 if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
                     // a custom ringer has been applied
                     icon = getRingerIcon(event.getRingerType(), getResources().getColor(R.color.primary));

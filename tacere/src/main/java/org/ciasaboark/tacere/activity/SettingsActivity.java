@@ -414,18 +414,6 @@ public class SettingsActivity extends Activity {
                         restartEventSilencerService();
                     }
                 })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //do nothing
-                    }
-                })
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //do nothing
-                    }
-                })
                 .create();
 
         alert.show();
@@ -444,19 +432,17 @@ public class SettingsActivity extends Activity {
         final NumberPicker minP = (NumberPicker) view.findViewById(R.id.minutePicker);
 
         String[] hours = new String[25];
-        String[] minutes = new String[60];
+        String[] minutes = new String[59];
 
         for (int i = 0; i < hours.length; i++) {
             hours[i] = Integer.toString(i);
         }
 
-        for (int i = 1; i < minutes.length - 1; i++) {
-            StringBuilder sb = new StringBuilder(Integer.toString(i));
-//            if (i < 10) {
-//                sb.insert(0, "0");
-//            }
-            minutes[i] = sb.toString();
+        int i = 0;
+        while (i < minutes.length) {
+            minutes[i] = Integer.toString(++i);
         }
+
 
         hourP.setMinValue(1);
         hourP.setMaxValue(hours.length - 1);
@@ -474,7 +460,7 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 prefs.setQuickSilenceHours(hourP.getValue() - 1);
-                prefs.setQuicksilenceMinutes(minP.getValue() - 1);
+                prefs.setQuicksilenceMinutes(minP.getValue());
                 drawQuickSilenceWidget();
             }
         });

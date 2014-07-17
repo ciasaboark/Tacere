@@ -118,7 +118,6 @@ public class EventSilencerService extends IntentService {
         // is active, or a previous quick silence request is still ongoing. If this request occurred
         // while no event was active, then save the current ringer state so it can be restored later
         ringerState.storeRingerStateIfNeeded();
-
         stateManager.setServiceState(ServiceStates.QUICKSILENCE);
 
         long wakeAt = System.currentTimeMillis() + (CalEvent.MILLISECONDS_IN_MINUTE
@@ -129,9 +128,7 @@ public class EventSilencerService extends IntentService {
 
         //quick silence requests are always explicitly request to silence the ringer
         ringerState.setPhoneRinger(CalEvent.RINGER.SILENT);
-
         vibrate();
-
         notificationManager.displayQuickSilenceNotification(durationMinutes);
     }
 

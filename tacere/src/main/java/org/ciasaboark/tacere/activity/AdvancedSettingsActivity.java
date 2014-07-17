@@ -29,24 +29,13 @@ import org.ciasaboark.tacere.service.RequestTypes;
 public class AdvancedSettingsActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String TAG = "AdvancedSettingsActivity";
-    private final Prefs prefs;
-    private boolean silenceFreeTime;
-    private boolean silenceAllDay;
-    private int bufferMinutes;
-    private int lookaheadDays;
-
-    public AdvancedSettingsActivity() {
-        prefs = new Prefs(this);
-        this.silenceFreeTime = prefs.getSilenceFreeTimeEvents();
-        this.silenceAllDay = prefs.getSilenceAllDayEvents();
-        this.bufferMinutes = prefs.getBufferMinutes();
-        this.lookaheadDays = prefs.getLookaheadDays();
-    }
+    private Prefs prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_settings);
+        prefs = new Prefs(this);
         // Show the Up button in the action bar.
         setupActionBar();
         refreshDisplay();
@@ -76,21 +65,21 @@ public class AdvancedSettingsActivity extends Activity {
         // the lookahead interval button
         TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
         String lookaheadText = getResources().getString(R.string.pref_list_days);
-        lookaheadTV.setText(String.format(lookaheadText, lookaheadDays));
+        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays()));
     }
 
     private void drawEventBufferWidgets() {
         // the event buffer button
         TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
         String bufferText = getResources().getString(R.string.pref_buffer_minutes);
-        bufferTV.setText(String.format(bufferText, bufferMinutes));
+        bufferTV.setText(String.format(bufferText, prefs.getBufferMinutes()));
     }
 
     private void drawSilenceAllDayWidgets() {
         // the silence all day state toggle
         CheckBox dayCB = (CheckBox) findViewById(R.id.silenceAllDayCheckBox);
         TextView dayTV = (TextView) findViewById(R.id.silenceAllDayDescription);
-        if (silenceAllDay) {
+        if (prefs.getSilenceAllDayEvents()) {
             dayCB.setChecked(true);
             dayTV.setText(R.string.pref_all_day_enabled);
         } else {
@@ -103,7 +92,7 @@ public class AdvancedSettingsActivity extends Activity {
         // the silence free time state toggle
         CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
         TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
-        if (silenceFreeTime) {
+        if (prefs.getSilenceFreeTimeEvents()) {
             freeCB.setChecked(true);
             freeTV.setText(R.string.pref_silence_free_enabled);
         } else {
@@ -150,7 +139,6 @@ public class AdvancedSettingsActivity extends Activity {
 //    }
 
     public void onClickSilenceFreeTime(View v) {
-        silenceFreeTime = !silenceFreeTime;
         prefs.setSilenceFreeTimeEvents(!prefs.getSilenceFreeTimeEvents());
         drawFreeTimeWidgets();
         restartEventSilencerService();
@@ -176,12 +164,11 @@ public class AdvancedSettingsActivity extends Activity {
         number.setMaxValue(nums.length - 1);
         number.setWrapSelectorWheel(false);
         number.setDisplayedValues(nums);
-        number.setValue(bufferMinutes + 1);
+        number.setValue(prefs.getBufferMinutes() + 1);
 
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                bufferMinutes = number.getValue() - 1;
-                prefs.setBufferMinutes(bufferMinutes);
+                prefs.setBufferMinutes(number.getValue() - 1);
                 drawEventBufferWidgets();
                 restartEventSilencerService();
             }
@@ -217,17 +204,16 @@ public class AdvancedSettingsActivity extends Activity {
         number.setMaxValue(nums.length - 1);
         number.setWrapSelectorWheel(false);
         number.setDisplayedValues(nums);
-        number.setValue(lookaheadDays);
+        number.setValue(prefs.getLookaheadDays());
 
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                lookaheadDays = number.getValue();
-                prefs.setLookaheadDays(lookaheadDays);
+                prefs.setLookaheadDays(number.getValue());
                 drawLookaheadWidgets();
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Do nothing
             }
