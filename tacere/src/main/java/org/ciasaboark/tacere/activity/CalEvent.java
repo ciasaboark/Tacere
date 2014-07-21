@@ -15,6 +15,7 @@ public class CalEvent {
     public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
     @SuppressWarnings("unused")
     private static final String TAG = "CalEvent";
+    private int calendarId;
     private int instanceId;
     private String title;
     private long begin;
@@ -26,7 +27,9 @@ public class CalEvent {
     private boolean isAllDay;
 
 
-    public CalEvent(int instanceId, String title, long begin, long end, String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+    public CalEvent(int calendarId, int instanceId, String title, long begin, long end,
+                    String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+        this.calendarId = calendarId;
         this.instanceId = instanceId;
         this.title = title;
         this.begin = begin;
@@ -48,6 +51,10 @@ public class CalEvent {
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
         Date date = new Date(end);
         return dateFormatter.format(date);
+    }
+
+    public int getCalendarId() {
+        return calendarId;
     }
 
     public String getLocalBeginDate() {

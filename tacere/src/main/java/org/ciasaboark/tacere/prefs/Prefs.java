@@ -7,6 +7,10 @@ package org.ciasaboark.tacere.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Presents an abstracted view of the preferences that can be modified by the user
@@ -29,6 +33,41 @@ public class Prefs {
             editor = sharedPreferences.edit();
         }
 
+    }
+
+    public List<Long> getSelectedCalendars() {
+        String calendars = sharedPreferences.getString(Keys.SELECTED_CALENDARS, "");
+        String[] calendarArray = calendars.split(",");
+        List<Long> calendarList = new ArrayList<Long>();
+        for (String calendarId : calendarArray) {
+            long id;
+            try {
+                id = Long.parseLong(calendarId);
+                calendarList.add(id);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "unable to read calendar id '" + calendarId + "' as integer" +
+                        " value, ignoring");
+            }
+
+        }
+        return calendarList;
+    }
+
+    public void setSelectedCalendars(List<Long> calendarList) {
+        String commaSeparatedCalIds = "";
+        for (long id : calendarList) {
+            commaSeparatedCalIds += id + ",";
+        }
+        editor.putString(Keys.SELECTED_CALENDARS, commaSeparatedCalIds).commit();
+    }
+
+    public void setSyncAllCalendars() {
+        //TODO
+    }
+
+    public boolean shouldAllCalendarsBeSynced() {
+        //TODO
+        return false;
     }
 
     public Boolean getIsServiceActivated() {
@@ -241,6 +280,7 @@ public class Prefs {
         public static final String BUFFER_MINUTES = "BUFFER_MINUTES";
         public static final String LOOKAHEAD_DAYS = "LOOKAHEAD_DAYS";
         public static final String DO_NOT_DISTURB = "DO_NOT_DISTURB";
+        public static final String SELECTED_CALENDARS = "SELECTED_CALENDARS";
 //		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
 
 

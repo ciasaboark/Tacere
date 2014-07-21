@@ -300,7 +300,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         eventListview = (ListView) findViewById(R.id.eventListView);
         eventListview.setOnItemClickListener(this);
         eventListview.setOnItemLongClickListener(this);
-        eventListview.setFadingEdgeLength(0);
+        eventListview.setFadingEdgeLength(32);
+        eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_future_background));
         cursor = databaseInterface.getEventCursor();
         cursorAdapter = new EventCursorAdapter(this, cursor);
         eventListview.setAdapter(cursorAdapter);

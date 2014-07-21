@@ -5,11 +5,13 @@
 
 package org.ciasaboark.tacere.database;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.CalendarContract;
 import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
@@ -19,6 +21,9 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
+
+import static android.provider.CalendarContract.Calendars;
 
 public class DatabaseInterface {
     private static final String TAG = "DatabaseInterface";
@@ -30,7 +35,8 @@ public class DatabaseInterface {
             Instances.EVENT_COLOR,
             Instances.ALL_DAY,
             Instances.AVAILABILITY,
-            Instances._ID
+            Instances._ID,
+            CalendarContract.Events.CALENDAR_ID
     };
 
     private static final String DB_NAME = "events.sqlite";
@@ -165,6 +171,7 @@ public class DatabaseInterface {
             do {
                 int eventID = cursor.getInt(cursor.getColumnIndex(Columns._ID));
                 if (eventID == id) {
+                    int cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
                     String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
                     long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
                     long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
@@ -174,7 +181,8 @@ public class DatabaseInterface {
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
 
-                    thisEvent = new CalEvent(eventID, title, begin, end, description, displayColor, isFreeTime, isAllDay);
+                    thisEvent = new CalEvent(cal_id, eventID, title, begin, end, description,
+                            displayColor, isFreeTime, isAllDay);
                     thisEvent.setRingerType(ringerType);
                     break;
                 }
@@ -208,6 +216,7 @@ public class DatabaseInterface {
             int col_allDay = calendarCursor.getColumnIndex(projection[5]);
             int col_availability = calendarCursor.getColumnIndex(projection[6]);
             int col_id = calendarCursor.getColumnIndex(projection[7]);
+            int col_cal_id = calendarCursor.getColumnIndex(projection[8]);
 
             do {
                 // the cursor
@@ -219,13 +228,14 @@ public class DatabaseInterface {
                 int event_allDay = calendarCursor.getInt(col_allDay);
                 int event_availability = calendarCursor.getInt(col_availability);
                 int id = calendarCursor.getInt(col_id);
+                int cal_id = calendarCursor.getInt(col_cal_id);
 
                 // if the event is already in the local database then we need to preserve
                 // the ringerType, all other values should be read from the system calendar
                 // database
 
 
-                CalEvent newEvent = new CalEvent(id, event_title, event_begin, event_end,
+                CalEvent newEvent = new CalEvent(cal_id, id, event_title, event_begin, event_end,
                         event_description, event_displayColor, (event_availability == 0),
                         (event_allDay == 1));
 
@@ -239,6 +249,7 @@ public class DatabaseInterface {
 
                 // inserting an event with the same id will clobber all previous data, completing
                 // the synchronization of this event
+                //TODO insert the event only if that calendar is set to synchronize
                 insertEvent(newEvent);
             } while (calendarCursor.moveToNext());
         }
@@ -268,6 +279,48 @@ public class DatabaseInterface {
                 begin, end);
     }
 
+    public List<Calendar> getCalendarIdList() {
+        List<Calendar> calendarIds = new ArrayList<Calendar>();
+        final String[] projection = {
+                Calendars._ID,
+                Calendars.ACCOUNT_NAME,
+                Calendars.CALENDAR_DISPLAY_NAME,
+                Calendars.OWNER_ACCOUNT,
+                Calendars.CALENDAR_COLOR
+        };
+        final int projection_id = 0;
+        final int projection_accountName = 2;
+        final int projection_displayname = 3;
+        final int projection_owner = 4;
+        final int projection_color = 5;
+        Cursor cursor;
+        ContentResolver cr = context.getContentResolver();
+        cursor = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(projection_id);
+                String accountName = cursor.getString(projection_accountName);
+                String displayName = cursor.getString(projection_displayname);
+                String owner = cursor.getString(projection_owner);
+                int color = cursor.getInt(projection_color);
+                try {
+                    Calendar c = new Calendar(id, accountName, displayName, owner, color);
+                    calendarIds.add(c);
+                } catch (IllegalArgumentException e) {
+                    Log.w(TAG, "android database supplied bad values calendar info for id " + id +
+                            ", accountName:" + accountName + "displayName:" + displayName +
+                            " owner:" + owner);
+                    Log.w(TAG, e.getMessage());
+                }
+            } while (cursor.moveToNext());
+        } else {
+            Log.d(TAG, "no calendars installed");
+        }
+
+
+        return calendarIds;
+    }
+
     private boolean isEventValidToInsert(CalEvent e) {
         boolean eventIsValid = false;
         if (e.getTitle() != null && e.getId() != null && e.getBegin() != null && e.getEnd() != null
@@ -291,6 +344,7 @@ public class DatabaseInterface {
         cv.put(Columns.DESCRIPTION, e.getDescription());
         cv.put(Columns.RINGER_TYPE, e.getRingerType());
         cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
+        cv.put(Columns.CAL_ID, e.getCalendarId());
         if (e.isAllDay()) {
             cv.put(Columns.IS_ALLDAY, 1);
         } else {
