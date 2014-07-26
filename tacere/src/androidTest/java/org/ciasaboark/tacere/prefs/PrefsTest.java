@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
+ */
+
 package org.ciasaboark.tacere.prefs;
 
 import junit.framework.TestCase;
-import junit.framework.Test;
 
 public class PrefsTest extends TestCase {
 
@@ -48,7 +52,7 @@ public class PrefsTest extends TestCase {
         assert(prefs.getAdjustAlarm() == DefaultPrefs.ADJUST_ALARM);
         assert(prefs.getAdjustMedia() == DefaultPrefs.ADJUST_MEDIA);
         assert(prefs.getIsServiceActivated() == DefaultPrefs.IS_ACTIVATED);
-        assert(prefs.getSilenceAllDayEvents() == DefaultPrefs.SILENCE_ALL_DAY);
+        assert(prefs.getSilenceAllDayEvents() == DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
         assert(prefs.getSilenceFreeTimeEvents() == DefaultPrefs.SILENCE_FREE_TIME);
         assert(prefs.getBufferMinutes() == DefaultPrefs.BUFFER_MINUTES);
         assert(prefs.getCurAlarmVolume() == DefaultPrefs.ALARM_VOLUME);

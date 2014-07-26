@@ -60,7 +60,7 @@
                 android:value="org.ciasaboark.tacere.activity.MainActivity"/>
         </activity>
         <activity
-            android:name="org.ciasaboark.tacere.activity.UpdatesActivity"
+            android:name=".activity.ShowUpdatesActivity"
             android:theme="@style/Dialog">
         </activity>
         <activity
@@ -68,7 +68,7 @@
             android:theme="@style/Dialog">
         </activity>
         <activity
-            android:name="org.ciasaboark.tacere.activity.CalendarsActivity"
+            android:name=".activity.SelectCalendarsActivity"
             android:theme="@style/Dialog">
         </activity>
         <activity

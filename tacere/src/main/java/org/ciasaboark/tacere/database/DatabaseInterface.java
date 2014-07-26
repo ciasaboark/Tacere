@@ -316,7 +316,6 @@ public class DatabaseInterface {
             Log.d(TAG, "no calendars installed");
         }
 
-
         return simpleCalendarIds;
     }
 

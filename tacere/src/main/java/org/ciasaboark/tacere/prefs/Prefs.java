@@ -73,7 +73,7 @@ public class Prefs {
     }
 
     public Boolean getIsServiceActivated() {
-        return sharedPreferences.getBoolean(Keys.IS_SERVICE_ACTIVATED, DefaultPrefs.IS_ACTIVATED);
+        return sharedPreferences.getBoolean(Keys.IS_SERVICE_ACTIVATED, DefaultPrefs.IS_SERVICE_ACTIVATED);
     }
 
     public void setIsServiceActivated(Boolean isServiceActivated) {
@@ -81,20 +81,20 @@ public class Prefs {
     }
 
     public Boolean getSilenceFreeTimeEvents() {
-        return sharedPreferences.getBoolean(Keys.SILENCE_FREE_TIME, DefaultPrefs.SILENCE_FREE_TIME);
+        return sharedPreferences.getBoolean(Keys.SILENCE_FREE_TIME_EVENTS, DefaultPrefs.SILENCE_FREE_TIME_EVENTS);
     }
 
     public void setSilenceFreeTimeEvents(Boolean silenceFreeTimeEvents) {
-        editor.putBoolean(Keys.SILENCE_FREE_TIME, silenceFreeTimeEvents).commit();
+        editor.putBoolean(Keys.SILENCE_FREE_TIME_EVENTS, silenceFreeTimeEvents).commit();
 
     }
 
     public Boolean getSilenceAllDayEvents() {
-        return sharedPreferences.getBoolean(Keys.SILENCE_ALL_DAY, DefaultPrefs.SILENCE_ALL_DAY);
+        return sharedPreferences.getBoolean(Keys.SILENCE_ALL_DAY_EVENTS, DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
     }
 
     public void setSilenceAllDayEvents(Boolean silenceAllDayEvents) {
-        editor.putBoolean(Keys.SILENCE_ALL_DAY, silenceAllDayEvents).commit();
+        editor.putBoolean(Keys.SILENCE_ALL_DAY_EVENTS, silenceAllDayEvents).commit();
     }
 
     public int getRingerType() {
@@ -243,9 +243,9 @@ public class Prefs {
     }
 
     public void restoreDefaultPreferences() {
-        this.setIsServiceActivated(DefaultPrefs.IS_ACTIVATED);
-        this.setSilenceFreeTimeEvents(DefaultPrefs.SILENCE_FREE_TIME);
-        this.setSilenceAllDayEvents(DefaultPrefs.SILENCE_ALL_DAY);
+        this.setIsServiceActivated(DefaultPrefs.IS_SERVICE_ACTIVATED);
+        this.setSilenceFreeTimeEvents(DefaultPrefs.SILENCE_FREE_TIME_EVENTS);
+        this.setSilenceAllDayEvents(DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
         this.setRingerType(DefaultPrefs.RINGER_TYPE);
         this.setAdjustAlarm(DefaultPrefs.ADJUST_ALARM);
         this.setAdjustMedia(DefaultPrefs.ADJUST_MEDIA);
@@ -264,14 +264,10 @@ public class Prefs {
         sharedPreferences.edit().remove(key).apply();
     }
 
-    /**
-     * @author Jonathan Nelson <ciasaboark@gmail.com>
-     */
-    public static class Keys {
-        //@formatter:off
+    private static class Keys {
         public static final String IS_SERVICE_ACTIVATED = "IS_ACTIVATED";
-        public static final String SILENCE_FREE_TIME = "SILENCE_FREE_TIME";
-        public static final String SILENCE_ALL_DAY = "SILENCE_ALL_DAY";
+        public static final String SILENCE_FREE_TIME_EVENTS = "SILENCE_FREE_TIME_EVENTS";
+        public static final String SILENCE_ALL_DAY_EVENTS = "SILENCE_ALL_DAY_EVENTS";
         public static final String RINGER_TYPE = "RINGER_TYPE";
         public static final String ADJUST_MEDIA = "ADJUST_MEDIA";
         public static final String ADJUST_ALARM = "ADJUST_ALARM";
@@ -283,10 +279,10 @@ public class Prefs {
         public static final String LOOKAHEAD_DAYS = "LOOKAHEAD_DAYS";
         public static final String DO_NOT_DISTURB = "DO_NOT_DISTURB";
         public static final String SELECTED_CALENDARS = "SELECTED_CALENDARS";
-//		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
-public static final String SYNC_ALL_CALENDARS = "SYNC_ALL_CALENDARS";
+        public static final String SYNC_ALL_CALENDARS = "SYNC_ALL_CALENDARS";
 
-
-        //@formatter:on
+        //TODO work these in as replacements for adjusting alarm and media volume
+        public static final String SILENCE_MEDIA = "SILENCE_MEDIA";
+        public static final String SILENCE_ALARM = "SILENCE_ALARM";
     }
 }

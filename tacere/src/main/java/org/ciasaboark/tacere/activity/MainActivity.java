@@ -100,7 +100,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                 new IntentFilter("custom-event-name"));
 
         // display the updates dialog if it hasn't been shown yet
-        UpdatesActivity.showUpdatesDialogIfNeeded(this);
+        ShowUpdatesActivity.showUpdatesDialogIfNeeded(this);
 
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);

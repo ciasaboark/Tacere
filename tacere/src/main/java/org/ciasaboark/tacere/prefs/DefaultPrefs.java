@@ -6,19 +6,19 @@
 package org.ciasaboark.tacere.prefs;
 
 class DefaultPrefs {
-    public static final boolean DO_NOT_DISTURB = false;
+    static final boolean DO_NOT_DISTURB = false;
     // whether or not the service should run
-    static final Boolean IS_ACTIVATED = true;
+    static final boolean IS_SERVICE_ACTIVATED = true;
     // events marked as free time (or available) will be silenced
-    static final Boolean SILENCE_FREE_TIME = true;
+    static final boolean SILENCE_FREE_TIME_EVENTS = true;
     // events marked as all day will be silenced
-    static final Boolean SILENCE_ALL_DAY = false;
+    static final boolean SILENCE_ALL_DAY_EVENTS = false;
     // 1: normal mode, 2: vibrate, 3: silent
     static final int RINGER_TYPE = 3;
     // change the media volume during an event
-    static final Boolean ADJUST_MEDIA = false;
+    static final boolean ADJUST_MEDIA = false;
     // change the alarm volume during an event
-    static final Boolean ADJUST_ALARM = false;
+    static final boolean ADJUST_ALARM = false;
     static final int MEDIA_VOLUME = 10;
     static final int ALARM_VOLUME = 6;
     static final int QUICK_SILENCE_MINUTES = 30;
@@ -27,4 +27,8 @@ class DefaultPrefs {
     static final int BUFFER_MINUTES = 5;
     // how many days to merge when a calendar change is detected
     static final int LOOKAHEAD_DAYS = 7;
+
+    //TODO work these in to replace adjusting media and alarm volume with complete silencing
+    static final boolean SILENCE_MEDIA = false;
+    static final boolean SILENCE_ALARM = false;
 }

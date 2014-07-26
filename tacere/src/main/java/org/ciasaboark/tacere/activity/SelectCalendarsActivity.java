@@ -32,12 +32,11 @@ import org.ciasaboark.tacere.service.RequestTypes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalendarsActivity extends Activity {
+public class SelectCalendarsActivity extends Activity {
     @SuppressWarnings("unused")
     private final String TAG = "CalendarsActivity";
     //    private final ArrayList<CheckBox> calendarIds = new ArrayList<CheckBox>();
     private Prefs prefs;
-    private DatabaseInterface databaseInterface;
     private List<SimpleCalendar> simpleCalendars;
 
     @Override
@@ -45,25 +44,24 @@ public class CalendarsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_calendars);
         prefs = new Prefs(getApplicationContext());
-        databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
+        DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
         simpleCalendars = databaseInterface.getCalendarIdList();
 
-        final Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
-        syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
         final RelativeLayout syncAllCalendarsBox = (RelativeLayout) findViewById(R.id.sync_all_calendars);
         syncAllCalendarsBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                syncAllCalendarsSwitch.setChecked(!syncAllCalendarsSwitch.isChecked());
+                prefs.setSyncAllCalendars(!prefs.shouldAllCalendarsBeSynced());
+                drawSyncBoxSwitch();
                 drawListView();
             }
         });
-
 
         Button okButton = (Button) findViewById(R.id.calendars_ok);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
                 if (syncAllCalendarsSwitch.isChecked()) {
                     prefs.setSyncAllCalendars(true);
                 } else {
@@ -89,6 +87,14 @@ public class CalendarsActivity extends Activity {
                 finish();
             }
         });
+
+        drawSyncBoxSwitch();
+        drawListView();
+    }
+
+    private void drawSyncBoxSwitch() {
+        final Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
+        syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
     }
 
     private void drawListView() {
@@ -144,15 +150,17 @@ public class CalendarsActivity extends Activity {
             TextView calendarAccountName = (TextView) row.findViewById(R.id.calendar_account);
             CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
 
-
             try {
                 SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
                 calendarColor.setBackgroundColor(simpleCalendar.getColor());
                 calendarName.setText(simpleCalendar.getDisplayName());
                 calendarAccountName.setText(simpleCalendar.getAccountName());
-                calendarCheckBox.setSelected(simpleCalendar.isSelected());
+                if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
+                    calendarCheckBox.setChecked(true);
+                }
             } catch (IndexOutOfBoundsException e) {
                 Log.e(TAG, "error getting calendar at position " + position);
+                calendarName.setText("Error getting calendar for this position, check logcat");
             }
 
             return row;

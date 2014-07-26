@@ -122,7 +122,7 @@ public class AboutActivity extends Activity {
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
             case R.id.action_about_updates:
-                UpdatesActivity.showUpdatesDialog(getApplication());
+                ShowUpdatesActivity.showUpdatesDialog(getApplication());
                 return true;
         }
         return super.onOptionsItemSelected(item);

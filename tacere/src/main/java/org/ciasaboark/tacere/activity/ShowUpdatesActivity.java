@@ -19,21 +19,21 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.versioning.Versioning;
 
-public class UpdatesActivity extends Activity {
+public class ShowUpdatesActivity extends Activity {
     private Prefs prefs;
     private boolean showingUpdatesFromMainScreen = false;
 
     public static void showUpdatesDialogIfNeeded(Context ctx) {
         boolean showUpdates = shouldChangelogForCurrentAppVersionBeShown(ctx);
         if (showUpdates) {
-            Intent updatesIntent = new Intent(ctx, UpdatesActivity.class);
+            Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
             updatesIntent.putExtra("initiator", "main"); //TODO need a better way of keeping track of who started this activity
             ctx.startActivity(updatesIntent);
         }
     }
 
     public static void showUpdatesDialog(Context ctx) {
-        Intent updatesIntent = new Intent(ctx, UpdatesActivity.class);
+        Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
         ctx.startActivity(updatesIntent);
     }
 

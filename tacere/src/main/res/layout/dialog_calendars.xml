@@ -7,7 +7,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="vertical">
 
     <TextView
@@ -43,13 +43,13 @@
     <ListView
         android:id="@+id/calendar_listview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="317dp"/>
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="36dp">
 
-        <Button
+    <Button
             android:id="@+id/calendars_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

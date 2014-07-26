@@ -398,7 +398,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void onClickSelectCalendars(View v) {
-        Intent i = new Intent(this, CalendarsActivity.class);
+        Intent i = new Intent(this, SelectCalendarsActivity.class);
         startActivity(i);
     }
 
