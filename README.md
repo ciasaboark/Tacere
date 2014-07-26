@@ -16,6 +16,12 @@ Tacere is available on the <a href="https://play.google.com/store/apps/details?i
 ![Main Activity](https://raw.github.com/ciasaboark/Tacere/master/web/device-2013-07-29-211444.png)
 ![Notification](https://raw.github.com/ciasaboark/Tacere/master/web/device-2013-08-01-143025.png)
 
+###Beta Screenshots
+![Main Activity](https://raw.githubusercontent.com/ciasaboark/Tacere/master/web/beta/device-2014-07-15-130905.png)
+![Notification](https://raw.githubusercontent.com/ciasaboark/Tacere/master/web/beta/device-2014-07-15-130929.png)
+![Settings](https://raw.githubusercontent.com/ciasaboark/Tacere/master/web/beta/device-2014-07-15-131107.png)
+![About](https://raw.githubusercontent.com/ciasaboark/Tacere/master/web/beta/device-2014-07-16-213719.png)
+
 ###License
 Tacere is released under the BSD license
 Copyright (c) 2013, Jonathan Nelson
