@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
-import org.ciasaboark.tacere.activity.CalEvent;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class RingerStateManager {
@@ -49,20 +49,20 @@ public class RingerStateManager {
     public int getStoredRingerState() {
         SharedPreferences preferences = context.getSharedPreferences(
                 "org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-        return preferences.getInt("curRinger", CalEvent.RINGER.UNDEFINED);
+        return preferences.getInt("curRinger", SimpleCalendarEvent.RINGER.UNDEFINED);
     }
 
     public void setPhoneRinger(int ringerType) {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         switch (ringerType) {
-            case CalEvent.RINGER.VIBRATE:
+            case SimpleCalendarEvent.RINGER.VIBRATE:
                 audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 break;
-            case CalEvent.RINGER.SILENT:
+            case SimpleCalendarEvent.RINGER.SILENT:
                 audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 break;
-            case CalEvent.RINGER.IGNORE:
+            case SimpleCalendarEvent.RINGER.IGNORE:
                 //ignore this event
                 break;
             default:
@@ -83,8 +83,8 @@ public class RingerStateManager {
 
     public void restorePhoneRinger() {
         int storedRinger = getStoredRingerState();
-        if (storedRinger == CalEvent.RINGER.UNDEFINED) {
-            storedRinger = CalEvent.RINGER.NORMAL;
+        if (storedRinger == SimpleCalendarEvent.RINGER.UNDEFINED) {
+            storedRinger = SimpleCalendarEvent.RINGER.NORMAL;
         }
         setPhoneRinger(storedRinger);
     }

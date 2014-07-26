@@ -62,7 +62,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerVertical="false"
             android:layout_gravity="fill_horizontal|center_horizontal"
-            android:layout_toLeftOf="@id/ringerState"
+            android:layout_toLeftOf="@id/calendar_checkbox"
             android:clickable="false"
             android:focusable="false"
             android:focusableInTouchMode="false"

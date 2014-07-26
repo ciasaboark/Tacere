@@ -3,13 +3,13 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.database;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class CalEvent {
+public class SimpleCalendarEvent {
     public static final long MILLISECONDS_IN_SECOND = 1000;
     public static final long MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
     public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
@@ -27,8 +27,8 @@ public class CalEvent {
     private boolean isAllDay;
 
 
-    public CalEvent(int calendarId, int instanceId, String title, long begin, long end,
-                    String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+    public SimpleCalendarEvent(int calendarId, int instanceId, String title, long begin, long end,
+                               String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
         this.title = title;
@@ -156,11 +156,11 @@ public class CalEvent {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof CalEvent)) {
+        if (!(o instanceof SimpleCalendarEvent)) {
             return false;
         }
 
-        return getId().equals(((CalEvent) o).getId());
+        return getId().equals(((SimpleCalendarEvent) o).getId());
     }
 
     public class RINGER {

@@ -22,7 +22,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/activateServiceDescription"
@@ -43,20 +43,19 @@
             android:clickable="false"/>
 
     </RelativeLayout>
+
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="outsideOverlay" >
-
+        android:scrollbarStyle="outsideOverlay">
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
+            android:orientation="vertical">
 
 
             <TextView
@@ -67,6 +66,33 @@
                 android:padding="16dp"
                 android:text="@string/pref_general_header"
                 android:textColor="@color/section_text_color"/>
+
+            <RelativeLayout
+                android:id="@+id/select_calendar_box"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:onClick="onClickSelectCalendars"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/calendar_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/calendar_icon"
+                    android:paddingLeft="16dp"/>
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/calendar_icon"
+                    android:paddingLeft="16dp"
+                    android:text="@string/select_calendars"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/settings_ringerBox"
@@ -93,7 +119,7 @@
                     android:id="@+id/settings_ringerTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
+                    android:layout_toRightOf="@+id/settings_ringerIcon"
                     android:clickable="false"
                     android:text="@string/pref_ringer_type_title"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -103,7 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/settings_ringerTitle"
-                    android:layout_marginLeft="50dp"
+                    android:layout_toRightOf="@+id/settings_ringerIcon"
                     android:clickable="false"
                     android:text="@string/placeholder"
                     android:textAppearance="?android:attr/textAppearanceSmall"/>
@@ -164,14 +190,14 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:clickable="false"
-                     />
+                    />
 
                 <TextView
                     android:id="@+id/settings_mediaText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/pref_media_volume"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             </RelativeLayout>
 
@@ -199,7 +225,7 @@
                     android:layout_centerHorizontal="false"
                     android:layout_centerVertical="true"
                     android:clickable="false"
-                     />
+                    />
 
                 <TextView
                     android:id="@+id/settings_alarmText"
@@ -240,14 +266,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/pref_quick_silence"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <TextView
                     android:id="@+id/quickSilenceDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/placeholder"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
             </LinearLayout>
 
             <TextView
@@ -280,10 +306,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/pref_advanced_sub"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
             </LinearLayout>
 
         </LinearLayout>
 
-</ScrollView>
+    </ScrollView>
 </LinearLayout>

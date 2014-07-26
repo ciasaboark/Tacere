@@ -118,6 +118,7 @@
     <string name="notification_event_enable">Enable auto silencing</string>
     <string name="startQuicksilence">Quicksilence</string>
     <string name="cancelQuicksilence">Cancel quicksilence</string>
+    <string name="select_calendars">Select Calendars</string>
     <!-- first parameter is string for hour length and "hour" -->
 
 </resources>

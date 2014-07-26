@@ -6,7 +6,7 @@
 package org.ciasaboark.tacere.database;
 
 
-public class Calendar {
+public class SimpleCalendar {
     private final long id;
     private final String account_name;
     private final String display_name;
@@ -14,7 +14,7 @@ public class Calendar {
     private final int color;
     private boolean isSelected = false;
 
-    public Calendar(long id, String account_name, String display_name, String owner_name, int color) {
+    public SimpleCalendar(long id, String account_name, String display_name, String owner_name, int color) {
         if (account_name == null || display_name == null || owner_name == null) {
             throw new IllegalArgumentException("can not initialize Calendar object will null values");
         }

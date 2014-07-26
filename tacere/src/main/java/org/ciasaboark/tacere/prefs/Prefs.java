@@ -54,6 +54,8 @@ public class Prefs {
     }
 
     public void setSelectedCalendars(List<Long> calendarList) {
+        //setting specific calendar ids to sync should clear the preference to sync all calendars
+        setSyncAllCalendars(false);
         String commaSeparatedCalIds = "";
         for (long id : calendarList) {
             commaSeparatedCalIds += id + ",";
@@ -61,13 +63,13 @@ public class Prefs {
         editor.putString(Keys.SELECTED_CALENDARS, commaSeparatedCalIds).commit();
     }
 
-    public void setSyncAllCalendars() {
-        //TODO
+    public void setSyncAllCalendars(boolean syncAllCalendars) {
+        editor.putBoolean(Keys.SYNC_ALL_CALENDARS, syncAllCalendars).commit();
     }
 
     public boolean shouldAllCalendarsBeSynced() {
-        //TODO
-        return false;
+        boolean syncAllCalendars = sharedPreferences.getBoolean(Keys.SYNC_ALL_CALENDARS, false);
+        return syncAllCalendars;
     }
 
     public Boolean getIsServiceActivated() {
@@ -282,6 +284,7 @@ public class Prefs {
         public static final String DO_NOT_DISTURB = "DO_NOT_DISTURB";
         public static final String SELECTED_CALENDARS = "SELECTED_CALENDARS";
 //		public static final String UPDATES_CHECKBOX 	= "UPDATES_CHECKBOX";
+public static final String SYNC_ALL_CALENDARS = "SYNC_ALL_CALENDARS";
 
 
         //@formatter:on

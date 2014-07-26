@@ -13,13 +13,16 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="fill_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:padding="16dp"
         android:text="Select calendars to sync"/>
 
     <RelativeLayout
+        android:id="@+id/sync_all_calendars"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="fill_parent"
@@ -27,7 +30,7 @@
             android:text="Select all calendars"/>
 
         <Switch
-            android:id="@+id/calendars_sync_all"
+            android:id="@+id/sync_all_calendars_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

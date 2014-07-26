@@ -15,7 +15,6 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
-import org.ciasaboark.tacere.activity.CalEvent;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.ArrayDeque;
@@ -104,9 +103,9 @@ public class DatabaseInterface {
     }
 
     public void setRingerType(int eventId, int ringerType) {
-        if (ringerType != CalEvent.RINGER.IGNORE && ringerType != CalEvent.RINGER.NORMAL
-                && ringerType != CalEvent.RINGER.SILENT && ringerType != CalEvent.RINGER.UNDEFINED
-                && ringerType != CalEvent.RINGER.VIBRATE) {
+        if (ringerType != SimpleCalendarEvent.RINGER.IGNORE && ringerType != SimpleCalendarEvent.RINGER.NORMAL
+                && ringerType != SimpleCalendarEvent.RINGER.SILENT && ringerType != SimpleCalendarEvent.RINGER.UNDEFINED
+                && ringerType != SimpleCalendarEvent.RINGER.VIBRATE) {
             throw new IllegalArgumentException("unknown ringer type: " + ringerType);
         }
         String mSelectionClause = Columns._ID + " = ?";
@@ -117,22 +116,22 @@ public class DatabaseInterface {
                 mSelectionClause, mSelectionArgs);
     }
 
-    public Deque<CalEvent> syncAndGetAllActiveEvents() {
+    public Deque<SimpleCalendarEvent> syncAndGetAllActiveEvents() {
         // sync the db and prune old events
         syncCalendarDb();
 
-        Deque<CalEvent> events = new ArrayDeque<CalEvent>();
+        Deque<SimpleCalendarEvent> events = new ArrayDeque<SimpleCalendarEvent>();
         Cursor cursor = getEventCursor();
         long beginTime = System.currentTimeMillis()
-                - (CalEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
+                - (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
         long endTime = System.currentTimeMillis()
-                + (CalEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
+                + (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
 
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
                 try {
-                    CalEvent e = getEvent(id);
+                    SimpleCalendarEvent e = getEvent(id);
                     if (e.isActiveBetween(beginTime, endTime)) {
                         events.addLast(e);
                     }
@@ -159,14 +158,14 @@ public class DatabaseInterface {
         // update(n) will also remove all events not found in the next n days, so we
         // + need to keep this in sync with the users preferences.
         update(prefs.getLookaheadDays());
-        pruneEventsBefore(System.currentTimeMillis() - CalEvent.MILLISECONDS_IN_MINUTE
+        pruneEventsBefore(System.currentTimeMillis() - SimpleCalendarEvent.MILLISECONDS_IN_MINUTE
                 * (long) prefs.getBufferMinutes());
     }
 
     // returns the event that matches the given Instance id, null if no match
-    public CalEvent getEvent(int id) throws NoSuchEventException {
+    public SimpleCalendarEvent getEvent(int id) throws NoSuchEventException {
         Cursor cursor = getEventCursor();
-        CalEvent thisEvent = null;
+        SimpleCalendarEvent thisEvent = null;
         if (cursor.moveToFirst()) {
             do {
                 int eventID = cursor.getInt(cursor.getColumnIndex(Columns._ID));
@@ -181,7 +180,7 @@ public class DatabaseInterface {
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
 
-                    thisEvent = new CalEvent(cal_id, eventID, title, begin, end, description,
+                    thisEvent = new SimpleCalendarEvent(cal_id, eventID, title, begin, end, description,
                             displayColor, isFreeTime, isAllDay);
                     thisEvent.setRingerType(ringerType);
                     break;
@@ -235,12 +234,12 @@ public class DatabaseInterface {
                 // database
 
 
-                CalEvent newEvent = new CalEvent(cal_id, id, event_title, event_begin, event_end,
+                SimpleCalendarEvent newEvent = new SimpleCalendarEvent(cal_id, id, event_title, event_begin, event_end,
                         event_description, event_displayColor, (event_availability == 0),
                         (event_allDay == 1));
 
                 try {
-                    CalEvent oldEvent = getEvent(id);
+                    SimpleCalendarEvent oldEvent = getEvent(id);
                     newEvent.setRingerType(oldEvent.getRingerType());
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
@@ -279,8 +278,8 @@ public class DatabaseInterface {
                 begin, end);
     }
 
-    public List<Calendar> getCalendarIdList() {
-        List<Calendar> calendarIds = new ArrayList<Calendar>();
+    public List<SimpleCalendar> getCalendarIdList() {
+        List<SimpleCalendar> simpleCalendarIds = new ArrayList<SimpleCalendar>();
         final String[] projection = {
                 Calendars._ID,
                 Calendars.ACCOUNT_NAME,
@@ -304,8 +303,8 @@ public class DatabaseInterface {
                 String owner = cursor.getString(projection_owner);
                 int color = cursor.getInt(projection_color);
                 try {
-                    Calendar c = new Calendar(id, accountName, displayName, owner, color);
-                    calendarIds.add(c);
+                    SimpleCalendar c = new SimpleCalendar(id, accountName, displayName, owner, color);
+                    simpleCalendarIds.add(c);
                 } catch (IllegalArgumentException e) {
                     Log.w(TAG, "android database supplied bad values calendar info for id " + id +
                             ", accountName:" + accountName + "displayName:" + displayName +
@@ -318,10 +317,10 @@ public class DatabaseInterface {
         }
 
 
-        return calendarIds;
+        return simpleCalendarIds;
     }
 
-    private boolean isEventValidToInsert(CalEvent e) {
+    private boolean isEventValidToInsert(SimpleCalendarEvent e) {
         boolean eventIsValid = false;
         if (e.getTitle() != null && e.getId() != null && e.getBegin() != null && e.getEnd() != null
                 && e.isFreeTime() != null && e.isAllDay() != null) {
@@ -330,7 +329,7 @@ public class DatabaseInterface {
         return eventIsValid;
     }
 
-    public void insertEvent(CalEvent e) {
+    public void insertEvent(SimpleCalendarEvent e) {
         if (!isEventValidToInsert(e)) {
             throw new IllegalArgumentException(
                     "DatabaseInterface:insertEvent given an event with blank values");
@@ -399,11 +398,11 @@ public class DatabaseInterface {
      *
      * @return the next event in the database, or null if there are no events
      */
-    public CalEvent nextEvent() {
+    public SimpleCalendarEvent nextEvent() {
         // sync the database and prune old events first to make sure that we don't return an event
         // that has already expired
         syncCalendarDb();
-        CalEvent nextEvent = null;
+        SimpleCalendarEvent nextEvent = null;
 
         Cursor cursor = getOrderedEventCursor(Columns.BEGIN);
         if (cursor.moveToFirst()) {

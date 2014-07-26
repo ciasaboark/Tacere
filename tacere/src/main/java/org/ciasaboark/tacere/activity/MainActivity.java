@@ -46,6 +46,7 @@ import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
@@ -338,10 +339,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
-            CalEvent thisEvent = databaseInterface.getEvent((int) id);
+            SimpleCalendarEvent thisEvent = databaseInterface.getEvent((int) id);
             int nextRingerType = thisEvent.getRingerType() + 1;
-            if (nextRingerType > CalEvent.RINGER.SILENT) {
-                nextRingerType = CalEvent.RINGER.NORMAL;
+            if (nextRingerType > SimpleCalendarEvent.RINGER.SILENT) {
+                nextRingerType = SimpleCalendarEvent.RINGER.NORMAL;
             }
             databaseInterface.setRingerType((int) id, nextRingerType);
             eventListview.getAdapter().getView(position, view, eventListview);
@@ -376,8 +377,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         boolean result = false;
 
         try {
-            CalEvent thisEvent = databaseInterface.getEvent((int) id);
-            databaseInterface.setRingerType((int) id, CalEvent.RINGER.UNDEFINED);
+            SimpleCalendarEvent thisEvent = databaseInterface.getEvent((int) id);
+            databaseInterface.setRingerType((int) id, SimpleCalendarEvent.RINGER.UNDEFINED);
             eventListview.getAdapter().getView(position, view, eventListview);
             Toast.makeText(parent.getContext(), thisEvent.getTitle() + " reset to default ringer",
                     Toast.LENGTH_SHORT).show();
@@ -434,7 +435,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         public void bindView(View view, final Context context, final Cursor cursor) {
             int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
             try {
-                CalEvent thisEvent = databaseInterface.getEvent(id);
+                SimpleCalendarEvent thisEvent = databaseInterface.getEvent(id);
                 // a text view to show the event title
                 TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
                 if (descriptionTV != null) {
@@ -516,20 +517,20 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             Drawable icon;
 
             switch (ringerType) {
-                case CalEvent.RINGER.NORMAL:
+                case SimpleCalendarEvent.RINGER.NORMAL:
                     icon = getResources().getDrawable(R.drawable.ic_state_normal);
                     break;
-                case CalEvent.RINGER.SILENT:
+                case SimpleCalendarEvent.RINGER.SILENT:
                     icon = getResources().getDrawable(R.drawable.ic_state_silent);
                     break;
-                case CalEvent.RINGER.VIBRATE:
+                case SimpleCalendarEvent.RINGER.VIBRATE:
                     icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                     break;
-                case CalEvent.RINGER.UNDEFINED:
+                case SimpleCalendarEvent.RINGER.UNDEFINED:
                     int defaultRinger = prefs.getRingerType();
                     icon = getRingerIcon(defaultRinger, null);
                     break;
-                case CalEvent.RINGER.IGNORE:
+                case SimpleCalendarEvent.RINGER.IGNORE:
                 default:
                     // events that should be ignored are given a blank icon
                     icon = getResources().getDrawable(R.drawable.blank);
@@ -543,7 +544,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             return icon;
         }
 
-        private boolean shouldEventSilence(CalEvent event) {
+        private boolean shouldEventSilence(SimpleCalendarEvent event) {
             boolean eventMatches = false;
 
             // if the event is marked as busy (but is not an all day event)
@@ -567,7 +568,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
             // events with a custom ringer set should always use that ringer
             boolean isCustomRingerSet = false;
-            if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
+            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
                 isCustomRingerSet = true;
             }
 
@@ -576,26 +577,26 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             }
 
             //all of this is negated if the event has been marked to be ignored
-            if (event.getRingerType() == CalEvent.RINGER.IGNORE) {
+            if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
                 eventMatches = false;
             }
 
             return eventMatches;
         }
 
-        private Drawable getEventIcon(CalEvent event) {
+        private Drawable getEventIcon(SimpleCalendarEvent event) {
             Drawable icon;
             int defaultColor = getResources().getColor(R.color.icon_accent);
 
             if (shouldEventSilence(event)) {
-                if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
+                if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
                     // a custom ringer has been applied
                     icon = getRingerIcon(event.getRingerType(), getResources().getColor(R.color.primary));
                 } else {
-                    icon = getRingerIcon(CalEvent.RINGER.UNDEFINED, defaultColor);
+                    icon = getRingerIcon(SimpleCalendarEvent.RINGER.UNDEFINED, defaultColor);
                 }
             } else {
-                icon = getRingerIcon(CalEvent.RINGER.IGNORE, null);
+                icon = getRingerIcon(SimpleCalendarEvent.RINGER.IGNORE, null);
             }
 
             return icon;

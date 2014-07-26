@@ -5,20 +5,20 @@
 
 package org.ciasaboark.tacere.manager;
 
-import org.ciasaboark.tacere.activity.CalEvent;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 
 public class ActiveEventManager {
-    private static CalEvent activeEvent = null;
+    private static SimpleCalendarEvent activeEvent = null;
 
     private ActiveEventManager() {
         // ♫ can't touch this ♫
     }
 
-    public static void setActiveEvent(CalEvent e) {
+    public static void setActiveEvent(SimpleCalendarEvent e) {
         activeEvent = e;
     }
 
-    public static boolean isActiveEvent(CalEvent e) {
+    public static boolean isActiveEvent(SimpleCalendarEvent e) {
         if (activeEvent == null || e == null) {
             return false;
         }

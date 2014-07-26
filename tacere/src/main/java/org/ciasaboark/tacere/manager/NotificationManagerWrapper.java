@@ -15,8 +15,8 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import org.ciasaboark.tacere.R;
-import org.ciasaboark.tacere.activity.CalEvent;
 import org.ciasaboark.tacere.activity.MainActivity;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 import org.ciasaboark.tacere.service.ResetEventService;
@@ -92,7 +92,7 @@ public class NotificationManagerWrapper {
      *
      * @param event the CalEvent that is currently active.
      */
-    public void displayEventNotification(CalEvent event) {
+    public void displayEventNotification(SimpleCalendarEvent event) {
         if (event == null) {
             throw new IllegalArgumentException(TAG + " displayEventNotification given null event");
         }
@@ -111,7 +111,7 @@ public class NotificationManagerWrapper {
      * @param event the CalEvent that is currently active
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void displayNewEventNotification(CalEvent event) {
+    private void displayNewEventNotification(SimpleCalendarEvent event) {
         // clicking the notification should take the user to the app
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -128,7 +128,7 @@ public class NotificationManagerWrapper {
                 .setSmallIcon(R.drawable.small_mono).setAutoCancel(false).setOnlyAlertOnce(true)
                 .setOngoing(true).setContentIntent(pendIntent);
 
-        if (event.getRingerType() != CalEvent.RINGER.IGNORE) {
+        if (event.getRingerType() != SimpleCalendarEvent.RINGER.IGNORE) {
             // this intent will be attached to the button on the notification
             Intent skipEventIntent = new Intent(context, SkipEventService.class);
             skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", event.getId());
@@ -162,7 +162,7 @@ public class NotificationManagerWrapper {
      *
      * @param event the CalEvent that is currently active.
      */
-    private void displayCompatEventNotification(CalEvent event) {
+    private void displayCompatEventNotification(SimpleCalendarEvent event) {
         // clicking the notification should take the user to the app
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

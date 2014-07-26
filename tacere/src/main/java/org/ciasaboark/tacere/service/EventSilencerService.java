@@ -12,8 +12,8 @@ import android.os.Vibrator;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.ciasaboark.tacere.activity.CalEvent;
 import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.NotificationManagerWrapper;
@@ -120,14 +120,13 @@ public class EventSilencerService extends IntentService {
         ringerState.storeRingerStateIfNeeded();
         stateManager.setServiceState(ServiceStates.QUICKSILENCE);
 
-        long wakeAt = System.currentTimeMillis() + (CalEvent.MILLISECONDS_IN_MINUTE
+        long wakeAt = System.currentTimeMillis() + (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE
                 * durationMinutes);
-        // TODO check here to make sure scheduling is working
         alarmManager.scheduleCancelQuickSilenceAlarmAt(wakeAt);
 
 
         //quick silence requests are always explicitly request to silence the ringer
-        ringerState.setPhoneRinger(CalEvent.RINGER.SILENT);
+        ringerState.setPhoneRinger(SimpleCalendarEvent.RINGER.SILENT);
         vibrate();
         notificationManager.displayQuickSilenceNotification(durationMinutes);
     }
@@ -153,9 +152,9 @@ public class EventSilencerService extends IntentService {
     }
 
     private void checkForActiveEventsAndSilence() {
-        Deque<CalEvent> events = databaseInterface.syncAndGetAllActiveEvents();
+        Deque<SimpleCalendarEvent> events = databaseInterface.syncAndGetAllActiveEvents();
         boolean foundEvent = false;
-        for (CalEvent event : events) {
+        for (SimpleCalendarEvent event : events) {
             if (shouldEventSilence(event)) {
                 foundEvent = true;
                 ActiveEventManager.setActiveEvent(event);
@@ -180,14 +179,14 @@ public class EventSilencerService extends IntentService {
             long wakeAt;
 
             if (!events.isEmpty()) {
-                CalEvent lastActiveEvent = events.getLast();
+                SimpleCalendarEvent lastActiveEvent = events.getLast();
                 wakeAt = lastActiveEvent.getEnd();
             } else {
-                CalEvent nextInactiveEvent = databaseInterface.nextEvent();
+                SimpleCalendarEvent nextInactiveEvent = databaseInterface.nextEvent();
                 if (nextInactiveEvent != null) {
-                    wakeAt = nextInactiveEvent.getBegin() - (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes());
+                    wakeAt = nextInactiveEvent.getBegin() - (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes());
                 } else {
-                    wakeAt = System.currentTimeMillis() + CalEvent.MILLISECONDS_IN_DAY;
+                    wakeAt = System.currentTimeMillis() + SimpleCalendarEvent.MILLISECONDS_IN_DAY;
 
                 }
             }
@@ -196,15 +195,15 @@ public class EventSilencerService extends IntentService {
         }
     }
 
-    private int getBestRingerType(CalEvent e) {
+    private int getBestRingerType(SimpleCalendarEvent e) {
         int eventRingerType = e.getRingerType();
-        if (eventRingerType == CalEvent.RINGER.UNDEFINED) {
+        if (eventRingerType == SimpleCalendarEvent.RINGER.UNDEFINED) {
             eventRingerType = prefs.getRingerType();
         }
         return eventRingerType;
     }
 
-    private void silenceEventAndShowNotification(CalEvent event) {
+    private void silenceEventAndShowNotification(SimpleCalendarEvent event) {
         ringerState.storeRingerStateIfNeeded();
         ringerState.setPhoneRinger(getBestRingerType(event));
 
@@ -219,7 +218,7 @@ public class EventSilencerService extends IntentService {
         // the extra ten seconds is to make sure that the event ending is pushed into the
         // correct minute
         long wakeAt = event.getEnd()
-                + (CalEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
+                + (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
         alarmManager.scheduleNormalWakeAt(wakeAt);
     }
 
@@ -256,7 +255,7 @@ public class EventSilencerService extends IntentService {
     // check all events in the database to see if they match the user's criteria
     // + for silencing. Returns the first event that matches. Does not check
     // + whether that event is active
-    private boolean shouldEventSilence(CalEvent event) {
+    private boolean shouldEventSilence(SimpleCalendarEvent event) {
         boolean eventMatches = false;
 
         // if the event is marked as busy (but is not an all day event)
@@ -280,7 +279,7 @@ public class EventSilencerService extends IntentService {
 
         // events with a custom ringer set should always use that ringer
         boolean isCustomRingerSet = false;
-        if (event.getRingerType() != CalEvent.RINGER.UNDEFINED) {
+        if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
             isCustomRingerSet = true;
         }
 
@@ -289,8 +288,17 @@ public class EventSilencerService extends IntentService {
         }
 
         //all of this is negated if the event has been marked to be ignored
-        if (event.getRingerType() == CalEvent.RINGER.IGNORE) {
+        if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
             eventMatches = false;
+        }
+
+        //only silence events if they belong to one of the selected calendars
+        //TODO this might be needed, selecting calendars should strip all events not in one of the
+        //selected calendars, so we should not have to check it here
+        if (!prefs.shouldAllCalendarsBeSynced()) {
+            if (!prefs.getSelectedCalendars().contains(event.getId())) {
+                eventMatches = false;
+            }
         }
 
         return eventMatches;
