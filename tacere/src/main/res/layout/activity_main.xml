@@ -19,7 +19,7 @@
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
         android:scrollbarStyle="outsideOverlay"
-        android:visibility="visible"/>
+        android:visibility="invisible"/>
 
     <LinearLayout
         android:id="@+id/error_box"
@@ -31,9 +31,9 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="100dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <ImageView
+    <ImageView
             android:id="@+id/calendar_icon"
             android:layout_width="64dp"
             android:layout_height="64dp"
@@ -60,9 +60,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginRight="16dp"
+        >
 
-        <ImageButton
+    <ImageButton
             android:id="@+id/quickSilenceButton"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"

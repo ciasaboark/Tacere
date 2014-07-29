@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -77,6 +78,7 @@ public class SettingsActivity extends Activity {
 
     private void drawAllWidgets() {
         drawServiceWidget();
+        drawCalendarWidgets();
         drawRingerWidgets();
         drawDoNotDisturbWidgets();
         drawMediaWidgets();
@@ -92,6 +94,13 @@ public class SettingsActivity extends Activity {
         } else {
             serviceActivatedSwitch.setChecked(false);
         }
+    }
+
+    private void drawCalendarWidgets() {
+        ImageView calendarIcon = (ImageView) findViewById(id.calendar_icon);
+        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
+        d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+        calendarIcon.setImageDrawable(d);
     }
 
     private void drawRingerWidgets() {

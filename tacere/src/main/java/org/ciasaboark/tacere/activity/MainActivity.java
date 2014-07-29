@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Outline;
+import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -323,6 +324,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
     private void drawError() {
         LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
+        ImageView calendarIcon = (ImageView) findViewById(R.id.calendar_icon);
+        Drawable d = calendarIcon.getDrawable().mutate();
+        d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+        calendarIcon.setImageDrawable(d);
         errorBox.setVisibility(View.VISIBLE);
     }
 
