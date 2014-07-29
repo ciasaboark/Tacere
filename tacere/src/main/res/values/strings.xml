@@ -34,18 +34,18 @@
     <string name="pref_service">Service</string>
     <string name="pref_ringer_type_title">Ringer Type</string>
     <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
-    <string name="pref_media_volume">Adjust Media Volume</string>
-    <string name="pref_alarm_volume">Adjust Alarm Volume</string>
+    <string name="pref_media_volume">Silence Media Volume</string>
+    <string name="pref_alarm_volume">Silence Alarm Volume</string>
     <string name="pref_quick_silence">Adjust Quick Silence Duration</string>
-    <string name="pref_advanced_title">Advanced Settings</string>
+    <string name="pref_advanced_title">Additional Settings</string>
 
     <string name="pref_service_enabled">Automatic Silencing</string>
     <string name="pref_service_disabled">Automatic Silencing</string>
-    <string name="pref_ringer_type_normal">Phone will ring as normal</string>
-    <string name="pref_ringer_type_vibrate">Phone will vibrate</string>
-    <string name="pref_ringer_type_silent">Phone will silence</string>
+    <string name="pref_ringer_type_normal">Device will ring as normal during events</string>
+    <string name="pref_ringer_type_vibrate">Device will vibrate during events</string>
+    <string name="pref_ringer_type_silent">Device will silence during events</string>
     <string name="pref_quicksilent_duration">Quick silencing will last for %1$s%2$d minutes</string>
-    <string name="pref_advanced_sub">Proceed at your own risk</string>
+    <string name="pref_advanced_sub">Intervals and event types</string>
 
 
     <!-- Advanced Settings Activity -->
@@ -107,7 +107,6 @@
     <string name="widget_duration">%1$s%2$d minutes</string>
     <string name="action_add_event">Add Event</string>
     <string name="notification_quicksilence_title">Quick Silence</string>
-    <string name="pref_ringer_type">Ringer Type</string>
     <string name="settings_restored">Settings have been restored to defaults</string>
     <string name="notification_time_and_unit">%1$d %2$s</string>
     <string name="notification_quicksilence_description">Silencing for %1$s%2$s. Touch to cancel.</string>

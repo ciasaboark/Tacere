@@ -87,13 +87,10 @@ public class SettingsActivity extends Activity {
     private void drawServiceWidget() {
         //the service state toggle
         Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
-        TextView serviceTV = (TextView) findViewById(id.activateServiceDescription);
         if (prefs.getIsServiceActivated()) {
             serviceActivatedSwitch.setChecked(true);
-            serviceTV.setText(R.string.pref_service_enabled);
         } else {
             serviceActivatedSwitch.setChecked(false);
-            serviceTV.setText(R.string.pref_service_disabled);
         }
     }
 
@@ -411,7 +408,7 @@ public class SettingsActivity extends Activity {
         };
 
         AlertDialog alert = new AlertDialog.Builder(this)
-                .setTitle(R.string.pref_ringer_type)
+                .setTitle(R.string.pref_ringer_type_title)
                 .setSingleChoiceItems(ringerTypes, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
