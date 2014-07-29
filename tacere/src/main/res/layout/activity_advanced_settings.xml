@@ -1,5 +1,11 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<ScrollView
     android:id="@+id/scrollView2"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:scrollbarAlwaysDrawVerticalTrack="true"
@@ -15,10 +21,10 @@
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/pref_events_header"
-            android:textColor="@color/section_text_color"
+            android:background="@color/section_background"
             android:padding="16dp"
-            android:background="@color/section_background"/>
+            android:text="@string/pref_events_header"
+            android:textColor="@color/section_text_color"/>
 
 
         <RelativeLayout
@@ -58,6 +64,8 @@
                 android:clickable="false" />
 
         </RelativeLayout>
+
+        <View style="@style/Divider"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -101,10 +109,10 @@
             android:id="@+id/textView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/pref_quick_silence_header"
-            android:textColor="@color/section_text_color"
+            android:background="@color/section_background"
             android:padding="16dp"
-            android:background="@color/section_background"/>
+            android:text="@string/pref_quick_silence_header"
+            android:textColor="@color/section_text_color"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -130,6 +138,8 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
 
+        <View style="@style/Divider"/>
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -153,6 +163,8 @@
                 android:text="@string/placeholder"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
+
+        <View style="@style/Divider"/>
 
     </LinearLayout>
 
