@@ -3,6 +3,8 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_NAME = "magic mongoose"
@@ -10,13 +12,13 @@ def DEBUG_VERSION_NAME = "beta"
 def VERSION_CODE = 5
 
 android {
-    compileSdkVersion 'android-L'
+    compileSdkVersion 19
     buildToolsVersion '20.0.0'
 
     defaultConfig {
         applicationId "org.ciasaboark.tacere"
         minSdkVersion 14
-        targetSdkVersion 'android-L'
+        targetSdkVersion 19
         //TODO get current version from versioning
         versionCode VERSION_CODE
         versionName APP_VERSION_NAME

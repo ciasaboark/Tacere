@@ -32,7 +32,7 @@
     <string name="pref_advance_header">Advanced</string>
 
     <string name="pref_service">Service</string>
-    <string name="pref_ringer_type_title">Ringer Type</string>
+    <string name="pref_ringer_type_title">Default Ringer Type</string>
     <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
     <string name="pref_media_volume">Silence Media Volume</string>
     <string name="pref_alarm_volume">Silence Alarm Volume</string>

@@ -79,7 +79,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_centerVertical="true"
-                    android:background="@drawable/calendar_icon"
+                    android:background="@drawable/ic_state_normal"
                     android:paddingLeft="16dp"/>
 
                 <TextView

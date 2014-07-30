@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
 <resources>
 
     <!--
@@ -5,8 +10,11 @@
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- API 14 theme customizations can go here. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:textColor">@color/textcolor</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:actionMenuTextColor">@color/textColorMenu</item>
+        <item name="android:actionMenuTextAppearance">@color/menu_text</item>
     </style>
 
 </resources>
