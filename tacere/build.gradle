@@ -30,7 +30,7 @@ android {
             buildConfigField "String", "APP_VERSION_MAJOR", "2"
             buildConfigField "String", "APP_VERSION_MINOR", "0"
             buildConfigField "String", "APP_VERSION_RELEASE", "5"
-            buildConfigField "String", "APP_VERSION_NAME", APP_VERSION_NAME
+            buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\"";
         }
         debug {
             runProguard false
