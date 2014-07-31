@@ -288,10 +288,10 @@ public class DatabaseInterface {
                 Calendars.CALENDAR_COLOR
         };
         final int projection_id = 0;
-        final int projection_accountName = 2;
-        final int projection_displayname = 3;
-        final int projection_owner = 4;
-        final int projection_color = 5;
+        final int projection_accountName = 1;
+        final int projection_displayname = 2;
+        final int projection_owner = 3;
+        final int projection_color = 4;
         Cursor cursor;
         ContentResolver cr = context.getContentResolver();
         cursor = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);

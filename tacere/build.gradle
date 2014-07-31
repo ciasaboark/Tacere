@@ -5,11 +5,13 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_NAME = "magic mongoose"
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 5
+def VERSION_CODE = 7
 
 android {
     compileSdkVersion 18
@@ -27,9 +29,9 @@ android {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "APP_VERSION_MAJOR", "2"
-            buildConfigField "String", "APP_VERSION_MINOR", "0"
-            buildConfigField "String", "APP_VERSION_RELEASE", "5"
+            buildConfigField "String", "APP_VERSION_MAJOR", "\"2\""
+            buildConfigField "String", "APP_VERSION_MINOR", "\"1\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\"";
         }
         debug {
