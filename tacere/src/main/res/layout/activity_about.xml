@@ -14,7 +14,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/about_header"
-            android:elevation="4dp"
             android:measureWithLargestChild="false"
             android:background="@color/header_background"
             android:padding="16dp">
@@ -67,7 +66,6 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="fill_horizontal"
         android:layout_marginLeft="0dp"
-        android:elevation="0dp"
         android:layout_below="@+id/about_header"/>
 
 </RelativeLayout>

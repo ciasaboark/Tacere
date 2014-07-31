@@ -33,14 +33,13 @@
         android:orientation="horizontal"
         android:visibility="visible">
 
-    <ImageView
+        <ImageView
             android:id="@+id/calendar_icon"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp"
-            android:background="@drawable/calendar_icon"
-            android:tint="@color/primary"/>
+            android:background="@drawable/calendar_icon"/>
 
         <TextView
             android:id="@+id/event_list_error"
@@ -71,7 +70,6 @@
             android:layout_marginBottom="16dp"
             android:layout_marginRight="16dp"
             android:background="@drawable/action_button_quicksilence"
-            android:elevation="2dp"
             android:src="@drawable/ic_state_silent"
             android:text="@string/placeholder"
             android:visibility="gone"/>
@@ -84,7 +82,6 @@
             android:layout_marginBottom="16dp"
             android:layout_marginRight="16dp"
             android:background="@drawable/action_button_cancel_quicksilence"
-            android:elevation="2dp"
             android:src="@drawable/ic_state_normal"
             android:text="@string/placeholder"
             android:visibility="gone"/>

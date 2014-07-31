@@ -7,16 +7,18 @@ package org.ciasaboark.tacere.activity;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Outline;
+//import android.graphics.Outline;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -66,7 +68,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     private ListView eventListview = null;
     private int listViewIndex = 0;
     private Prefs prefs;
-    private Outline outline;
+//    private Outline outline;
 
 
     @Override
@@ -118,12 +120,12 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         quickSilenceImageButton.setVisibility(View.GONE);
         cancelQuickSilenceButton.setVisibility(View.GONE);
 
-        //Draw a round outline on the buttons
-        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
-        outline = new Outline();
-        outline.setOval(0, 0, size, size);
-        quickSilenceImageButton.setOutline(outline);
-        cancelQuickSilenceButton.setOutline(outline);
+//        //Draw a round outline on the buttons
+//        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
+//        outline = new Outline();
+//        outline.setOval(0, 0, size, size);
+//        quickSilenceImageButton.setOutline(outline);
+//        cancelQuickSilenceButton.setOutline(outline);
 
         quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -322,12 +324,19 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         listview.setVisibility(View.GONE);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void drawError() {
         LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
         ImageView calendarIcon = (ImageView) findViewById(R.id.calendar_icon);
-        Drawable d = calendarIcon.getDrawable().mutate();
-        d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-        calendarIcon.setImageDrawable(d);
+        Drawable d = calendarIcon.getBackground();
+        Drawable mutable = d.mutate();
+        mutable.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+        if (apiLevelAvailable >= 16) {
+            calendarIcon.setBackground(mutable);
+        } else {
+            calendarIcon.setBackgroundDrawable(mutable);
+        }
         errorBox.setVisibility(View.VISIBLE);
     }
 

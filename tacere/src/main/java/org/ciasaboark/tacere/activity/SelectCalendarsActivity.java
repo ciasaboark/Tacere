@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -53,7 +55,7 @@ public class SelectCalendarsActivity extends Activity {
             public void onClick(View view) {
                 prefs.setSyncAllCalendars(!prefs.shouldAllCalendarsBeSynced());
                 drawSyncBoxSwitch();
-                drawListView();
+                drawDialogBody();
             }
         });
 
@@ -89,12 +91,45 @@ public class SelectCalendarsActivity extends Activity {
         });
 
         drawSyncBoxSwitch();
-        drawListView();
+        drawDialogBodyOrError();
     }
 
     private void drawSyncBoxSwitch() {
         final Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
         syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
+    }
+
+    private void drawDialogBodyOrError() {
+        if (simpleCalendars.isEmpty()) {
+            drawError();
+        } else {
+            drawDialogBody();
+        }
+    }
+
+    private void drawError() {
+        hideDialogBody();
+        LinearLayout error = (LinearLayout)findViewById(R.id.error_box);
+        error.setVisibility(View.VISIBLE);
+
+    }
+
+    public void onClickAddAccount(View v) {
+        Intent i = new Intent(Settings.ACTION_ADD_ACCOUNT);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+    }
+
+    private void hideDialogBody() {
+        LinearLayout layout = (LinearLayout)findViewById(R.id.calendars_box);
+        layout.setVisibility(View.GONE);
+    }
+
+    private void drawDialogBody() {
+        hideError();
+        drawSyncBoxSwitch();
+        drawListView();
+        drawListView();
     }
 
     private void drawListView() {
@@ -115,6 +150,11 @@ public class SelectCalendarsActivity extends Activity {
         }
     }
 
+    private void hideError() {
+        LinearLayout error = (LinearLayout)findViewById(R.id.error_box);
+        error.setVisibility(View.GONE);
+    }
+
     private void restartService() {
         Intent i = new Intent(this, EventSilencerService.class);
         i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
@@ -123,7 +163,7 @@ public class SelectCalendarsActivity extends Activity {
 
     @Override
     public void onStart() {
-
+        super.onStart();
     }
 
     private class SimpleCalendarListAdapter extends ArrayAdapter<SimpleCalendar> {

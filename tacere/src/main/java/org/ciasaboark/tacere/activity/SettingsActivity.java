@@ -23,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
@@ -83,7 +82,7 @@ public class SettingsActivity extends Activity {
         drawDoNotDisturbWidgets();
         drawMediaWidgets();
         drawAlarmWidgets();
-        drawQuickSilenceWidget();
+
     }
 
     private void drawServiceWidget() {
@@ -100,7 +99,7 @@ public class SettingsActivity extends Activity {
         ImageView calendarIcon = (ImageView) findViewById(id.calendar_icon);
         Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
         d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-        calendarIcon.setImageDrawable(d);
+        calendarIcon.setBackgroundDrawable(d);
     }
 
     private void drawRingerWidgets() {
@@ -267,16 +266,7 @@ public class SettingsActivity extends Activity {
         });
     }
 
-    private void drawQuickSilenceWidget() {
-        //the quick silence button
-        TextView quickTV = (TextView) findViewById(id.quickSilenceDescription);
-        String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
-        String hrs = "";
-        if (prefs.getQuickSilenceHours() > 0) {
-            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
-        }
-        quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
-    }
+
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("deprecation")
@@ -290,52 +280,54 @@ public class SettingsActivity extends Activity {
 
     @TargetApi(21)
     private void animateRevealView(View v) {
-        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
-            // previously invisible view
-            v.setVisibility(View.VISIBLE);
-
-            // get the center for the clipping circle
-            int cx = (v.getLeft() + v.getRight()) / 2;
-            int cy = (v.getTop() + v.getBottom()) / 2;
-
-            // get the final radius for the clipping circle
-            int finalRadius = v.getWidth();
-
-            // create and start the animator for this view
-            // (the start radius is zero)
-            android.animation.ValueAnimator anim =
-                    android.view.ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
-            anim.start();
-        }
+//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+//        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
+//            // previously invisible view
+//            v.setVisibility(View.VISIBLE);
+//
+//            // get the center for the clipping circle
+//            int cx = (v.getLeft() + v.getRight()) / 2;
+//            int cy = (v.getTop() + v.getBottom()) / 2;
+//
+//            // get the final radius for the clipping circle
+//            int finalRadius = v.getWidth();
+//
+//            // create and start the animator for this view
+//            // (the start radius is zero)
+//            android.animation.ValueAnimator anim =
+//                    android.view.ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
+//            anim.start();
+//        }
+        v.setVisibility(View.VISIBLE);
     }
 
     @TargetApi(21)
     private void animateHideView(final View v) {
-        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
-            // get the center for the clipping circle
-            int cx = (v.getLeft() + v.getRight()) / 2;
-            int cy = (v.getTop() + v.getBottom()) / 2;
-
-            // get the initial radius for the clipping circle
-            int initialRadius = v.getWidth();
-
-            // create the animation (the final radius is zero)
-            ValueAnimator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, initialRadius, 0);
-
-            // make the view invisible when the animation is done
-            anim.addListener(new android.animation.AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(android.animation.Animator animation) {
-                    super.onAnimationEnd(animation);
-                    v.setVisibility(View.GONE);
-                }
-            });
-
-            // start the animation
-            anim.start();
-        }
+//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
+//        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
+//            // get the center for the clipping circle
+//            int cx = (v.getLeft() + v.getRight()) / 2;
+//            int cy = (v.getTop() + v.getBottom()) / 2;
+//
+//            // get the initial radius for the clipping circle
+//            int initialRadius = v.getWidth();
+//
+//            // create the animation (the final radius is zero)
+//            ValueAnimator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, initialRadius, 0);
+//
+//            // make the view invisible when the animation is done
+//            anim.addListener(new android.animation.AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(android.animation.Animator animation) {
+//                    super.onAnimationEnd(animation);
+//                    v.setVisibility(View.GONE);
+//                }
+//            });
+//
+//            // start the animation
+//            anim.start();
+//        }
+        v.setVisibility(View.GONE);
     }
 
     public void onClickAdjustAlarm(View v) {
@@ -416,7 +408,7 @@ public class SettingsActivity extends Activity {
                 "Silent",
         };
 
-        AlertDialog alert = new AlertDialog.Builder(this)
+        final AlertDialog alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.pref_ringer_type_title)
                 .setSingleChoiceItems(ringerTypes, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
                     @Override
@@ -424,66 +416,12 @@ public class SettingsActivity extends Activity {
                         prefs.setRingerType(which + 1);
                         drawRingerWidgets();
                         restartEventSilencerService();
+                        dialog.dismiss();
                     }
                 })
                 .create();
 
         alert.show();
-    }
-
-
-    public void onClickQuickSilence(View v) {
-        LayoutInflater inflator = LayoutInflater.from(this);
-        @SuppressLint("Java")
-        View view = inflator.inflate(R.layout.dialog_quicksilent, null);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.notification_quicksilence_title);
-        builder.setView(view);
-
-        final NumberPicker hourP = (NumberPicker) view.findViewById(R.id.hourPicker);
-        final NumberPicker minP = (NumberPicker) view.findViewById(R.id.minutePicker);
-
-        String[] hours = new String[25];
-        String[] minutes = new String[59];
-
-        for (int i = 0; i < hours.length; i++) {
-            hours[i] = Integer.toString(i);
-        }
-
-        int i = 0;
-        while (i < minutes.length) {
-            minutes[i] = Integer.toString(++i);
-        }
-
-
-        hourP.setMinValue(1);
-        hourP.setMaxValue(hours.length - 1);
-        hourP.setWrapSelectorWheel(false);
-        hourP.setDisplayedValues(hours);
-        hourP.setValue(prefs.getQuickSilenceHours() + 1);
-
-        minP.setMinValue(1);
-        minP.setMaxValue(minutes.length - 1);
-        minP.setWrapSelectorWheel(false);
-        minP.setDisplayedValues(minutes);
-        minP.setValue(prefs.getQuicksilenceMinutes() + 1);
-
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                prefs.setQuickSilenceHours(hourP.getValue() - 1);
-                prefs.setQuicksilenceMinutes(minP.getValue());
-                drawQuickSilenceWidget();
-            }
-        });
-
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //do nothing
-            }
-        });
-
-        builder.show();
     }
 
     public void onClickAdvancedSettings(View v) {

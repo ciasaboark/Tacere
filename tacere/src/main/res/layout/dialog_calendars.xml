@@ -18,36 +18,93 @@
         android:padding="16dp"
         android:text="Select calendars to sync"/>
 
-    <RelativeLayout
-        android:id="@+id/sync_all_calendars"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:id="@+id/calendars_box" >
 
-        <TextView
+        <RelativeLayout
+            android:id="@+id/sync_all_calendars"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Select all calendars"/>
+            android:padding="16dp">
 
-        <Switch
-            android:id="@+id/sync_all_calendars_switch"
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Select all calendars"/>
+
+            <Switch
+                android:id="@+id/sync_all_calendars_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:checked="false"/>
+
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/calendar_listview"
             android:layout_width="wrap_content"
+            android:layout_height="317dp"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/error_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="96dp"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/calendar_icon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/calendar_icon"/>
+
+            <TextView
+                android:id="@+id/calendar_list_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/calendar_list_error_text"
+                />
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:checked="false"/>
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/calendar_error_add_account"
+                android:id="@+id/add_account_button"
+                android:clickable="true"
+                android:layout_centerInParent="true"
+                android:onClick="onClickAddAccount" />
+        </RelativeLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <ListView
-        android:id="@+id/calendar_listview"
-        android:layout_width="wrap_content"
-        android:layout_height="317dp"/>
+
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="36dp">
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp">
 
     <Button
             android:id="@+id/calendars_cancel"

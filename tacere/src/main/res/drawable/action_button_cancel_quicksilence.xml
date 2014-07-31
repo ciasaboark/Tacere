@@ -2,14 +2,8 @@
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-        android:color="?android:colorControlHighlight">
-    <item>
-        <shape android:shape="oval">
-            <solid
-                android:background="@drawable/ic_state_normal"
-                android:color="@color/cancel_quicksilence"/>
-        </shape>
-    </item>
-</ripple>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid
+        android:background="@drawable/ic_state_normal"
+        android:color="@color/cancel_quicksilence"/>
+</shape>

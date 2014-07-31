@@ -5,9 +5,6 @@
 
 <resources>
     <style name="AppTheme" parent="android:Theme.Holo.Light">
-        <item name="android:colorPrimary">@color/primary</item>
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorAccent">@color/accent</item>
         <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:actionMenuTextColor">@color/textColorMenu</item>
@@ -23,7 +20,6 @@
     <style name="Header_Switch" parent="AppTheme">
         <item name="android:colorBackground">@color/header_background</item>
         <item name="android:background">@color/header_background</item>
-
         <item name="android:textColor">@color/header_text_color</item>
     </style>
 

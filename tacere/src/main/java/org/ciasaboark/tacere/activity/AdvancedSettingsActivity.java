@@ -5,6 +5,7 @@
 
 package org.ciasaboark.tacere.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +40,7 @@ public class AdvancedSettingsActivity extends Activity {
         prefs = new Prefs(this);
         // Show the Up button in the action bar.
         setupActionBar();
-        refreshDisplay();
+        drawAllWidgets();
     }
 
     /**
@@ -54,11 +56,12 @@ public class AdvancedSettingsActivity extends Activity {
 
     }
 
-    private void refreshDisplay() {
+    private void drawAllWidgets() {
         drawFreeTimeWidgets();
         drawSilenceAllDayWidgets();
         drawEventBufferWidgets();
         drawLookaheadWidgets();
+        drawQuickSilenceWidget();
     }
 
     private void drawLookaheadWidgets() {
@@ -99,6 +102,17 @@ public class AdvancedSettingsActivity extends Activity {
             freeCB.setChecked(false);
             freeTV.setText(R.string.pref_silence_free_disabled);
         }
+    }
+
+    private void drawQuickSilenceWidget() {
+        //the quick silence button
+        TextView quickTV = (TextView) findViewById(R.id.quickSilenceDescription);
+        String quicksilenceText = getResources().getString(R.string.pref_quicksilent_duration);
+        String hrs = "";
+        if (prefs.getQuickSilenceHours() > 0) {
+            hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
+        }
+        quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
     }
 
     @Override
@@ -148,6 +162,60 @@ public class AdvancedSettingsActivity extends Activity {
         prefs.setSilenceAllDayEvents(!prefs.getSilenceAllDayEvents());
         drawSilenceAllDayWidgets();
         restartEventSilencerService();
+    }
+
+    public void onClickQuickSilence(View v) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        @SuppressLint("Java")
+        View view = inflater.inflate(R.layout.dialog_quicksilent, null);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.notification_quicksilence_title);
+        builder.setView(view);
+
+        final NumberPicker hourP = (NumberPicker) view.findViewById(R.id.hourPicker);
+        final NumberPicker minP = (NumberPicker) view.findViewById(R.id.minutePicker);
+
+        String[] hours = new String[25];
+        String[] minutes = new String[59];
+
+        for (int i = 0; i < hours.length; i++) {
+            hours[i] = Integer.toString(i);
+        }
+
+        int i = 0;
+        while (i < minutes.length) {
+            minutes[i] = Integer.toString(++i);
+        }
+
+
+        hourP.setMinValue(1);
+        hourP.setMaxValue(hours.length - 1);
+        hourP.setWrapSelectorWheel(false);
+        hourP.setDisplayedValues(hours);
+        hourP.setValue(prefs.getQuickSilenceHours() + 1);
+
+        minP.setMinValue(1);
+        minP.setMaxValue(minutes.length - 1);
+        minP.setWrapSelectorWheel(false);
+        minP.setDisplayedValues(minutes);
+        minP.setValue(prefs.getQuicksilenceMinutes());
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                prefs.setQuickSilenceHours(hourP.getValue() - 1);
+                prefs.setQuicksilenceMinutes(minP.getValue());
+                drawQuickSilenceWidget();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //do nothing
+            }
+        });
+
+        builder.show();
     }
 
     public void onClickBufferMinutes(View v) {

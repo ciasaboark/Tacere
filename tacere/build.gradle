@@ -12,13 +12,13 @@ def DEBUG_VERSION_NAME = "beta"
 def VERSION_CODE = 5
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 18
     buildToolsVersion '20.0.0'
 
     defaultConfig {
         applicationId "org.ciasaboark.tacere"
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 18
         //TODO get current version from versioning
         versionCode VERSION_CODE
         versionName APP_VERSION_NAME

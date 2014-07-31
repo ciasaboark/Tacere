@@ -118,6 +118,8 @@
     <string name="startQuicksilence">Quicksilence</string>
     <string name="cancelQuicksilence">Cancel quicksilence</string>
     <string name="select_calendars">Select Calendars</string>
+    <string name="calendar_list_error_text">No calendar accounts found.  Make sure you have at least one sync account set up.</string>
+    <string name="calendar_error_add_account">Add a sync account</string>
     <!-- first parameter is string for hour length and "hour" -->
 
 </resources>
