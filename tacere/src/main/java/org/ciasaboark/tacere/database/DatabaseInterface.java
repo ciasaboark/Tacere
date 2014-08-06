@@ -31,12 +31,12 @@ public class DatabaseInterface {
             Instances.BEGIN,
             Instances.END,
             Instances.DESCRIPTION,
-            Instances.EVENT_COLOR,
+            Instances.DISPLAY_COLOR,
             Instances.ALL_DAY,
             Instances.AVAILABILITY,
             Instances._ID,
             Events.CALENDAR_ID,
-            Instances.EVENT_ID
+            Instances.EVENT_ID,
     };
 
     private static final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
@@ -168,7 +168,7 @@ public class DatabaseInterface {
             do {
                 int instanceId = cursor.getInt(cursor.getColumnIndex(Columns._ID));
                 if (instanceId == id) {
-                    int cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
                     int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
                     String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
                     long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
@@ -227,7 +227,7 @@ public class DatabaseInterface {
                 int event_allDay = calendarCursor.getInt(col_allDay);
                 int event_availability = calendarCursor.getInt(col_availability);
                 int id = calendarCursor.getInt(col_id);
-                int cal_id = calendarCursor.getInt(col_cal_id);
+                long cal_id = calendarCursor.getInt(col_cal_id);
                 int event_id = calendarCursor.getInt(col_event_id);
 
                 // if the event is already in the local database then we need to preserve

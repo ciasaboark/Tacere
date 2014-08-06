@@ -254,18 +254,7 @@ public class Prefs {
     }
 
     public void restoreDefaultPreferences() {
-        this.setIsServiceActivated(DefaultPrefs.IS_SERVICE_ACTIVATED);
-        this.setSilenceFreeTimeEvents(DefaultPrefs.SILENCE_FREE_TIME_EVENTS);
-        this.setSilenceAllDayEvents(DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
-        this.setRingerType(DefaultPrefs.RINGER_TYPE);
-        this.setAdjustAlarm(DefaultPrefs.ADJUST_ALARM);
-        this.setAdjustMedia(DefaultPrefs.ADJUST_MEDIA);
-        this.setCurAlarmVolume(DefaultPrefs.ALARM_VOLUME);
-        this.setCurMediaVolume(DefaultPrefs.MEDIA_VOLUME);
-        this.setQuickSilenceHours(DefaultPrefs.QUICK_SILENCE_HOURS);
-        this.setQuicksilenceMinutes(DefaultPrefs.QUICK_SILENCE_MINUTES);
-        this.setBufferMinutes(DefaultPrefs.BUFFER_MINUTES);
-        this.setLookaheadDays(DefaultPrefs.LOOKAHEAD_DAYS);
+        sharedPreferences.edit().clear().commit();
     }
 
     public void remove(String key) {

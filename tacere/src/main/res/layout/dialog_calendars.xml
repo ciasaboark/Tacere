@@ -10,6 +10,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+
     <LinearLayout
         android:id="@+id/calendars_box"
         android:layout_width="fill_parent"
@@ -19,26 +20,38 @@
         <RelativeLayout
             android:id="@+id/sync_all_calendars"
             style="@style/Header_Switch"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:clickable="true"
+            android:padding="16dp"
+            android:theme="@style/Header_Switch">
 
-            <TextView
-                android:layout_width="fill_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select all calendars"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sync_all_calendars"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/header_text_color"/>
+            </LinearLayout>
 
             <Switch
                 android:id="@+id/sync_all_calendars_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="false"
-                android:layout_alignParentTop="false"
-                android:checked="false"/>
+                android:layout_centerVertical="true"
+                android:checked="true"
+                android:clickable="false"/>
 
         </RelativeLayout>
+
+        <View style="@style/Divider"/>
+
 
         <ListView
             android:id="@+id/calendar_listview"

@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,49 +15,42 @@
 
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/about_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/about_header"
-            android:measureWithLargestChild="false"
             android:background="@color/header_background"
+            android:measureWithLargestChild="false"
+            android:orientation="horizontal"
             android:padding="16dp">
 
             <ImageView
+                android:id="@+id/imageView"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:id="@+id/imageView"
                 android:background="@drawable/ic_launcher"
                 />
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="64dp"
+                android:orientation="vertical"
                 android:paddingLeft="16dp">
 
                 <TextView
+                    android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="@string/app_name"
-                    android:id="@+id/textView"
-                    android:textStyle="bold"
-                    android:textColor="@color/header_text_color"/>
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/header_text_color"
+                    android:textStyle="bold"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/placeholder"
-                    android:id="@+id/about_version_name"
-                    android:textColor="@color/header_text_color"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/placeholder"
                     android:id="@+id/about_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/header_text_color"/>
             </LinearLayout>
         </LinearLayout>
@@ -64,8 +62,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/about_header"
         android:layout_gravity="fill_horizontal"
-        android:layout_marginLeft="0dp"
-        android:layout_below="@+id/about_header"/>
+        android:layout_marginLeft="0dp"/>
 
 </RelativeLayout>

@@ -24,6 +24,7 @@ import org.ciasaboark.tacere.manager.VolumesManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.Deque;
+import java.util.List;
 
 public class EventSilencerService extends IntentService {
     private static final String TAG = "EventSilencerService";
@@ -287,18 +288,21 @@ public class EventSilencerService extends IntentService {
             eventMatches = true;
         }
 
-        //all of this is negated if the event has been marked to be ignored
-        if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
-            eventMatches = false;
-        }
-
         //only silence events if they belong to one of the selected calendars
         //TODO this might be needed, selecting calendars should strip all events not in one of the
         //selected calendars, so we should not have to check it here
-        if (!prefs.shouldAllCalendarsBeSynced()) {
-            if (!prefs.getSelectedCalendars().contains(event.getId())) {
+        boolean syncAllCalendars = prefs.shouldAllCalendarsBeSynced();
+        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        long calendarId = event.getCalendarId();
+        if (!syncAllCalendars) {
+            if (!calendarsToSync.contains(calendarId)) {
                 eventMatches = false;
             }
+        }
+
+        //all of this is negated if the event has been marked to be ignored
+        if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
+            eventMatches = false;
         }
 
         return eventMatches;

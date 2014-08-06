@@ -12,12 +12,12 @@
 
     <RelativeLayout
         android:id="@+id/settings_serviceBox"
+        style="@style/Header_Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:padding="16dp"
-        android:theme="@style/Header_Switch"
-        >
+        android:theme="@style/Header_Switch">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,6 +43,7 @@
             android:clickable="false"/>
 
     </RelativeLayout>
+
     <View style="@style/Divider"/>
 
 
@@ -283,6 +284,7 @@
                     android:text="@string/pref_advanced_sub"
                     android:textAppearance="?android:attr/textAppearanceSmall"/>
             </LinearLayout>
+
             <View style="@style/Divider"/>
 
         </LinearLayout>

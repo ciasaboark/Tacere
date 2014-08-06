@@ -458,7 +458,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
                 ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar);
                 Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar);
-                Integer displayColor = thisEvent.getDisplayColor();
+                int displayColor = thisEvent.getDisplayColor();
                 coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
                 sidebar.setBackgroundDrawable(coloredSidebar);
 

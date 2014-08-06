@@ -15,7 +15,7 @@ public class SimpleCalendarEvent {
     public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
     @SuppressWarnings("unused")
     private static final String TAG = "CalEvent";
-    private int calendarId;
+    private long calendarId;
     private int instanceId;     //instance ids are unique in repeating events
     private int eventId;        //event ids are shared among repeating events
     private String title;
@@ -28,7 +28,7 @@ public class SimpleCalendarEvent {
     private boolean isAllDay;
 
 
-    public SimpleCalendarEvent(int calendarId, int instanceId, int eventId, String title, long begin, long end,
+    public SimpleCalendarEvent(long calendarId, int instanceId, int eventId, String title, long begin, long end,
                                String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
@@ -55,7 +55,7 @@ public class SimpleCalendarEvent {
         return dateFormatter.format(date);
     }
 
-    public int getCalendarId() {
+    public long getCalendarId() {
         return calendarId;
     }
 

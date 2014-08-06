@@ -8,6 +8,8 @@ package org.ciasaboark.tacere.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -81,7 +84,6 @@ public class SelectCalendarsActivity extends Activity {
     private void drawSyncBoxSwitch() {
         final Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
         syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
-        syncAllCalendarsSwitch.setEnabled(false);
     }
 
     private void drawDialogBodyOrError() {
@@ -133,7 +135,6 @@ public class SelectCalendarsActivity extends Activity {
         });
 
         boolean syncAllCalendars = prefs.shouldAllCalendarsBeSynced();
-        lv.setEnabled(!syncAllCalendars);
         lv.setClickable(!syncAllCalendars);
     }
 
@@ -196,14 +197,17 @@ public class SelectCalendarsActivity extends Activity {
                 LayoutInflater inflator = ((Activity) context).getLayoutInflater();
                 row = inflator.inflate(R.layout.calendar_list_item, parent, false);
             }
-            RelativeLayout calendarColor = (RelativeLayout) row.findViewById(R.id.calendar_color);
             TextView calendarName = (TextView) row.findViewById(R.id.calendar_name);
             TextView calendarAccountName = (TextView) row.findViewById(R.id.calendar_account);
             CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
+            ImageView calendarSidebar = (ImageView) row.findViewById(R.id.calendar_sidebar);
 
             try {
                 SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
-                calendarColor.setBackgroundColor(simpleCalendar.getColor());
+                Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar).mutate();
+                sideBarImage.setColorFilter(simpleCalendar.getColor(), PorterDuff.Mode.MULTIPLY);
+                calendarSidebar.setBackgroundDrawable(sideBarImage); //TODO deprecated method
+
                 calendarName.setText(simpleCalendar.getDisplayName());
                 calendarAccountName.setText(simpleCalendar.getAccountName());
                 List<Long> selectedCalendars = prefs.getSelectedCalendars();
@@ -221,8 +225,9 @@ public class SelectCalendarsActivity extends Activity {
 
             if (prefs.shouldAllCalendarsBeSynced()) {
                 calendarCheckBox.setEnabled(false);
-                calendarAccountName.setEnabled(false);
-                calendarName.setEnabled(false);
+                int disabledTextColor = getResources().getColor(R.color.textColorDisabled);
+                calendarAccountName.setTextColor(disabledTextColor);
+                calendarName.setTextColor(disabledTextColor);
             }
 
             return row;

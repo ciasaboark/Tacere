@@ -11,11 +11,17 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
-def APP_VERSION_NAME = "magic mongoose"
+def APP_VERSION_MAJOR = "2";
+def APP_VERSION_MINOR = "1";
+def APP_VERSION_RELEASE = "0 - beta 3";
+
+def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 8
+def VERSION_CODE = 9
 
 android {
     compileSdkVersion 18
@@ -38,17 +44,17 @@ android {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "APP_VERSION_MAJOR", "\"2\""
-            buildConfigField "String", "APP_VERSION_MINOR", "\"1\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta 2\""
+            buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
+            buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + "\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\"";
         }
         debug {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "APP_VERSION_MAJOR", "\"2\""
-            buildConfigField "String", "APP_VERSION_MINOR", "\"1\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta 2\""
+            buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
+            buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + " - debug\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\"";
         }
     }

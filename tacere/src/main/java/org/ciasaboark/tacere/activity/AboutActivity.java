@@ -75,9 +75,6 @@ public class AboutActivity extends Activity {
         wv.setBackgroundColor(0x00000000);
         wv.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
 
-        TextView versionName = (TextView) findViewById(id.about_version_name);
-        versionName.setText(Versioning.getReleaseName());
-
         TextView versionText = (TextView) findViewById(id.about_version);
         String formattedVersion = String.format(getString(R.string.about_version), Versioning.getVersionCode());
         versionText.setText(formattedVersion);
@@ -93,7 +90,6 @@ public class AboutActivity extends Activity {
         } catch (NullPointerException e) {
             Log.e(TAG, "unable to setup action bar");
         }
-
     }
 
     @Override
