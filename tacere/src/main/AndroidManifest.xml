@@ -68,8 +68,7 @@
             android:theme="@style/Dialog">
         </activity>
         <activity
-            android:name=".activity.SelectCalendarsActivity"
-            android:theme="@style/Dialog">
+            android:name=".activity.SelectCalendarsActivity">
         </activity>
         <activity
             android:name="org.ciasaboark.tacere.activity.AboutLicenseActivity"

@@ -9,13 +9,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by Jonathan Nelson on 8/5/14.
- */
 class EventDatabaseOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_EVENTS = "events";
     private static final String DB_NAME = "events.sqlite";
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     public EventDatabaseOpenHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
@@ -24,11 +21,11 @@ class EventDatabaseOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + Columns._ID + " integer primary key," +
-                Columns.TITLE + " varchar(100)," + Columns.DESCRIPTION + " varchar(100)," +
-                Columns.BEGIN + " integer," + Columns.END + " integer," +
-                Columns.IS_ALLDAY + " integer," + Columns.IS_FREETIME + " integer," +
-                Columns.RINGER_TYPE + " integer," + Columns.DISPLAY_COLOR + " integer," +
-                Columns.CAL_ID + " integer," + Columns.EVENT_ID + "integer)");
+                Columns.EVENT_ID + " integer," + Columns.TITLE + " varchar(100)," +
+                Columns.DESCRIPTION + " varchar(100)," + Columns.BEGIN + " integer," +
+                Columns.END + " integer," + Columns.IS_ALLDAY + " integer," +
+                Columns.IS_FREETIME + " integer," + Columns.RINGER_TYPE + " integer," +
+                Columns.DISPLAY_COLOR + " integer," + Columns.CAL_ID + " integer" + ")");
     }
 
     @Override

@@ -250,12 +250,26 @@ public class DatabaseInterface {
                 // inserting an event with the same id will clobber all previous data, completing
                 // the synchronization of this event
                 //TODO insert the event only if that calendar is set to synchronize
-                insertEvent(newEvent);
+                List calendarsToSync = prefs.getSelectedCalendars();
+                long calendarId = newEvent.getCalendarId();
+                if (prefs.shouldAllCalendarsBeSynced() || calendarsToSync.contains(calendarId)) {
+                    insertEvent(newEvent);
+                } else {
+                    removeEventIfExists(newEvent);
+                }
             } while (calendarCursor.moveToNext());
         }
         calendarCursor.close();
 
         pruneRemovedEvents(days);
+    }
+
+    private void removeEventIfExists(SimpleCalendarEvent event) {
+        int instanceId = event.getId();
+        String whereClause = Columns._ID + "=?";
+        String[] whereArgs = new String[]{String.valueOf(instanceId)};
+        int rowsDeleted = eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, whereClause, whereArgs);
+        Log.d(TAG, "deleted " + rowsDeleted + " rows");
     }
 
     // remove all events from the database with an ending date
@@ -344,6 +358,8 @@ public class DatabaseInterface {
         cv.put(Columns.RINGER_TYPE, e.getRingerType());
         cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
         cv.put(Columns.CAL_ID, e.getCalendarId());
+        cv.put(Columns.EVENT_ID, e.getEventId());
+
         if (e.isAllDay()) {
             cv.put(Columns.IS_ALLDAY, 1);
         } else {

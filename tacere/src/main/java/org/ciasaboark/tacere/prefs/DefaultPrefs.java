@@ -31,4 +31,5 @@ class DefaultPrefs {
     //TODO work these in to replace adjusting media and alarm volume with complete silencing
     static final boolean SILENCE_MEDIA = false;
     static final boolean SILENCE_ALARM = false;
+    static final boolean SYNC_ALL_CALENDARS = true;
 }

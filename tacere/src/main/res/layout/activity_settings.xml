@@ -73,7 +73,8 @@
                 android:id="@+id/select_calendar_box"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:onClick="onClickSelectCalendars"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
                 android:padding="16dp">
 
                 <ImageView
@@ -84,7 +85,7 @@
                     android:paddingLeft="16dp"/>
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/calendar_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

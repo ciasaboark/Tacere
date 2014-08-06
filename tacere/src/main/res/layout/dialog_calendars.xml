@@ -5,27 +5,20 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="16dp"
-        android:text="Select calendars to sync"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/calendars_box"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/calendars_box" >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/sync_all_calendars"
+            style="@style/Header_Switch"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
@@ -39,9 +32,10 @@
                 android:id="@+id/sync_all_calendars_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="false"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentTop="false"
                 android:checked="false"/>
 
         </RelativeLayout>
@@ -49,7 +43,7 @@
         <ListView
             android:id="@+id/calendar_listview"
             android:layout_width="wrap_content"
-            android:layout_height="317dp"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
@@ -58,15 +52,16 @@
         android:id="@+id/error_box"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginRight="16dp"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="96dp"
             android:orientation="horizontal">
+
             <ImageView
                 android:id="@+id/calendar_icon"
                 android:layout_width="64dp"
@@ -83,46 +78,23 @@
                 android:text="@string/calendar_list_error_text"
                 />
         </LinearLayout>
+
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <Button
+                android:id="@+id/add_account_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/calendar_error_add_account"
-                android:id="@+id/add_account_button"
-                android:clickable="true"
                 android:layout_centerInParent="true"
-                android:onClick="onClickAddAccount" />
+                android:clickable="true"
+                android:onClick="onClickAddAccount"
+                android:text="@string/calendar_error_add_account"/>
         </RelativeLayout>
 
     </LinearLayout>
 
 
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:layout_marginTop="16dp">
-
-    <Button
-            android:id="@+id/calendars_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/calendars_ok"
-            android:layout_toStartOf="@+id/calendars_ok"
-            android:text="@string/cancel"/>
-
-        <Button
-            android:id="@+id/calendars_ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/ok"/>
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

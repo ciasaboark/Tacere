@@ -56,19 +56,30 @@ public class Prefs {
     public void setSelectedCalendars(List<Long> calendarList) {
         //setting specific calendar ids to sync should clear the preference to sync all calendars
         setSyncAllCalendars(false);
+        List<Long> noDuplicates = new ArrayList<Long>();
+        for (Long l : calendarList) {
+            if (!noDuplicates.contains(l)) {
+                noDuplicates.add(l);
+            }
+        }
+
         String commaSeparatedCalIds = "";
-        for (long id : calendarList) {
+        for (long id : noDuplicates) {
             commaSeparatedCalIds += id + ",";
         }
         editor.putString(Keys.SELECTED_CALENDARS, commaSeparatedCalIds).commit();
     }
 
     public void setSyncAllCalendars(boolean syncAllCalendars) {
+        //syncing all calendars will remove any previously selected calendars to sync
+        if (syncAllCalendars) {
+            setSelectedCalendars(new ArrayList());
+        }
         editor.putBoolean(Keys.SYNC_ALL_CALENDARS, syncAllCalendars).commit();
     }
 
     public boolean shouldAllCalendarsBeSynced() {
-        boolean syncAllCalendars = sharedPreferences.getBoolean(Keys.SYNC_ALL_CALENDARS, false);
+        boolean syncAllCalendars = sharedPreferences.getBoolean(Keys.SYNC_ALL_CALENDARS, DefaultPrefs.SYNC_ALL_CALENDARS);
         return syncAllCalendars;
     }
 

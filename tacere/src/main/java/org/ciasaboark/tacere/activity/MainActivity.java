@@ -39,7 +39,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -457,10 +456,11 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
                     timeTV.setText(timeSB.toString());
                 }
 
-                // a color box to match the calendar color
-                RelativeLayout calColorBox = (RelativeLayout) view.findViewById(R.id.calendarColor);
-                if (calColorBox != null)
-                    calColorBox.setBackgroundColor(thisEvent.getDisplayColor());
+                ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar);
+                Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar);
+                Integer displayColor = thisEvent.getDisplayColor();
+                coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
+                sidebar.setBackgroundDrawable(coloredSidebar);
 
                 // an image button to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);

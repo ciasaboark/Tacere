@@ -9,11 +9,13 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_NAME = "magic mongoose"
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 7
+def VERSION_CODE = 8
 
 android {
     compileSdkVersion 18
@@ -38,7 +40,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "APP_VERSION_MAJOR", "\"2\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"1\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta 2\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\"";
         }
         debug {
@@ -46,7 +48,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "APP_VERSION_MAJOR", "\"2\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"1\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"0 - beta 2\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\"";
         }
     }

@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -31,7 +30,6 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SelectCalendarsActivity extends Activity {
@@ -46,47 +44,16 @@ public class SelectCalendarsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_calendars);
         prefs = new Prefs(getApplicationContext());
-        DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
-        simpleCalendars = databaseInterface.getCalendarIdList();
+        buildSimpleCalendarList();
 
         final RelativeLayout syncAllCalendarsBox = (RelativeLayout) findViewById(R.id.sync_all_calendars);
         syncAllCalendarsBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 prefs.setSyncAllCalendars(!prefs.shouldAllCalendarsBeSynced());
+                buildSimpleCalendarList();
                 drawSyncBoxSwitch();
                 drawDialogBody();
-            }
-        });
-
-        Button okButton = (Button) findViewById(R.id.calendars_ok);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
-                if (syncAllCalendarsSwitch.isChecked()) {
-                    prefs.setSyncAllCalendars(true);
-                } else {
-                    List<Long> calendarsToSync = new ArrayList<Long>();
-                    for (SimpleCalendar simpleCalendar : simpleCalendars) {
-                        if (simpleCalendar.isSelected()) {
-                            calendarsToSync.add(simpleCalendar.getId());
-                        }
-                    }
-                    prefs.setSelectedCalendars(calendarsToSync);
-                }
-
-                //restart the service to make sure that the event list is updated
-                restartService();
-                finish();
-            }
-        });
-
-        Button closeButton = (Button) findViewById(R.id.calendars_cancel);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
             }
         });
 
@@ -94,9 +61,27 @@ public class SelectCalendarsActivity extends Activity {
         drawDialogBodyOrError();
     }
 
+    private void buildSimpleCalendarList() {
+        DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
+        simpleCalendars = databaseInterface.getCalendarIdList();
+        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        for (SimpleCalendar c : simpleCalendars) {
+            if (calendarsToSync.contains(c.getId())) {
+                c.setSelected(true);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        restartService();
+    }
+
     private void drawSyncBoxSwitch() {
         final Switch syncAllCalendarsSwitch = (Switch) findViewById(R.id.sync_all_calendars_switch);
         syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
+        syncAllCalendarsSwitch.setEnabled(false);
     }
 
     private void drawDialogBodyOrError() {
@@ -109,7 +94,7 @@ public class SelectCalendarsActivity extends Activity {
 
     private void drawError() {
         hideDialogBody();
-        LinearLayout error = (LinearLayout)findViewById(R.id.error_box);
+        LinearLayout error = (LinearLayout) findViewById(R.id.error_box);
         error.setVisibility(View.VISIBLE);
 
     }
@@ -121,7 +106,7 @@ public class SelectCalendarsActivity extends Activity {
     }
 
     private void hideDialogBody() {
-        LinearLayout layout = (LinearLayout)findViewById(R.id.calendars_box);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.calendars_box);
         layout.setVisibility(View.GONE);
     }
 
@@ -129,29 +114,55 @@ public class SelectCalendarsActivity extends Activity {
         hideError();
         drawSyncBoxSwitch();
         drawListView();
-        drawListView();
     }
 
     private void drawListView() {
         ListView lv = (ListView) findViewById(R.id.calendar_listview);
         SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, simpleCalendars);
         lv.setAdapter(listAdapter);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 SimpleCalendar simpleCalendar = simpleCalendars.get(position);
                 CheckBox checkBox = (CheckBox) view.findViewById(R.id.calendar_checkbox);
-                checkBox.setChecked(!checkBox.isChecked());
                 simpleCalendar.setSelected(!simpleCalendar.isSelected());
+                checkBox.setChecked(simpleCalendar.isSelected());
+                toggleSyncCalendar(simpleCalendar);
             }
         });
-        if (prefs.shouldAllCalendarsBeSynced()) {
-            lv.setEnabled(false);
+
+        boolean syncAllCalendars = prefs.shouldAllCalendarsBeSynced();
+        lv.setEnabled(!syncAllCalendars);
+        lv.setClickable(!syncAllCalendars);
+    }
+
+    private void toggleSyncCalendar(SimpleCalendar calendar) {
+        if (calendar.isSelected()) {
+            addCalendarToSyncList(calendar);
+        } else {
+            removeCalendarFromSyncList(calendar);
         }
     }
 
+    private void removeCalendarFromSyncList(SimpleCalendar calendar) {
+        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        long calendarId = calendar.getId();
+        calendarsToSync.remove(calendarId);
+        prefs.setSelectedCalendars(calendarsToSync);
+    }
+
+    private void addCalendarToSyncList(SimpleCalendar calendar) {
+        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        long calendarId = calendar.getId();
+        if (!calendarsToSync.contains(calendarId)) {
+            calendarsToSync.add(calendarId);
+        }
+        prefs.setSelectedCalendars(calendarsToSync);
+    }
+
     private void hideError() {
-        LinearLayout error = (LinearLayout)findViewById(R.id.error_box);
+        LinearLayout error = (LinearLayout) findViewById(R.id.error_box);
         error.setVisibility(View.GONE);
     }
 
@@ -195,12 +206,23 @@ public class SelectCalendarsActivity extends Activity {
                 calendarColor.setBackgroundColor(simpleCalendar.getColor());
                 calendarName.setText(simpleCalendar.getDisplayName());
                 calendarAccountName.setText(simpleCalendar.getAccountName());
+                List<Long> selectedCalendars = prefs.getSelectedCalendars();
+                if (selectedCalendars.contains(simpleCalendar.getId())) {
+                    simpleCalendar.setSelected(true);
+                }
+
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
                     calendarCheckBox.setChecked(true);
                 }
             } catch (IndexOutOfBoundsException e) {
                 Log.e(TAG, "error getting calendar at position " + position);
                 calendarName.setText("Error getting calendar for this position, check logcat");
+            }
+
+            if (prefs.shouldAllCalendarsBeSynced()) {
+                calendarCheckBox.setEnabled(false);
+                calendarAccountName.setEnabled(false);
+                calendarName.setEnabled(false);
             }
 
             return row;

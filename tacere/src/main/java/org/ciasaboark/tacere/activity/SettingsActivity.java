@@ -5,8 +5,6 @@
 
 package org.ciasaboark.tacere.activity;
 
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,13 +17,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -45,13 +41,14 @@ import org.ciasaboark.tacere.service.RequestTypes;
 public class SettingsActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String TAG = "Settings";
-    private final Context context = this;
     private final Prefs prefs = new Prefs(this);
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        context = this;
         // Show the Up button in the action bar.
         setupActionBar();
         RelativeLayout serviceToggleBox = (RelativeLayout) findViewById(id.settings_serviceBox);
@@ -97,9 +94,33 @@ public class SettingsActivity extends Activity {
 
     private void drawCalendarWidgets() {
         ImageView calendarIcon = (ImageView) findViewById(id.calendar_icon);
+        TextView calendarTV = (TextView) findViewById(id.calendar_text);
+        RelativeLayout calendarBox = (RelativeLayout) findViewById(id.select_calendar_box);
+
         Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
         d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+
+        calendarBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(context, SelectCalendarsActivity.class);
+                startActivity(i);
+            }
+        });
+
+        if (prefs.getIsServiceActivated()) {
+            int iconColor = getResources().getColor(R.color.primary);
+            d.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            calendarTV.setTextColor(getResources().getColor(R.color.textcolor));
+            calendarBox.setClickable(true);
+        } else {
+            int iconColor = getResources().getColor(android.R.color.darker_gray);
+            d.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+            calendarTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            calendarBox.setClickable(false);
+        }
         calendarIcon.setBackgroundDrawable(d);
+
     }
 
     private void drawRingerWidgets() {
@@ -280,53 +301,11 @@ public class SettingsActivity extends Activity {
 
     @TargetApi(21)
     private void animateRevealView(View v) {
-//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-//        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
-//            // previously invisible view
-//            v.setVisibility(View.VISIBLE);
-//
-//            // get the center for the clipping circle
-//            int cx = (v.getLeft() + v.getRight()) / 2;
-//            int cy = (v.getTop() + v.getBottom()) / 2;
-//
-//            // get the final radius for the clipping circle
-//            int finalRadius = v.getWidth();
-//
-//            // create and start the animator for this view
-//            // (the start radius is zero)
-//            android.animation.ValueAnimator anim =
-//                    android.view.ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
-//            anim.start();
-//        }
         v.setVisibility(View.VISIBLE);
     }
 
     @TargetApi(21)
     private void animateHideView(final View v) {
-//        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-//        if (apiLevelAvailable >= 20) {  //TODO this should really be API 21
-//            // get the center for the clipping circle
-//            int cx = (v.getLeft() + v.getRight()) / 2;
-//            int cy = (v.getTop() + v.getBottom()) / 2;
-//
-//            // get the initial radius for the clipping circle
-//            int initialRadius = v.getWidth();
-//
-//            // create the animation (the final radius is zero)
-//            ValueAnimator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, initialRadius, 0);
-//
-//            // make the view invisible when the animation is done
-//            anim.addListener(new android.animation.AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(android.animation.Animator animation) {
-//                    super.onAnimationEnd(animation);
-//                    v.setVisibility(View.GONE);
-//                }
-//            });
-//
-//            // start the animation
-//            anim.start();
-//        }
         v.setVisibility(View.GONE);
     }
 
@@ -339,6 +318,7 @@ public class SettingsActivity extends Activity {
         prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
         restartEventSilencerService();
         drawServiceWidget();
+        drawCalendarWidgets();
         drawMediaWidgets();
         drawAlarmWidgets();
         drawRingerWidgets();
@@ -396,8 +376,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void onClickSelectCalendars(View v) {
-        Intent i = new Intent(this, SelectCalendarsActivity.class);
-        startActivity(i);
+
     }
 
     public void onClickRingerType(View v) {
