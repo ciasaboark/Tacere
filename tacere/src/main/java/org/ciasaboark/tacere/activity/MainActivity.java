@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-//import android.graphics.Outline;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
@@ -58,6 +57,8 @@ import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+//import android.graphics.Outline;
 
 public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
@@ -120,18 +121,11 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         quickSilenceImageButton.setVisibility(View.GONE);
         cancelQuickSilenceButton.setVisibility(View.GONE);
 
-//        //Draw a round outline on the buttons
-//        int size = getResources().getDimensionPixelSize(R.dimen.fab_size);
-//        outline = new Outline();
-//        outline.setOval(0, 0, size, size);
-//        quickSilenceImageButton.setOutline(outline);
-//        cancelQuickSilenceButton.setOutline(outline);
-
         quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 quickSilenceImageButton.setEnabled(false);
-                flipInAndOut(cancelQuickSilenceButton, quickSilenceImageButton);
+                fadeImageButtonsInAndOut(cancelQuickSilenceButton, quickSilenceImageButton);
                 startQuicksilence();
                 quickSilenceImageButton.setEnabled(true);
             }
@@ -141,31 +135,29 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             @Override
             public void onClick(View view) {
                 cancelQuickSilenceButton.setEnabled(false);
-                flipInAndOut(quickSilenceImageButton, cancelQuickSilenceButton);
+                fadeImageButtonsInAndOut(quickSilenceImageButton, cancelQuickSilenceButton);
                 stopOngoingQuicksilence();
                 cancelQuickSilenceButton.setEnabled(true);
             }
         });
     }
 
-    private void flipInAndOut(final ImageButton flipInImageButton, final ImageButton flipOutImageButton) {
-        flipInImageButton.setAlpha(0f);
-        flipOutImageButton.setAlpha(1f);
-        ObjectAnimator animator = ObjectAnimator.ofFloat(flipOutImageButton, "alpha", 1f, 0f);
+    private void fadeImageButtonsInAndOut(final ImageButton fadeInImageButton, final ImageButton fadeOutImageButton) {
+        fadeInImageButton.setAlpha(0f);
+        fadeOutImageButton.setAlpha(1f);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(fadeOutImageButton, "alpha", 1f, 0f);
         animator.setDuration(1000);
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-//                flipOutImageButton.setOutline(null);
-                flipOutImageButton.setVisibility(View.VISIBLE);
+                fadeOutImageButton.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                flipOutImageButton.setVisibility(View.GONE);
-//                flipOutImageButton.setOutline(outline);
-                flipOutImageButton.setAlpha(1f);
-                flipIn(flipInImageButton);
+                fadeOutImageButton.setVisibility(View.GONE);
+                fadeOutImageButton.setAlpha(1f);
+                flipIn(fadeInImageButton);
             }
 
             @Override
@@ -190,12 +182,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
             public void onAnimationStart(Animator animator) {
                 button.setAlpha(0f);
                 button.setVisibility(View.VISIBLE);
-//                button.setOutline(null);
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-//                button.setOutline(outline);
             }
 
             @Override
@@ -388,24 +378,9 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        boolean result = false;
-
-        try {
-            SimpleCalendarEvent thisEvent = databaseInterface.getEvent((int) id);
-            databaseInterface.setRingerType((int) id, SimpleCalendarEvent.RINGER.UNDEFINED);
-            eventListview.getAdapter().getView(position, view, eventListview);
-            Toast.makeText(parent.getContext(), thisEvent.getTitle() + " reset to default ringer",
-                    Toast.LENGTH_SHORT).show();
-
-            // since the database has changed we need to wake the service
-            restartEventSilencerService();
-            result = true;
-        } catch (NullPointerException e) {
-            removeListViewEvent(view);
-        } catch (NoSuchEventException e) {
-            removeListViewEvent(view);
-        }
-        return result;
+        Toast.makeText(this, "Long click menu not completed yet",
+                Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

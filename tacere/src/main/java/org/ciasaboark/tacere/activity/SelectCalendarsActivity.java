@@ -140,7 +140,7 @@ public class SelectCalendarsActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 SimpleCalendar simpleCalendar = simpleCalendars.get(position);
-                CheckBox checkBox = (CheckBox) findViewById(R.id.calendar_checkbox);
+                CheckBox checkBox = (CheckBox) view.findViewById(R.id.calendar_checkbox);
                 checkBox.setChecked(!checkBox.isChecked());
                 simpleCalendar.setSelected(!simpleCalendar.isSelected());
             }

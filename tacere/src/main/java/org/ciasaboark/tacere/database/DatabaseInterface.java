@@ -10,8 +10,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
@@ -35,12 +35,10 @@ public class DatabaseInterface {
             Instances.ALL_DAY,
             Instances.AVAILABILITY,
             Instances._ID,
-            CalendarContract.Events.CALENDAR_ID
+            Events.CALENDAR_ID,
+            Instances.EVENT_ID
     };
 
-    private static final String DB_NAME = "events.sqlite";
-    private static final int VERSION = 1;
-    private static final String TABLE_EVENTS = "events";
     private static final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
     private static DatabaseInterface instance;
     private static Context context = null;
@@ -50,7 +48,7 @@ public class DatabaseInterface {
 
     private DatabaseInterface(Context context) {
         DatabaseInterface.context = context;
-        EventDatabaseHelper dbHelper = new EventDatabaseHelper(context);
+        EventDatabaseOpenHelper dbHelper = new EventDatabaseOpenHelper(context);
         this.eventsDB = dbHelper.getWritableDatabase();
     }
 
@@ -75,13 +73,13 @@ public class DatabaseInterface {
 
         String[] args = {String.valueOf(begin), String.valueOf(end)};
         String selection = Columns.BEGIN + " >= ? AND " + Columns.END + " <= ?";
-        Cursor cursor = eventsDB.query(TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
+        Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
         return cursor;
     }
 
     private void deleteEventWithId(int id) {
         String selection = Columns._ID + " = ?";
-        eventsDB.delete(TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
+        eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
     }
 
     public boolean isDatabaseEmpty() {
@@ -99,7 +97,7 @@ public class DatabaseInterface {
     }
 
     private Cursor getOrderedEventCursor(String order) {
-        return eventsDB.query(TABLE_EVENTS, null, null, null, null, null, order, null);
+        return eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, null, null, null, null, order, null);
     }
 
     public void setRingerType(int eventId, int ringerType) {
@@ -112,7 +110,7 @@ public class DatabaseInterface {
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
-        eventsDB.update(TABLE_EVENTS, values,
+        eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
                 mSelectionClause, mSelectionArgs);
     }
 
@@ -168,9 +166,10 @@ public class DatabaseInterface {
         SimpleCalendarEvent thisEvent = null;
         if (cursor.moveToFirst()) {
             do {
-                int eventID = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-                if (eventID == id) {
+                int instanceId = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                if (instanceId == id) {
                     int cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
                     String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
                     long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
                     long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
@@ -180,7 +179,7 @@ public class DatabaseInterface {
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
 
-                    thisEvent = new SimpleCalendarEvent(cal_id, eventID, title, begin, end, description,
+                    thisEvent = new SimpleCalendarEvent(cal_id, instanceId, event_id, title, begin, end, description,
                             displayColor, isFreeTime, isAllDay);
                     thisEvent.setRingerType(ringerType);
                     break;
@@ -216,6 +215,7 @@ public class DatabaseInterface {
             int col_availability = calendarCursor.getColumnIndex(projection[6]);
             int col_id = calendarCursor.getColumnIndex(projection[7]);
             int col_cal_id = calendarCursor.getColumnIndex(projection[8]);
+            int col_event_id = calendarCursor.getColumnIndex(projection[9]);
 
             do {
                 // the cursor
@@ -228,13 +228,14 @@ public class DatabaseInterface {
                 int event_availability = calendarCursor.getInt(col_availability);
                 int id = calendarCursor.getInt(col_id);
                 int cal_id = calendarCursor.getInt(col_cal_id);
+                int event_id = calendarCursor.getInt(col_event_id);
 
                 // if the event is already in the local database then we need to preserve
                 // the ringerType, all other values should be read from the system calendar
                 // database
 
 
-                SimpleCalendarEvent newEvent = new SimpleCalendarEvent(cal_id, id, event_title, event_begin, event_end,
+                SimpleCalendarEvent newEvent = new SimpleCalendarEvent(cal_id, id, event_id, event_title, event_begin, event_end,
                         event_description, event_displayColor, (event_availability == 0),
                         (event_allDay == 1));
 
@@ -354,7 +355,7 @@ public class DatabaseInterface {
             cv.put(Columns.IS_FREETIME, 1);
         }
 
-        long rowID = eventsDB.insertWithOnConflict(TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        long rowID = eventsDB.insertWithOnConflict(EventDatabaseOpenHelper.TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
     }
 
@@ -418,26 +419,4 @@ public class DatabaseInterface {
         return nextEvent;
     }
 
-    private class EventDatabaseHelper extends SQLiteOpenHelper {
-
-
-        public EventDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + Columns._ID + " integer primary key," +
-                    Columns.TITLE + " varchar(100)," + Columns.DESCRIPTION + " varchar(100)," +
-                    Columns.BEGIN + " integer," + Columns.END + " integer," +
-                    Columns.IS_ALLDAY + " integer," + Columns.IS_FREETIME + " integer," +
-                    Columns.RINGER_TYPE + " integer," + Columns.DISPLAY_COLOR + " integer," +
-                    Columns.CAL_ID + " integer)");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-            // TODO Add code to update the database from a previous version
-        }
-    }
 }

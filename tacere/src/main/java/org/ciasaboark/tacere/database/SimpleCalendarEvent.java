@@ -16,7 +16,8 @@ public class SimpleCalendarEvent {
     @SuppressWarnings("unused")
     private static final String TAG = "CalEvent";
     private int calendarId;
-    private int instanceId;
+    private int instanceId;     //instance ids are unique in repeating events
+    private int eventId;        //event ids are shared among repeating events
     private String title;
     private long begin;
     private long end; // in milliseconds from epoch
@@ -27,10 +28,11 @@ public class SimpleCalendarEvent {
     private boolean isAllDay;
 
 
-    public SimpleCalendarEvent(int calendarId, int instanceId, String title, long begin, long end,
+    public SimpleCalendarEvent(int calendarId, int instanceId, int eventId, String title, long begin, long end,
                                String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
+        this.eventId = eventId;
         this.title = title;
         this.begin = begin;
         this.end = end;
@@ -55,6 +57,10 @@ public class SimpleCalendarEvent {
 
     public int getCalendarId() {
         return calendarId;
+    }
+
+    public int getEventId() {
+        return eventId;
     }
 
     public String getLocalBeginDate() {
