@@ -8,7 +8,6 @@ package org.ciasaboark.tacere.activity;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.CalendarContract;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,7 +58,7 @@ import java.util.GregorianCalendar;
 
 //import android.graphics.Outline;
 
-public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
+public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
     private EventCursorAdapter cursorAdapter;
@@ -380,9 +380,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         try {
             SimpleCalendarEvent event = databaseInterface.getEvent((int) id);
-            Intent i = new Intent(this, org.ciasaboark.tacere.activity.EventLongclickActivity.class);
-            i.putExtra(EventLongclickActivity.INSTANCE_KEY, event.getId());
-            startActivity(i);
+
+            android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+            EventLongclickFragment dialogFragment = EventLongclickFragment.newInstance(event.getId());
+            dialogFragment.show(fm, "foo");
 
         } catch (NoSuchEventException e) {
             Log.d(TAG, "unable to find event with id " + id);
