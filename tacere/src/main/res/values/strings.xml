@@ -3,8 +3,8 @@
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
 <resources>
+
     <string name="app_name">Tacere</string>
 
     <!-- Main Activity -->
@@ -12,7 +12,6 @@
     <string name="action_about">About</string>
     <string name="upcoming_events">Events in the next %1$d days</string>
     <string name="no_events">No calendar events found for the next %1$s.</string>
-
 
     <!-- About Activity -->
     <string name="title_activity_about">About</string>
@@ -30,7 +29,6 @@
     <string name="pref_volumes_header">Volumes</string>
     <string name="pref_quick_silence_header">Intervals</string>
     <string name="pref_advance_header">Advanced</string>
-
     <string name="pref_service">Service</string>
     <string name="pref_ringer_type_title">Default Ringer Type</string>
     <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
@@ -38,7 +36,6 @@
     <string name="pref_alarm_volume">Silence Alarm Volume</string>
     <string name="pref_quick_silence">Adjust Quick Silence Duration</string>
     <string name="pref_advanced_title">Additional Settings</string>
-
     <string name="pref_service_enabled">Automatic Silencing</string>
     <string name="pref_service_disabled">Automatic Silencing</string>
     <string name="pref_ringer_type_normal">Device will ring as normal during events</string>
@@ -47,18 +44,15 @@
     <string name="pref_quicksilent_duration">Quick silencing will last for %1$s%2$d minutes</string>
     <string name="pref_advanced_sub">Intervals and event types</string>
 
-
     <!-- Advanced Settings Activity -->
     <string name="title_activity_advanced_settings">Advanced Settings</string>
     <string name="pref_events_header">Events</string>
-
     <string name="pref_silence_free_time_title">Available Events</string>
     <string name="pref_silence_all_day_title">All Day Events</string>
     <string name="pref_refresh_interval">Refresh Interval</string>
     <string name="pref_buffer_minutes_title">Event Buffer</string>
     <string name="pref_list_days_title">Lookahead</string>
     <string name="pref_wake_device_title">Wake Device</string>
-
     <string name="pref_silence_free_enabled">Events marked as available will be silenced</string>
     <string name="pref_silence_free_disabled">Events marked as available will be ignored</string>
     <string name="pref_all_day_enabled">All day events will be silenced</string>
@@ -122,5 +116,8 @@
     <string name="calendar_list_error_text">No calendar accounts found.  Make sure you have at least one sync account set up.</string>
     <string name="calendar_error_add_account">Add a sync account</string>
     <!-- first parameter is string for hour length and "hour" -->
+
+    <string name="title_activity_event_longclick">EventLongclickActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

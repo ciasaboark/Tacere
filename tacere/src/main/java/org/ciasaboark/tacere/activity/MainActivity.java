@@ -40,7 +40,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.converter.DateConverter;
@@ -68,6 +67,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
     private ListView eventListview = null;
     private int listViewIndex = 0;
     private Prefs prefs;
+    private long animationDuration = 300;
 //    private Outline outline;
 
 
@@ -145,7 +145,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         fadeInImageButton.setAlpha(0f);
         fadeOutImageButton.setAlpha(1f);
         ObjectAnimator animator = ObjectAnimator.ofFloat(fadeOutImageButton, "alpha", 1f, 0f);
-        animator.setDuration(1000);
+        animator.setDuration(animationDuration);
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -175,7 +175,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
     private void flipIn(final ImageButton button) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
-        animator.setDuration(1000);
+        animator.setDuration(animationDuration);
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -361,9 +361,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
         }
     }
 
+
     private void removeListViewEvent(View view) {
         Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-        anim.setDuration(500);
+        anim.setDuration(animationDuration);
         view.startAnimation(anim);
 
         new Handler().postDelayed(new Runnable() {
@@ -377,8 +378,16 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "Long click menu not completed yet",
-                Toast.LENGTH_SHORT).show();
+        try {
+            SimpleCalendarEvent event = databaseInterface.getEvent((int) id);
+            Intent i = new Intent(this, org.ciasaboark.tacere.activity.EventLongclickActivity.class);
+            i.putExtra(EventLongclickActivity.INSTANCE_KEY, event.getId());
+            startActivity(i);
+
+        } catch (NoSuchEventException e) {
+            Log.d(TAG, "unable to find event with id " + id);
+        }
+
         return true;
     }
 

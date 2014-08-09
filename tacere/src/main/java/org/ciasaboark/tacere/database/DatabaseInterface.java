@@ -160,7 +160,7 @@ public class DatabaseInterface {
                 * (long) prefs.getBufferMinutes());
     }
 
-    // returns the event that matches the given Instance id, null if no match
+    // returns the event that matches the given Instance id, throws NoSuchEventException if no match
     public SimpleCalendarEvent getEvent(int id) throws NoSuchEventException {
         Cursor cursor = getEventCursor();
         SimpleCalendarEvent thisEvent = null;
@@ -291,6 +291,29 @@ public class DatabaseInterface {
     private Cursor getCalendarCursor(long begin, long end) {
         return Instances.query(context.getContentResolver(), projection,
                 begin, end);
+    }
+
+    public String getCalendarNameForId(long id) {
+        String calendarName = "";
+        final String[] projection = {
+                Calendars._ID,
+                Calendars.NAME
+        };
+        final int projection_id = 0;
+        final int projection_name = 1;
+        Cursor cursor;
+        ContentResolver cr = context.getContentResolver();
+        cursor = cr.query(Calendars.CONTENT_URI, projection, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                long calendarId = cursor.getLong(projection_id);
+                if (calendarId == id) {
+                    calendarName = cursor.getString(projection_name);
+                    break;
+                }
+            } while (cursor.moveToNext());
+        }
+        return calendarName;
     }
 
     public List<SimpleCalendar> getCalendarIdList() {

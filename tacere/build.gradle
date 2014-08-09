@@ -13,6 +13,8 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
@@ -31,7 +33,6 @@ android {
         applicationId "org.ciasaboark.tacere"
         minSdkVersion 14
         targetSdkVersion 18
-        //TODO get current version from versioning
         versionCode VERSION_CODE
         versionName APP_VERSION_NAME
     }
