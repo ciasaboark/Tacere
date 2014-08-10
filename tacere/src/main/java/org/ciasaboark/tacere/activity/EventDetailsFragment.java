@@ -32,7 +32,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 /**
  * Created by ciasaboark on 8/9/14.
  */
-public class EventLongclickFragment extends DialogFragment {
+public class EventDetailsFragment extends DialogFragment {
     private static final String TAG = "EventLongClickFragment";
     private DatabaseInterface databaseInterface;
     private Prefs prefs;
@@ -41,8 +41,8 @@ public class EventLongclickFragment extends DialogFragment {
     private Context context = getActivity();
     private View view;
 
-    public static EventLongclickFragment newInstance(int instanceId) {
-        EventLongclickFragment fragment = new EventLongclickFragment();
+    public static EventDetailsFragment newInstance(int instanceId) {
+        EventDetailsFragment fragment = new EventDetailsFragment();
         Bundle args = new Bundle();
         args.putInt("instanceId", instanceId);
         fragment.setArguments(args);
@@ -108,9 +108,8 @@ public class EventLongclickFragment extends DialogFragment {
     }
 
     private void resetAllEvents() {
-        //TODO update all events in local database to have undefined ringer
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), SimpleCalendarEvent.RINGER.UNDEFINED);
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
-        databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
     }
 
     private void saveSettings() {
@@ -124,9 +123,8 @@ public class EventLongclickFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-        //TODO update all events in local database to have same ringer as current event
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
-        databaseInterface.setRingerType(event.getId(), event.getRingerType());
     }
 
     private void setupWidgetsForView() {

@@ -161,6 +161,20 @@ public class DatabaseInterface {
         return events;
     }
 
+    public void setRingerForAllInstancesOfEvent(int eventId, int ringerType) {
+        String[] args = {String.valueOf(eventId)};
+        String selection = Columns.EVENT_ID + " = ?";
+        Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, selection, args, null, null, Columns._ID, null);
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                String name = cursor.getString(cursor.getColumnIndex(Columns.TITLE));   //TODO remove after testing
+                setRingerType(id, ringerType);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
     /**
      * Sync the internal database with the system calendar database. Forward syncing is limited to
      * the period specified in preferences. Old events are pruned.

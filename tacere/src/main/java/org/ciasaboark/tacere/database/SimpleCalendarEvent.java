@@ -146,7 +146,7 @@ public class SimpleCalendarEvent {
         return ringerType;
     }
 
-    public void setRingerType(Integer ringerType) {
+    public void setRingerType(int ringerType) {
         this.ringerType = ringerType;
     }
 
