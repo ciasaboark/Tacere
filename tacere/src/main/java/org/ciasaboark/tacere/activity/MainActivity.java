@@ -388,6 +388,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         } catch (NoSuchEventException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
+        restartEventSilencerService();
 
         return true;
     }
@@ -588,6 +589,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             int defaultColor = getResources().getColor(R.color.icon_accent);
 
             if (shouldEventSilence(event)) {
+
                 if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
                     // a custom ringer has been applied
                     icon = getRingerIcon(event.getRingerType(), getResources().getColor(R.color.primary));

@@ -197,11 +197,27 @@ public class EventSilencerService extends IntentService {
     }
 
     private int getBestRingerType(SimpleCalendarEvent e) {
-        int eventRingerType = e.getRingerType();
-        if (eventRingerType == SimpleCalendarEvent.RINGER.UNDEFINED) {
-            eventRingerType = prefs.getRingerType();
+        /*
+        priorities are assigned (in increasing order):
+        -generic default ringer
+        -calendar specific ringer (unimplemented)
+        -event specific ringer
+        -instance specific ringer
+         */
+        int genericRinger = prefs.getRingerType();
+//        int calendarRinger = prefs.getRingerForCalendar(e.getCalendarId());
+        int eventRinger = prefs.getRingerForEventSeries(e.getEventId());
+        int instanceRinger = e.getRingerType();
+
+        int bestRinger = genericRinger;
+        if (eventRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+            bestRinger = eventRinger;
         }
-        return eventRingerType;
+        if (instanceRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+            bestRinger = instanceRinger;
+        }
+
+        return bestRinger;
     }
 
     private void silenceEventAndShowNotification(SimpleCalendarEvent event) {

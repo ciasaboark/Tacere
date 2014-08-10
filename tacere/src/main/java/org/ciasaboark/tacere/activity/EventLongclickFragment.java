@@ -16,14 +16,12 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.DatabaseInterface;
@@ -40,8 +38,8 @@ public class EventLongclickFragment extends DialogFragment {
     private Prefs prefs;
     private SimpleCalendarEvent event;
     private int instanceId;
-    private View view;
     private Context context = getActivity();
+    private View view;
 
     public static EventLongclickFragment newInstance(int instanceId) {
         EventLongclickFragment fragment = new EventLongclickFragment();
@@ -53,6 +51,7 @@ public class EventLongclickFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        super.onCreateDialog(savedInstanceState);
         int instanceId = getArguments().getInt("instanceId");
         databaseInterface = DatabaseInterface.getInstance(getActivity());
         prefs = new Prefs(getActivity());
@@ -65,8 +64,12 @@ public class EventLongclickFragment extends DialogFragment {
         }
 
         AlertDialog.Builder thisDialog = new AlertDialog.Builder(getActivity());
-        thisDialog.setIcon(getResources().getDrawable(R.drawable.calendar_icon));
-        thisDialog.setTitle("Edit event");
+//        thisDialog.setIcon(getColorizedTitleIcon());
+//        thisDialog.setTitle("Edit event");
+        view = getActivity().getLayoutInflater().inflate(R.layout.dialog_event_longclick, null);
+        setupWidgetsForView();
+        thisDialog.setView(view);
+
         thisDialog.setNegativeButton("clear", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -81,20 +84,52 @@ public class EventLongclickFragment extends DialogFragment {
             }
         });
 
-        return thisDialog.create();
+        Dialog d = thisDialog.create();
+        d.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+        return d;
+    }
+
+    private Drawable getColorizedTitleIcon() {
+        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
+        int color = getResources().getColor(R.color.primary);
+        d.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        return d;
     }
 
     private void resetEvent() {
-        Toast.makeText(getActivity(), "not yet implemented", Toast.LENGTH_SHORT).show();
+        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
+        if (cb.isChecked()) {
+            resetAllEvents();
+        } else {
+            databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
+        }
+        notifyDatasetChanged();
+    }
+
+    private void resetAllEvents() {
+        //TODO update all events in local database to have undefined ringer
+        prefs.unsetRingerTypeForEventSeries(event.getEventId());
+        databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
     }
 
     private void saveSettings() {
-        Toast.makeText(getActivity(), "not yet implemented", Toast.LENGTH_SHORT).show();
+        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
+        if (cb.isChecked()) {
+            saveSettingsForAllEvents();
+        } else {
+            databaseInterface.setRingerType(event.getId(), event.getRingerType());
+        }
+        notifyDatasetChanged();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-        view = inflator.inflate(R.layout.dialog_event_longclick, null);
+    private void saveSettingsForAllEvents() {
+        //TODO update all events in local database to have same ringer as current event
+        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
+        databaseInterface.setRingerType(event.getId(), event.getRingerType());
+    }
+
+    private void setupWidgetsForView() {
         TextView eventTitle = (TextView) view.findViewById(R.id.event_title);
         eventTitle.setText(event.getTitle());
 
@@ -135,41 +170,16 @@ public class EventLongclickFragment extends DialogFragment {
                 setRingerType(SimpleCalendarEvent.RINGER.IGNORE);
             }
         });
-
-
-        Button resetEventButton = (Button) view.findViewById(R.id.button_reset);
-        resetEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setRingerType(SimpleCalendarEvent.RINGER.UNDEFINED);
-            }
-        });
-
-        Button saveForAllEventsButton = (Button) view.findViewById(R.id.button_all_events);
-        saveForAllEventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        return view;
     }
 
     private void setRingerType(int type) {
-        databaseInterface.setRingerType(event.getEventId(), type);
-        try {
-            event = databaseInterface.getEvent(event.getId());
-        } catch (NoSuchEventException e) {
-            Log.e(TAG, "unable to find event after setting a new ringer type, this should not happen");
-        }
+        event.setRingerType(type);
 
         drawIndicators();
-        nofityDatasetChanged();
+//        notifyDatasetChanged();
     }
 
-    private void nofityDatasetChanged() {
+    private void notifyDatasetChanged() {
         Log.d(TAG, "Broadcasting message");
         Intent intent = new Intent("custom-event-name");
         // You can also include some extra data.

@@ -17,6 +17,7 @@ import android.util.Log;
 
 import org.ciasaboark.tacere.prefs.Prefs;
 
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -110,8 +111,20 @@ public class DatabaseInterface {
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
-        eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
-                mSelectionClause, mSelectionArgs);
+        eventsDB.beginTransaction();
+        try {
+            int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
+                    mSelectionClause, mSelectionArgs);
+            if (rowsUpdated != 1) {
+                throw new SQLException("setRingerType() did not update any rows for event id " + eventId);
+            }
+            eventsDB.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e(TAG, "error setting ringer type: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            eventsDB.endTransaction();
+        }
     }
 
     public Deque<SimpleCalendarEvent> syncAndGetAllActiveEvents() {

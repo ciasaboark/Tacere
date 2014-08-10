@@ -9,8 +9,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Presents an abstracted view of the preferences that can be modified by the user
@@ -234,6 +238,59 @@ public class Prefs {
         }
     }
 
+    private Map getEventRingersMap() {
+        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
+        String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
+        Map<Integer, Integer> eventsMap = new HashMap<Integer, Integer>();
+
+        if (eventsString != "") {
+            String[] eventTuples = eventsString.split(",");
+            for (String tuple : eventTuples) {
+                try {
+                    String[] keyValuePair = tuple.split(":");
+                    Integer key = Integer.parseInt(keyValuePair[0]);
+                    Integer value = Integer.parseInt(keyValuePair[1]);
+                    eventsMap.put(key, value);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "error reading event id and ringer type from string: " + tuple);
+                }
+            }
+        }
+
+        return eventsMap;
+    }
+
+    private void setEventsRingerMap(Map<Integer, Integer> map) {
+        String eventRingers = "";
+        for (Integer k : map.keySet()) {
+            String key = k.toString();
+            String value = map.get(k).toString();
+            eventRingers += key + ":" + value + ",";
+        }
+        editor.putString(Keys.EVENT_RINGERS, eventRingers).commit();
+    }
+
+    public int getRingerForEventSeries(int eventId) {
+        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
+        Map<Integer, Integer> map = getEventRingersMap();
+        if (map.containsKey(eventId)) {
+            ringerType = map.get(eventId);
+        }
+        return ringerType;
+    }
+
+    public void setRingerForEventSeries(int eventId, int ringerType) {
+        Map<Integer, Integer> eventsMap = getEventRingersMap();
+        eventsMap.put(eventId, ringerType);
+        setEventsRingerMap(eventsMap);
+    }
+
+    public void unsetRingerTypeForEventSeries(int eventId) {
+        Map<Integer, Integer> eventsMap = getEventRingersMap();
+        eventsMap.remove(eventId);
+        setEventsRingerMap(eventsMap);
+    }
+
     public <V> void storePreference(String key, V value) {
         SharedPreferences.Editor sharedPrefEdit = sharedPreferences.edit();
         if (value instanceof String) {
@@ -284,5 +341,6 @@ public class Prefs {
         //TODO work these in as replacements for adjusting alarm and media volume
         public static final String SILENCE_MEDIA = "SILENCE_MEDIA";
         public static final String SILENCE_ALARM = "SILENCE_ALARM";
+        private static final String EVENT_RINGERS = "EVENT_RINGERS";
     }
 }
