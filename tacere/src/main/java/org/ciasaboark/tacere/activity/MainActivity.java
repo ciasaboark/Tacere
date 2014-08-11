@@ -549,7 +549,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     icon = getResources().getDrawable(R.drawable.ic_state_silent);
                     break;
                 case SimpleCalendarEvent.RINGER.IGNORE:
-                    icon = getResources().getDrawable(R.drawable.blank);
+                    icon = getResources().getDrawable(R.drawable.ic_state_ignore);
                     break;
                 default:
                     icon = getResources().getDrawable(R.drawable.normal);

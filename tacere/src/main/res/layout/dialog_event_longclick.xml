@@ -109,7 +109,7 @@
                     android:id="@+id/imageButtonIgnore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_state_normal"/>
+                    android:background="@drawable/ic_state_ignore"/>
 
                 <LinearLayout
                     android:id="@+id/indicator_ignore"
