@@ -70,14 +70,21 @@ public class EventDetailsFragment extends DialogFragment {
         setupWidgetsForView();
         thisDialog.setView(view);
 
-        thisDialog.setNegativeButton("clear", new DialogInterface.OnClickListener() {
+        thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 resetEvent();
             }
         });
 
-        thisDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        thisDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //nothing to do here
+            }
+        });
+
+        thisDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 saveSettings();

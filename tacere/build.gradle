@@ -15,11 +15,13 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
-def APP_VERSION_RELEASE = "0 - beta 3";
+def APP_VERSION_RELEASE = "0 - beta 4";
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
@@ -55,7 +57,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + " - debug\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + " - (debug build)\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\"";
         }
     }
