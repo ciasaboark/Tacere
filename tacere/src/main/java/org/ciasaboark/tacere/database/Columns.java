@@ -22,5 +22,6 @@ public class Columns {
     public static final String DISPLAY_COLOR = "display_color";
     public static final String IS_ALLDAY = "is_allday";
     public static final String IS_FREETIME = "is_freetime";
+    public static final String CUSTOM_RINGER = "custom_ringer";
 
 }

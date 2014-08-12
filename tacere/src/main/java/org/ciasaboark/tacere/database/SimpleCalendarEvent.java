@@ -23,6 +23,7 @@ public class SimpleCalendarEvent {
     private long end; // in milliseconds from epoch
     private String description;
     private int ringerType;
+    private boolean hasCustomRinger;
     private int dispColor;
     private boolean isFreeTime;
     private boolean isAllDay;
@@ -41,6 +42,15 @@ public class SimpleCalendarEvent {
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
         this.ringerType = RINGER.UNDEFINED;
+        this.hasCustomRinger = false;
+    }
+
+    public boolean hasCustomRinger() {
+        return hasCustomRinger;
+    }
+
+    public void setHasCutomRinger(boolean custom) {
+        hasCustomRinger = custom;
     }
 
     public String getLocalBeginTime() {

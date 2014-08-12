@@ -44,6 +44,7 @@ import android.widget.TextView;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
+import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.database.SimpleCalendarEvent;
@@ -95,12 +96,19 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
                 //redraw the widgets
                 setupAndDrawActionButtons();
+
+                //if this broadcast message came from the anywhere besided the event silencer service
+                //then the service needs to be restarted
+                String messageSource = intent.getStringExtra(DataSetManager.SOURCE_KEY);
+                if (!EventSilencerService.class.getName().equals(messageSource)) {
+                    restartEventSilencerService();
+                }
             }
         };
 
         // register to receive broadcast messages
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
-                new IntentFilter("custom-event-name"));
+                new IntentFilter(DataSetManager.BROADCAST_MESSAGE_KEY));
 
         // display the updates dialog if it hasn't been shown yet
         ShowUpdatesActivity.showUpdatesDialogIfNeeded(this);
@@ -339,19 +347,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         lv.setVisibility(View.VISIBLE);
     }
 
-    private int getBestRingerForInstance(SimpleCalendarEvent event) {
-        int bestRinger = prefs.getRingerType();
-        int eventRinger = prefs.getRingerForEventSeries(event.getEventId());
-
-        if (eventRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
-            bestRinger = eventRinger;
-        }
-        if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
-            bestRinger = event.getRingerType();
-        }
-        return bestRinger;
-    }
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
@@ -401,7 +396,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         } catch (NoSuchEventException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
-        restartEventSilencerService();
 
         return true;
     }
@@ -528,17 +522,29 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         private Drawable getRingerIcon(SimpleCalendarEvent event) {
             Drawable icon;
-            int bestRinger = getBestRingerForInstance(event);
             int defaultColor = getResources().getColor(R.color.icon_accent);
             int primaryColor = getResources().getColor(R.color.primary);
             int color;
-            if (eventHasCustomRinger(event)) {
-                color = primaryColor;
-            } else {
+            if (event.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
                 color = defaultColor;
+            } else {
+                color = primaryColor;
             }
 
-            switch (bestRinger) {
+            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                icon = getIconForRinger(event.getRingerType());
+            } else {
+                icon = getIconForRinger(prefs.getRingerType());
+            }
+
+            icon.mutate().setColorFilter(color, Mode.MULTIPLY);
+            return icon;
+        }
+
+        private Drawable getIconForRinger(int ringerType) {
+            Drawable icon;
+
+            switch (ringerType) {
                 case SimpleCalendarEvent.RINGER.NORMAL:
                     icon = getResources().getDrawable(R.drawable.ic_state_normal);
                     break;
@@ -552,21 +558,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     icon = getResources().getDrawable(R.drawable.ic_state_ignore);
                     break;
                 default:
-                    icon = getResources().getDrawable(R.drawable.normal);
+                    icon = getResources().getDrawable(R.drawable.blank);
             }
-            icon.mutate().setColorFilter(color, Mode.MULTIPLY);
+
             return icon;
-        }
-
-        private boolean eventHasCustomRinger(SimpleCalendarEvent event) {
-            boolean hasCustomRinger = false;
-            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                hasCustomRinger = true;
-            } else if (prefs.getRingerForEventSeries(event.getEventId()) != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                hasCustomRinger = true;
-            }
-
-            return hasCustomRinger;
         }
 
         private boolean shouldEventSilence(SimpleCalendarEvent event) {

@@ -101,22 +101,23 @@ public class DatabaseInterface {
         return eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, null, null, null, null, order, null);
     }
 
-    public void setRingerType(int eventId, int ringerType) {
+    public void setRingerType(int instanceId, int ringerType) {
         if (ringerType != SimpleCalendarEvent.RINGER.IGNORE && ringerType != SimpleCalendarEvent.RINGER.NORMAL
                 && ringerType != SimpleCalendarEvent.RINGER.SILENT && ringerType != SimpleCalendarEvent.RINGER.UNDEFINED
                 && ringerType != SimpleCalendarEvent.RINGER.VIBRATE) {
             throw new IllegalArgumentException("unknown ringer type: " + ringerType);
         }
         String mSelectionClause = Columns._ID + " = ?";
-        String[] mSelectionArgs = {String.valueOf(eventId)};
+        String[] mSelectionArgs = {String.valueOf(instanceId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
+        values.put(Columns.CUSTOM_RINGER, 1);
         eventsDB.beginTransaction();
         try {
             int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
                     mSelectionClause, mSelectionArgs);
             if (rowsUpdated != 1) {
-                throw new SQLException("setRingerType() did not update any rows for event id " + eventId);
+                throw new SQLException("setRingerType() should have updated 1 row for instance id " + instanceId + ", updated " + rowsUpdated);
             }
             eventsDB.setTransactionSuccessful();
         } catch (Exception e) {
@@ -162,17 +163,23 @@ public class DatabaseInterface {
     }
 
     public void setRingerForAllInstancesOfEvent(int eventId, int ringerType) {
-        String[] args = {String.valueOf(eventId)};
-        String selection = Columns.EVENT_ID + " = ?";
-        Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, selection, args, null, null, Columns._ID, null);
-        if (cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-                String name = cursor.getString(cursor.getColumnIndex(Columns.TITLE));   //TODO remove after testing
-                setRingerType(id, ringerType);
-            } while (cursor.moveToNext());
+        String mSelectionClause = Columns.EVENT_ID + " = ?";
+        String[] mSelectionArgs = {String.valueOf(eventId)};
+        ContentValues values = new ContentValues();
+        values.put(Columns.RINGER_TYPE, ringerType);
+        values.put(Columns.CUSTOM_RINGER, 0);
+        eventsDB.beginTransaction();
+        try {
+            int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
+                    mSelectionClause, mSelectionArgs);
+            Log.d(TAG, "setRingerForAllInstancesOfEvent updated " + rowsUpdated + " for event id " + eventId);
+            eventsDB.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e(TAG, "error setting ringer type: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            eventsDB.endTransaction();
         }
-        cursor.close();
     }
 
     /**
@@ -188,13 +195,14 @@ public class DatabaseInterface {
     }
 
     // returns the event that matches the given Instance id, throws NoSuchEventException if no match
-    public SimpleCalendarEvent getEvent(int id) throws NoSuchEventException {
+    public SimpleCalendarEvent getEvent(int instanceId) throws NoSuchEventException {
+        //TODO use better SQL SELECT
         Cursor cursor = getEventCursor();
         SimpleCalendarEvent thisEvent = null;
         if (cursor.moveToFirst()) {
             do {
-                int instanceId = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-                if (instanceId == id) {
+                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                if (id == instanceId) {
                     long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
                     int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
                     String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
@@ -205,10 +213,13 @@ public class DatabaseInterface {
                     int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+                    boolean hasCusomRinger = cursor.getInt(cursor.getColumnIndex(Columns.CUSTOM_RINGER)) == 1;
+                    int customRingerInt = cursor.getInt(cursor.getColumnIndex(Columns.CUSTOM_RINGER));
 
-                    thisEvent = new SimpleCalendarEvent(cal_id, instanceId, event_id, title, begin, end, description,
+                    thisEvent = new SimpleCalendarEvent(cal_id, id, event_id, title, begin, end, description,
                             displayColor, isFreeTime, isAllDay);
                     thisEvent.setRingerType(ringerType);
+                    thisEvent.setHasCutomRinger(hasCusomRinger);
                     break;
                 }
             } while (cursor.moveToNext());
@@ -216,7 +227,7 @@ public class DatabaseInterface {
         }
         cursor.close();
         if (thisEvent == null) {
-            throw new NoSuchEventException(TAG + " can not find event with given id " + id);
+            throw new NoSuchEventException(TAG + " can not find event with given id " + instanceId);
         }
         return thisEvent;
     }
@@ -261,7 +272,6 @@ public class DatabaseInterface {
                 // the ringerType, all other values should be read from the system calendar
                 // database
 
-
                 SimpleCalendarEvent newEvent = new SimpleCalendarEvent(cal_id, id, event_id, event_title, event_begin, event_end,
                         event_description, event_displayColor, (event_availability == 0),
                         (event_allDay == 1));
@@ -269,9 +279,26 @@ public class DatabaseInterface {
                 try {
                     SimpleCalendarEvent oldEvent = getEvent(id);
                     newEvent.setRingerType(oldEvent.getRingerType());
+                    newEvent.setHasCutomRinger(oldEvent.hasCustomRinger());
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
+                }
+
+                //if this event instance does not have a custom ringer then we can look for a default
+                // ringer based on the event series it belongs to and, failing that, the calendar
+                // the event instance belongs to
+                if (!newEvent.hasCustomRinger()) {
+                    //TODO get ringer from calendar settings
+                    if (newEvent.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
+                        int calendarRinger = prefs.getringerForCalendar(newEvent.getCalendarId());
+                        newEvent.setRingerType(calendarRinger); //TODO this will clobber events with custom UNDEFINED ringer
+                    }
+
+                    if (newEvent.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
+                        int eventRinger = prefs.getRingerForEventSeries(newEvent.getEventId());
+                        newEvent.setRingerType(eventRinger);
+                    }
                 }
 
                 // inserting an event with the same id will clobber all previous data, completing
@@ -409,17 +436,12 @@ public class DatabaseInterface {
         cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
         cv.put(Columns.CAL_ID, e.getCalendarId());
         cv.put(Columns.EVENT_ID, e.getEventId());
-
-        if (e.isAllDay()) {
-            cv.put(Columns.IS_ALLDAY, 1);
-        } else {
-            cv.put(Columns.IS_ALLDAY, 0);
-        }
-        if (e.isFreeTime()) {
-            cv.put(Columns.IS_FREETIME, 0);
-        } else {
-            cv.put(Columns.IS_FREETIME, 1);
-        }
+        cv.put(Columns.CUSTOM_RINGER,
+                e.hasCustomRinger() ? 1 : 0);
+        cv.put(Columns.IS_ALLDAY,
+                e.isAllDay() ? 1 : 0);
+        cv.put(Columns.IS_FREETIME,
+                e.isFreeTime() ? 0 : 1);    //yes, these are swapped. No, I don't remember why
 
         long rowID = eventsDB.insertWithOnConflict(EventDatabaseOpenHelper.TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);

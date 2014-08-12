@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 class EventDatabaseOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_EVENTS = "events";
     private static final String DB_NAME = "events.sqlite";
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
 
     public EventDatabaseOpenHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
@@ -20,16 +20,22 @@ class EventDatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createTable(db);
+    }
+
+    private void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( " + Columns._ID + " integer primary key," +
-                Columns.EVENT_ID + " integer," + Columns.TITLE + " varchar(100)," +
-                Columns.DESCRIPTION + " varchar(100)," + Columns.BEGIN + " integer," +
-                Columns.END + " integer," + Columns.IS_ALLDAY + " integer," +
-                Columns.IS_FREETIME + " integer," + Columns.RINGER_TYPE + " integer," +
-                Columns.DISPLAY_COLOR + " integer," + Columns.CAL_ID + " integer" + ")");
+                Columns.EVENT_ID + " integer, " + Columns.TITLE + " varchar(100), " +
+                Columns.DESCRIPTION + " varchar(100), " + Columns.BEGIN + " integer, " +
+                Columns.END + " integer, " + Columns.IS_ALLDAY + " integer, " +
+                Columns.IS_FREETIME + " integer, " + Columns.RINGER_TYPE + " integer, " +
+                Columns.DISPLAY_COLOR + " integer, " + Columns.CAL_ID + " integer, " +
+                Columns.CUSTOM_RINGER + " integer " + ")");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-        // TODO remove the old database and resync since the colums have changed from the last stable build
+    public void onUpgrade(SQLiteDatabase db, int arg1, int arg2) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        createTable(db);
     }
 }

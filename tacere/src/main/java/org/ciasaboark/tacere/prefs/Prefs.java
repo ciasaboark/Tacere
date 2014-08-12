@@ -194,10 +194,6 @@ public class Prefs {
         editor.putBoolean(Keys.DO_NOT_DISTURB, doNotDisturb).commit();
     }
 
-    public int getDefaultRinger() {
-        return DefaultPrefs.RINGER_TYPE;
-    }
-
     public int getDefaultMediaVolume() {
         return DefaultPrefs.MEDIA_VOLUME;
     }
@@ -319,6 +315,11 @@ public class Prefs {
             throw new IllegalArgumentException("unable to remove null key");
         }
         sharedPreferences.edit().remove(key).apply();
+    }
+
+    public int getringerForCalendar(long calendarId) {
+        //TODO
+        return SimpleCalendarEvent.RINGER.UNDEFINED;
     }
 
     private static class Keys {

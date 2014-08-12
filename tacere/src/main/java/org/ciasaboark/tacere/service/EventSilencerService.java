@@ -9,9 +9,9 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
@@ -97,8 +97,6 @@ public class EventSilencerService extends IntentService {
                 shutdownService();
             }
         }
-
-
     }
 
     /**
@@ -196,33 +194,15 @@ public class EventSilencerService extends IntentService {
         }
     }
 
-    private int getBestRingerType(SimpleCalendarEvent e) {
-        /*
-        priorities are assigned (in increasing order):
-        -generic default ringer
-        -calendar specific ringer (unimplemented)
-        -event specific ringer
-        -instance specific ringer
-         */
-        int genericRinger = prefs.getRingerType();
-//        int calendarRinger = prefs.getRingerForCalendar(e.getCalendarId());
-        int eventRinger = prefs.getRingerForEventSeries(e.getEventId());
-        int instanceRinger = e.getRingerType();
-
-        int bestRinger = genericRinger;
-        if (eventRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
-            bestRinger = eventRinger;
-        }
-        if (instanceRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
-            bestRinger = instanceRinger;
-        }
-
-        return bestRinger;
-    }
-
     private void silenceEventAndShowNotification(SimpleCalendarEvent event) {
         ringerState.storeRingerStateIfNeeded();
-        ringerState.setPhoneRinger(getBestRingerType(event));
+        //use the ringer type stored in the event instance if possible, otherwise use the default
+        //ringer
+        if (event.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
+            ringerState.setPhoneRinger(prefs.getRingerType());
+        } else {
+            ringerState.setPhoneRinger(event.getRingerType());
+        }
 
         volumesManager.adjustMediaAndAlarmVolumesIfNeeded();
         //only vibrate if we are transitioning from no event active to an active event
@@ -256,11 +236,8 @@ public class EventSilencerService extends IntentService {
     }
 
     private void notifyCursorAdapterDataChanged() {
-        Log.d(TAG, "Broadcasting message");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
-        intent.putExtra("message", "This is my message!");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
+        dsm.broadcastDataSetChangedMessage();
     }
 
     private void vibrate() {

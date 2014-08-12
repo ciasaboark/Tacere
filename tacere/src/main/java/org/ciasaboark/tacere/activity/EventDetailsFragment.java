@@ -9,12 +9,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.database.SimpleCalendarEvent;
@@ -38,7 +37,7 @@ public class EventDetailsFragment extends DialogFragment {
     private Prefs prefs;
     private SimpleCalendarEvent event;
     private int instanceId;
-    private Context context = getActivity();
+    private Context context;
     private View view;
 
     public static EventDetailsFragment newInstance(int instanceId) {
@@ -55,6 +54,7 @@ public class EventDetailsFragment extends DialogFragment {
         int instanceId = getArguments().getInt("instanceId");
         databaseInterface = DatabaseInterface.getInstance(getActivity());
         prefs = new Prefs(getActivity());
+        context = getActivity().getApplicationContext();
 
         try {
             event = databaseInterface.getEvent(instanceId);
@@ -178,11 +178,8 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void notifyDatasetChanged() {
-        Log.d(TAG, "Broadcasting message");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
-        intent.putExtra("message", "This is my message!");
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+        DataSetManager dsm = new DataSetManager(this, context);
+        dsm.broadcastDataSetChangedMessage();
     }
 
     private void colorizeIcons() {
