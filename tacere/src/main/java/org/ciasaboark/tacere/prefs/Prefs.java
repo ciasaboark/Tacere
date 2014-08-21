@@ -232,35 +232,44 @@ public class Prefs {
         }
     }
 
-    private Map getEventRingersMap() {
-        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
-        String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
-        Map<Integer, Integer> eventsMap = new HashMap<Integer, Integer>();
+    private String convertMapToString(Map<Integer, Integer> map) {
+        String line = "";
+        for (Integer k : map.keySet()) {
+            String key = k.toString();
+            String value = map.get(k).toString();
+            line += key + ":" + value + ",";
+        }
+        return line;
+    }
 
-        if (eventsString != "") {
-            String[] eventTuples = eventsString.split(",");
-            for (String tuple : eventTuples) {
+    private Map<Integer, Integer> convertStringToIntegerMap(String line) {
+        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+
+        if (line != "") {
+            String[] keyValueTuples = line.split(",");
+            for (String tuple : keyValueTuples) {
                 try {
                     String[] keyValuePair = tuple.split(":");
                     Integer key = Integer.parseInt(keyValuePair[0]);
                     Integer value = Integer.parseInt(keyValuePair[1]);
-                    eventsMap.put(key, value);
+                    map.put(key, value);
                 } catch (NumberFormatException e) {
                     Log.e(TAG, "error reading event id and ringer type from string: " + tuple);
                 }
             }
         }
 
-        return eventsMap;
+        return map;
+    }
+
+    private Map<Integer, Integer> getEventRingersMap() {
+        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
+        String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
+        return convertStringToIntegerMap(eventsString);
     }
 
     private void setEventsRingerMap(Map<Integer, Integer> map) {
-        String eventRingers = "";
-        for (Integer k : map.keySet()) {
-            String key = k.toString();
-            String value = map.get(k).toString();
-            eventRingers += key + ":" + value + ",";
-        }
+        String eventRingers = convertMapToString(map);
         editor.putString(Keys.EVENT_RINGERS, eventRingers).commit();
     }
 
@@ -283,6 +292,38 @@ public class Prefs {
         Map<Integer, Integer> eventsMap = getEventRingersMap();
         eventsMap.remove(eventId);
         setEventsRingerMap(eventsMap);
+    }
+
+
+    public int getRingerForCalendar(long calendarId) {
+        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
+        Map<Integer, Integer> map = getCalendarRingersMap();
+        if (map.containsKey(calendarId)) {
+            ringerType = map.get(calendarId);
+        }
+        return ringerType;
+    }
+
+    private Map<Integer, Integer> getCalendarRingersMap() {
+        String eventsString = sharedPreferences.getString(Keys.CALENDAR_RINGERS, "");
+        return convertStringToIntegerMap(eventsString);
+    }
+
+    private void setCalendarRingersMap(Map<Integer, Integer> map) {
+        String calendarRingers = convertMapToString(map);
+        editor.putString(Keys.CALENDAR_RINGERS, calendarRingers).commit();
+    }
+
+    public void setRingerForCalendar(int calendarId, int ringerType) {
+        Map<Integer, Integer> calendarMap = getCalendarRingersMap();
+        calendarMap.put(calendarId, ringerType);
+        setCalendarRingersMap(calendarMap);
+    }
+
+    public void unsetRingerTypeForCalendar(int calendarId) {
+        Map<Integer, Integer> calendarMap = getCalendarRingersMap();
+        calendarMap.remove(calendarId);
+        setCalendarRingersMap(calendarMap);
     }
 
     public <V> void storePreference(String key, V value) {
@@ -315,10 +356,6 @@ public class Prefs {
         sharedPreferences.edit().remove(key).apply();
     }
 
-    public int getringerForCalendar(long calendarId) {
-        //TODO
-        return SimpleCalendarEvent.RINGER.UNDEFINED;
-    }
 
     private static class Keys {
         public static final String IS_SERVICE_ACTIVATED = "IS_ACTIVATED";
@@ -340,6 +377,7 @@ public class Prefs {
         //TODO work these in as replacements for adjusting alarm and media volume
         public static final String SILENCE_MEDIA = "SILENCE_MEDIA";
         public static final String SILENCE_ALARM = "SILENCE_ALARM";
-        private static final String EVENT_RINGERS = "EVENT_RINGERS";
+        public static final String EVENT_RINGERS = "EVENT_RINGERS";
+        public static final String CALENDAR_RINGERS = "CALENDAR_RINGERS";
     }
 }

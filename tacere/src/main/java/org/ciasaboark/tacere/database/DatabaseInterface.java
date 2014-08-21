@@ -291,7 +291,7 @@ public class DatabaseInterface {
                 if (!newEvent.hasCustomRinger()) {
                     //TODO get ringer from calendar settings
                     if (newEvent.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
-                        int calendarRinger = prefs.getringerForCalendar(newEvent.getCalendarId());
+                        int calendarRinger = prefs.getRingerForCalendar(newEvent.getCalendarId());
                         newEvent.setRingerType(calendarRinger); //TODO this will clobber events with custom UNDEFINED ringer
                     }
 
