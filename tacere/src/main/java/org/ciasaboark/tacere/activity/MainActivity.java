@@ -514,7 +514,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 for (TextView v : textElements) {
                     v.setTextColor(textColor);
                 }
-
             } catch (NoSuchEventException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
             }

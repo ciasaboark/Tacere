@@ -7,6 +7,8 @@ package org.ciasaboark.tacere.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -27,6 +29,11 @@ public class AboutLicenseActivity extends Activity {
         setContentView(R.layout.activity_about_activity_license);
         // Show the Up button in the action bar.
         setupActionBar();
+
+        Drawable upIcon = getResources().getDrawable(R.drawable.copyright_icon);
+        int c = getResources().getColor(R.color.header_text_color);
+        upIcon.mutate().setColorFilter(c, PorterDuff.Mode.MULTIPLY);
+        getActionBar().setIcon(upIcon);
 
         WebView wv = (WebView) findViewById(R.id.webView1);
         wv.loadUrl("file:///android_asset/license.html");

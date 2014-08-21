@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -37,9 +39,16 @@ public class AdvancedSettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_settings);
+
         prefs = new Prefs(this);
         // Show the Up button in the action bar.
         setupActionBar();
+
+        Drawable upIcon = getResources().getDrawable(R.drawable.action_settings);
+        int c = getResources().getColor(R.color.header_text_color);
+        upIcon.mutate().setColorFilter(c, PorterDuff.Mode.MULTIPLY);
+        getActionBar().setIcon(upIcon);
+
         drawAllWidgets();
     }
 

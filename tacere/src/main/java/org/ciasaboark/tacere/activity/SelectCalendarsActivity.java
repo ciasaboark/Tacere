@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +47,11 @@ public class SelectCalendarsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_calendars);
+        Drawable upIcon = getResources().getDrawable(R.drawable.calendar_icon);
+        int c = getResources().getColor(R.color.header_text_color);
+        upIcon.mutate().setColorFilter(c, PorterDuff.Mode.MULTIPLY);
+        getActionBar().setIcon(upIcon);
+
         prefs = new Prefs(getApplicationContext());
         buildSimpleCalendarList();
 
@@ -171,6 +177,13 @@ public class SelectCalendarsActivity extends Activity {
         Intent i = new Intent(this, EventSilencerService.class);
         i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
         startService(i);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.select_calendars, menu);
+        return true;
     }
 
     @Override
