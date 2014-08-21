@@ -17,6 +17,8 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
@@ -25,7 +27,7 @@ def APP_VERSION_RELEASE = "0 - beta 4";
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 9
+def VERSION_CODE = 10
 
 android {
     compileSdkVersion 18

@@ -85,7 +85,7 @@ public class SettingsActivity extends Activity {
     private void drawServiceWidget() {
         //the service state toggle
         Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             serviceActivatedSwitch.setChecked(true);
         } else {
             serviceActivatedSwitch.setChecked(false);
@@ -108,7 +108,7 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             int iconColor = getResources().getColor(R.color.primary);
             d.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
             calendarTV.setTextColor(getResources().getColor(R.color.textcolor));
@@ -148,7 +148,7 @@ public class SettingsActivity extends Activity {
         }
 
 
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             int iconColor = getResources().getColor(R.color.primary);
             icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
             ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
@@ -162,18 +162,18 @@ public class SettingsActivity extends Activity {
 
         ImageButton ringerIcon = (ImageButton) findViewById(id.settings_ringerIcon);
         setImageButtonIcon(ringerIcon, icon);
-        findViewById(id.settings_ringerBox).setEnabled(prefs.getIsServiceActivated());
+        findViewById(id.settings_ringerBox).setEnabled(prefs.isServiceActivated());
     }
 
     private void drawDoNotDisturbWidgets() {
         Switch doNotDisturbSwitch = (Switch) findViewById(id.doNotDisturbSwitch);
         boolean isDoNotDisturbEnabled = prefs.getDoNotDisturb();
         doNotDisturbSwitch.setChecked(isDoNotDisturbEnabled);
-        doNotDisturbSwitch.setEnabled(prefs.getIsServiceActivated());
-        findViewById(id.do_not_disturb_box).setEnabled(prefs.getIsServiceActivated());
+        doNotDisturbSwitch.setEnabled(prefs.isServiceActivated());
+        findViewById(id.do_not_disturb_box).setEnabled(prefs.isServiceActivated());
 
         TextView doNotDisturbHeader = (TextView) findViewById(id.do_not_disturb_header);
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
             doNotDisturbHeader.setTextColor(getResources().getColor(R.color.textColorDisabled));
@@ -198,7 +198,7 @@ public class SettingsActivity extends Activity {
 
     private void drawMediaWidgets() {
         TextView mediaTV = (TextView) findViewById(id.settings_mediaText);
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             mediaTV.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
             mediaTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
@@ -212,14 +212,14 @@ public class SettingsActivity extends Activity {
         } else {
             mediaSwitch.setChecked(false);
         }
-        mediaSwitch.setEnabled(prefs.getIsServiceActivated());
-        findViewById(id.settings_mediaBox).setEnabled(prefs.getIsServiceActivated());
+        mediaSwitch.setEnabled(prefs.isServiceActivated());
+        findViewById(id.settings_mediaBox).setEnabled(prefs.isServiceActivated());
 
 
         //the media volumes slider
         mediaSB.setMax(VolumesManager.getMaxMediaVolume());
         mediaSB.setProgress(prefs.getCurMediaVolume());
-        if (prefs.getAdjustMedia() && prefs.getIsServiceActivated()) {
+        if (prefs.getAdjustMedia() && prefs.isServiceActivated()) {
             this.animateRevealView(mediaSB);
             mediaSB.setEnabled(true);
         } else {
@@ -246,7 +246,7 @@ public class SettingsActivity extends Activity {
 
     private void drawAlarmWidgets() {
         TextView alarmTV = (TextView) findViewById(id.settings_alarmText);
-        if (prefs.getIsServiceActivated()) {
+        if (prefs.isServiceActivated()) {
             alarmTV.setTextColor(getResources().getColor(R.color.textcolor));
         } else {
             alarmTV.setTextColor(getResources().getColor(R.color.textColorDisabled));
@@ -255,14 +255,14 @@ public class SettingsActivity extends Activity {
         //the alarm volumes toggle
         Switch alarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
         alarmSwitch.setChecked(prefs.getAdjustAlarm());
-        alarmSwitch.setEnabled(prefs.getIsServiceActivated());
-        findViewById(id.settings_alarmBox).setEnabled(prefs.getIsServiceActivated());
+        alarmSwitch.setEnabled(prefs.isServiceActivated());
+        findViewById(id.settings_alarmBox).setEnabled(prefs.isServiceActivated());
 
         //the alarm volumes slider
         SeekBar alarmSB = (SeekBar) findViewById(id.alarmSeekBar);
         alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
         alarmSB.setProgress(prefs.getCurAlarmVolume());
-        if (prefs.getAdjustAlarm() && prefs.getIsServiceActivated()) {
+        if (prefs.getAdjustAlarm() && prefs.isServiceActivated()) {
             this.animateRevealView(alarmSB);
             alarmSB.setEnabled(true);
         } else {
@@ -286,7 +286,6 @@ public class SettingsActivity extends Activity {
             }
         });
     }
-
 
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -315,7 +314,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void onClickToggleService(View v) {
-        prefs.setIsServiceActivated(!prefs.getIsServiceActivated());
+        prefs.setIsServiceActivated(!prefs.isServiceActivated());
         restartEventSilencerService();
         drawServiceWidget();
         drawCalendarWidgets();

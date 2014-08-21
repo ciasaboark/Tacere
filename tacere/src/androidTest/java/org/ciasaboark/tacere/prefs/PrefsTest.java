@@ -51,7 +51,7 @@ public class PrefsTest extends TestCase {
         prefs.restoreDefaultPreferences();
         assert(prefs.getAdjustAlarm() == DefaultPrefs.ADJUST_ALARM);
         assert(prefs.getAdjustMedia() == DefaultPrefs.ADJUST_MEDIA);
-        assert(prefs.getIsServiceActivated() == DefaultPrefs.IS_ACTIVATED);
+        assert(prefs.isServiceActivated() == DefaultPrefs.IS_ACTIVATED);
         assert(prefs.getSilenceAllDayEvents() == DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
         assert(prefs.getSilenceFreeTimeEvents() == DefaultPrefs.SILENCE_FREE_TIME);
         assert(prefs.getBufferMinutes() == DefaultPrefs.BUFFER_MINUTES);

@@ -90,7 +90,7 @@ public class EventSilencerService extends IntentService {
                 || requestType.equals(RequestTypes.PROVIDER_CHANGED)) {
             scheduleServiceRestart();
         } else if (requestType.equals(RequestTypes.NORMAL)) {
-            if (prefs.getIsServiceActivated() && !stateManager.isQuickSilenceActive()) {
+            if (prefs.isServiceActivated() && !stateManager.isQuickSilenceActive()) {
                 checkForActiveEventsAndSilence();
                 notifyCursorAdapterDataChanged();
             } else { // normal wake requests (but service is marked to be inactive)

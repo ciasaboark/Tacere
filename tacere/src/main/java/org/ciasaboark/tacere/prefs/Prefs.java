@@ -41,18 +41,16 @@ public class Prefs {
 
     public List<Long> getSelectedCalendars() {
         String calendars = sharedPreferences.getString(Keys.SELECTED_CALENDARS, "");
-        String[] calendarArray = calendars.split(",");
+        String[] calendarIdArray = calendars.split(",");
         List<Long> calendarList = new ArrayList<Long>();
-        for (String calendarId : calendarArray) {
-            long id;
+        for (String calendarId : calendarIdArray) {
             try {
-                id = Long.parseLong(calendarId);
+                long id = Long.parseLong(calendarId);
                 calendarList.add(id);
             } catch (NumberFormatException e) {
                 Log.e(TAG, "unable to read calendar id '" + calendarId + "' as integer" +
                         " value, ignoring");
             }
-
         }
         return calendarList;
     }
@@ -87,7 +85,7 @@ public class Prefs {
         return syncAllCalendars;
     }
 
-    public Boolean getIsServiceActivated() {
+    public Boolean isServiceActivated() {
         return sharedPreferences.getBoolean(Keys.IS_SERVICE_ACTIVATED, DefaultPrefs.IS_SERVICE_ACTIVATED);
     }
 

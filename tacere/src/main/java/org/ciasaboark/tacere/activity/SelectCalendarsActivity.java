@@ -211,15 +211,21 @@ public class SelectCalendarsActivity extends Activity {
                 calendarName.setText(simpleCalendar.getDisplayName());
                 calendarAccountName.setText(simpleCalendar.getAccountName());
                 List<Long> selectedCalendars = prefs.getSelectedCalendars();
+
                 if (selectedCalendars.contains(simpleCalendar.getId())) {
                     simpleCalendar.setSelected(true);
+                } else {
+                    simpleCalendar.setSelected(false);
                 }
 
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
                     calendarCheckBox.setChecked(true);
+                } else {
+                    calendarCheckBox.setChecked(false);
                 }
             } catch (IndexOutOfBoundsException e) {
                 Log.e(TAG, "error getting calendar at position " + position);
+                Log.e(TAG, e.getMessage());
                 calendarName.setText("Error getting calendar for this position, check logcat");
             }
 
