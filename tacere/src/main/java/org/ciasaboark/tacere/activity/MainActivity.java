@@ -122,6 +122,15 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         drawActionButton();
     }
 
+    /**
+     * Restarts the event silencer service
+     */
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
+    }
+
     private void setupActionButtons() {
         final ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
         final ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
@@ -147,6 +156,21 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 cancelQuickSilenceButton.setEnabled(true);
             }
         });
+    }
+
+    private void drawActionButton() {
+        ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
+        ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
+
+        ServiceStateManager ssManager = new ServiceStateManager(this);
+
+        if (ssManager.isQuickSilenceActive()) {
+            quickSilenceImageButton.setVisibility(View.GONE);
+            cancelQuickSilenceButton.setVisibility(View.VISIBLE);
+        } else {
+            quickSilenceImageButton.setVisibility(View.VISIBLE);
+            cancelQuickSilenceButton.setVisibility(View.GONE);
+        }
     }
 
     private void fadeImageButtonsInAndOut(final ImageButton fadeInImageButton, final ImageButton fadeOutImageButton) {
@@ -180,6 +204,21 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         animator.start();
     }
 
+    private void startQuicksilence() {
+        // an intent to send to either start or stop a quick silence duration
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.QUICKSILENCE);
+        // the length of time for the pollService to sleep in minutes
+        int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+        i.putExtra("duration", duration);
+        startService(i);
+    }
+
+    private void stopOngoingQuicksilence() {
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
+        startService(i);
+    }
 
     private void flipIn(final ImageButton button) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
@@ -210,54 +249,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     }
 
-    private void drawActionButton() {
-        ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
-        ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
-
-        ServiceStateManager ssManager = new ServiceStateManager(this);
-
-        if (ssManager.isQuickSilenceActive()) {
-            quickSilenceImageButton.setVisibility(View.GONE);
-            cancelQuickSilenceButton.setVisibility(View.VISIBLE);
-        } else {
-            quickSilenceImageButton.setVisibility(View.VISIBLE);
-            cancelQuickSilenceButton.setVisibility(View.GONE);
-        }
-    }
-
-    private void startQuicksilence() {
-        // an intent to send to either start or stop a quick silence duration
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.QUICKSILENCE);
-        // the length of time for the pollService to sleep in minutes
-        int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-        i.putExtra("duration", duration);
-        startService(i);
-    }
-
-    private void stopOngoingQuicksilence() {
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-        startService(i);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        setContentView(R.layout.activity_main);
-        // start the background service
-        restartEventSilencerService();
-        setupAndDrawActionButtons();
-        drawEventListOrError();
-    }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -270,13 +261,14 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         eventListview.setSelectionFromTop(listViewIndex, 0);
     }
 
-    /**
-     * Restarts the event silencer service
-     */
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
+    @Override
+    public void onStart() {
+        super.onStart();
+        setContentView(R.layout.activity_main);
+        // start the background service
+        restartEventSilencerService();
+        setupAndDrawActionButtons();
+        drawEventListOrError();
     }
 
     private void drawEventListOrError() {
@@ -348,11 +340,42 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // app icon in action bar clicked; go home
+                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+                settingsActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(settingsActivityIntent);
+                return true;
+            case R.id.action_about:
+                Intent aboutActivityIntent = new Intent(this, AboutActivity.class);
+                aboutActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(aboutActivityIntent);
+                return true;
+            case R.id.action_add_event:
+                Intent addEventIntent = new Intent(Intent.ACTION_INSERT,
+                        CalendarContract.Events.CONTENT_URI);
+                addEventIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(addEventIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
             SimpleCalendarEvent thisEvent = databaseInterface.getEvent((int) id);
             int nextRingerType = thisEvent.getRingerType() + 1;
-            if (nextRingerType > SimpleCalendarEvent.RINGER.SILENT) {
+            if (nextRingerType > SimpleCalendarEvent.RINGER.IGNORE) {
                 nextRingerType = SimpleCalendarEvent.RINGER.NORMAL;
             }
             databaseInterface.setRingerType((int) id, nextRingerType);
@@ -368,7 +391,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             removeListViewEvent(view);
         }
     }
-
 
     private void removeListViewEvent(View view) {
         Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
@@ -398,30 +420,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         }
 
         return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // app icon in action bar clicked; go home
-                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
-                settingsActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(settingsActivityIntent);
-                return true;
-            case R.id.action_about:
-                Intent aboutActivityIntent = new Intent(this, AboutActivity.class);
-                aboutActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(aboutActivityIntent);
-                return true;
-            case R.id.action_add_event:
-                Intent addEventIntent = new Intent(Intent.ACTION_INSERT,
-                        CalendarContract.Events.CONTENT_URI);
-                addEventIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(addEventIntent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     private class EventCursorAdapter extends CursorAdapter {

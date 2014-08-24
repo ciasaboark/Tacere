@@ -32,11 +32,6 @@ public class ShowUpdatesActivity extends Activity {
         }
     }
 
-    public static void showUpdatesDialog(Context ctx) {
-        Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
-        ctx.startActivity(updatesIntent);
-    }
-
     private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
         Prefs staticPrefs = new Prefs(ctx);
         boolean shouldChangelogBeShown = false;
@@ -47,6 +42,11 @@ public class ShowUpdatesActivity extends Activity {
             shouldChangelogBeShown = true;
         }
         return shouldChangelogBeShown;
+    }
+
+    public static void showUpdatesDialog(Context ctx) {
+        Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
+        ctx.startActivity(updatesIntent);
     }
 
     @Override

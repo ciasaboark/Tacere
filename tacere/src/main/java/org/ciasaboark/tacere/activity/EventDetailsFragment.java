@@ -64,8 +64,6 @@ public class EventDetailsFragment extends DialogFragment {
         }
 
         AlertDialog.Builder thisDialog = new AlertDialog.Builder(getActivity());
-//        thisDialog.setIcon(getColorizedTitleIcon());
-//        thisDialog.setTitle("Edit event");
         view = getActivity().getLayoutInflater().inflate(R.layout.dialog_event_longclick, null);
         setupWidgetsForView();
         thisDialog.setView(view);
@@ -95,43 +93,6 @@ public class EventDetailsFragment extends DialogFragment {
         d.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         return d;
-    }
-
-    private Drawable getColorizedTitleIcon() {
-        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
-        int color = getResources().getColor(R.color.primary);
-        d.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-        return d;
-    }
-
-    private void resetEvent() {
-        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        if (cb.isChecked()) {
-            resetAllEvents();
-        } else {
-            databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
-        }
-        notifyDatasetChanged();
-    }
-
-    private void resetAllEvents() {
-        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), SimpleCalendarEvent.RINGER.UNDEFINED);
-        prefs.unsetRingerTypeForEventSeries(event.getEventId());
-    }
-
-    private void saveSettings() {
-        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        if (cb.isChecked()) {
-            saveSettingsForAllEvents();
-        } else {
-            databaseInterface.setRingerType(event.getId(), event.getRingerType());
-        }
-        notifyDatasetChanged();
-    }
-
-    private void saveSettingsForAllEvents() {
-        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
-        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
     }
 
     private void setupWidgetsForView() {
@@ -177,16 +138,24 @@ public class EventDetailsFragment extends DialogFragment {
         });
     }
 
-    private void setRingerType(int type) {
-        event.setRingerType(type);
-
-        drawIndicators();
-//        notifyDatasetChanged();
+    private void resetEvent() {
+        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
+        if (cb.isChecked()) {
+            resetAllEvents();
+        } else {
+            databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
+        }
+        notifyDatasetChanged();
     }
 
-    private void notifyDatasetChanged() {
-        DataSetManager dsm = new DataSetManager(this, context);
-        dsm.broadcastDataSetChangedMessage();
+    private void saveSettings() {
+        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
+        if (cb.isChecked()) {
+            saveSettingsForAllEvents();
+        } else {
+            databaseInterface.setRingerType(event.getId(), event.getRingerType());
+        }
+        notifyDatasetChanged();
     }
 
     private void colorizeIcons() {
@@ -200,13 +169,6 @@ public class EventDetailsFragment extends DialogFragment {
             Drawable backgroundDrawable = getColorizedIcon(ib.getBackground());
             ib.setBackgroundDrawable(backgroundDrawable);
         }
-    }
-
-    private Drawable getColorizedIcon(Drawable d) {
-        Drawable colorizedIcon = d;
-        int color = getResources().getColor(R.color.primary);
-        colorizedIcon.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-        return colorizedIcon;
     }
 
     private void drawIndicators() {
@@ -242,5 +204,41 @@ public class EventDetailsFragment extends DialogFragment {
         } else {
             indicatorIgnore.setBackgroundColor(colorInactive);
         }
+    }
+
+    private void setRingerType(int type) {
+        event.setRingerType(type);
+
+        drawIndicators();
+//        notifyDatasetChanged();
+    }
+
+    private void resetAllEvents() {
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), SimpleCalendarEvent.RINGER.UNDEFINED);
+        prefs.unsetRingerTypeForEventSeries(event.getEventId());
+    }
+
+    private void notifyDatasetChanged() {
+        DataSetManager dsm = new DataSetManager(this, context);
+        dsm.broadcastDataSetChangedMessage();
+    }
+
+    private void saveSettingsForAllEvents() {
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
+        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
+    }
+
+    private Drawable getColorizedIcon(Drawable d) {
+        Drawable colorizedIcon = d;
+        int color = getResources().getColor(R.color.primary);
+        colorizedIcon.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        return colorizedIcon;
+    }
+
+    private Drawable getColorizedTitleIcon() {
+        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
+        int color = getResources().getColor(R.color.primary);
+        d.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        return d;
     }
 }

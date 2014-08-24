@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -39,7 +38,6 @@ import java.util.List;
 public class SelectCalendarsActivity extends Activity {
     @SuppressWarnings("unused")
     private final String TAG = "CalendarsActivity";
-    //    private final ArrayList<CheckBox> calendarIds = new ArrayList<CheckBox>();
     private Prefs prefs;
     private List<SimpleCalendar> simpleCalendars;
 
@@ -70,6 +68,30 @@ public class SelectCalendarsActivity extends Activity {
         drawDialogBodyOrError();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        restartService();
+    }
+
+    private void restartService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.select_calendars, menu);
+        return true;
+    }
+
     private void buildSimpleCalendarList() {
         DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
         simpleCalendars = databaseInterface.getCalendarIdList();
@@ -79,12 +101,6 @@ public class SelectCalendarsActivity extends Activity {
                 c.setSelected(true);
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        restartService();
     }
 
     private void drawSyncBoxSwitch() {
@@ -133,9 +149,15 @@ public class SelectCalendarsActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 SimpleCalendar simpleCalendar = simpleCalendars.get(position);
-                CheckBox checkBox = (CheckBox) view.findViewById(R.id.calendar_checkbox);
                 simpleCalendar.setSelected(!simpleCalendar.isSelected());
-                checkBox.setChecked(simpleCalendar.isSelected());
+                int backgroundColor;
+                if (simpleCalendar.isSelected()) {
+                    backgroundColor = getResources().getColor(R.color.event_list_active_event);
+                } else {
+                    backgroundColor = getResources().getColor(android.R.color.background_light);
+                }
+                view.setBackgroundColor(backgroundColor);
+
                 toggleSyncCalendar(simpleCalendar);
             }
         });
@@ -173,24 +195,6 @@ public class SelectCalendarsActivity extends Activity {
         error.setVisibility(View.GONE);
     }
 
-    private void restartService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.select_calendars, menu);
-        return true;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
     private class SimpleCalendarListAdapter extends ArrayAdapter<SimpleCalendar> {
         private static final String TAG = "CalendarListAdapter";
         private final Context context;
@@ -212,7 +216,6 @@ public class SelectCalendarsActivity extends Activity {
             }
             TextView calendarName = (TextView) row.findViewById(R.id.calendar_name);
             TextView calendarAccountName = (TextView) row.findViewById(R.id.calendar_account);
-            CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
             ImageView calendarSidebar = (ImageView) row.findViewById(R.id.calendar_sidebar);
 
             try {
@@ -220,7 +223,8 @@ public class SelectCalendarsActivity extends Activity {
                 Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar).mutate();
                 sideBarImage.setColorFilter(simpleCalendar.getColor(), PorterDuff.Mode.MULTIPLY);
                 calendarSidebar.setBackgroundDrawable(sideBarImage); //TODO deprecated method
-
+                Drawable calendarSettingsIcon = (Drawable) getResources().getDrawable(R.drawable.action_settings).mutate();
+                calendarSettingsIcon.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
                 calendarName.setText(simpleCalendar.getDisplayName());
                 calendarAccountName.setText(simpleCalendar.getAccountName());
                 List<Long> selectedCalendars = prefs.getSelectedCalendars();
@@ -231,10 +235,10 @@ public class SelectCalendarsActivity extends Activity {
                     simpleCalendar.setSelected(false);
                 }
 
+                int backgroundColor;
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                    calendarCheckBox.setChecked(true);
-                } else {
-                    calendarCheckBox.setChecked(false);
+                    backgroundColor = getResources().getColor(R.color.event_list_active_event);
+                    row.setBackgroundColor(backgroundColor);
                 }
             } catch (IndexOutOfBoundsException e) {
                 Log.e(TAG, "error getting calendar at position " + position);
@@ -243,7 +247,7 @@ public class SelectCalendarsActivity extends Activity {
             }
 
             if (prefs.shouldAllCalendarsBeSynced()) {
-                calendarCheckBox.setEnabled(false);
+                convertView.setBackgroundColor(getResources().getColor(R.color.event_list_active_event));
                 int disabledTextColor = getResources().getColor(R.color.textColorDisabled);
                 calendarAccountName.setTextColor(disabledTextColor);
                 calendarName.setTextColor(disabledTextColor);

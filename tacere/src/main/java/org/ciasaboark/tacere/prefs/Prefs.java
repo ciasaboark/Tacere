@@ -232,14 +232,19 @@ public class Prefs {
         }
     }
 
-    private String convertMapToString(Map<Integer, Integer> map) {
-        String line = "";
-        for (Integer k : map.keySet()) {
-            String key = k.toString();
-            String value = map.get(k).toString();
-            line += key + ":" + value + ",";
+    public int getRingerForEventSeries(int eventId) {
+        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
+        Map<Integer, Integer> map = getEventRingersMap();
+        if (map.containsKey(eventId)) {
+            ringerType = map.get(eventId);
         }
-        return line;
+        return ringerType;
+    }
+
+    private Map<Integer, Integer> getEventRingersMap() {
+        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
+        String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
+        return convertStringToIntegerMap(eventsString);
     }
 
     private Map<Integer, Integer> convertStringToIntegerMap(String line) {
@@ -262,10 +267,10 @@ public class Prefs {
         return map;
     }
 
-    private Map<Integer, Integer> getEventRingersMap() {
-        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
-        String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
-        return convertStringToIntegerMap(eventsString);
+    public void setRingerForEventSeries(int eventId, int ringerType) {
+        Map<Integer, Integer> eventsMap = getEventRingersMap();
+        eventsMap.put(eventId, ringerType);
+        setEventsRingerMap(eventsMap);
     }
 
     private void setEventsRingerMap(Map<Integer, Integer> map) {
@@ -273,19 +278,14 @@ public class Prefs {
         editor.putString(Keys.EVENT_RINGERS, eventRingers).commit();
     }
 
-    public int getRingerForEventSeries(int eventId) {
-        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
-        Map<Integer, Integer> map = getEventRingersMap();
-        if (map.containsKey(eventId)) {
-            ringerType = map.get(eventId);
+    private String convertMapToString(Map<Integer, Integer> map) {
+        String line = "";
+        for (Integer k : map.keySet()) {
+            String key = k.toString();
+            String value = map.get(k).toString();
+            line += key + ":" + value + ",";
         }
-        return ringerType;
-    }
-
-    public void setRingerForEventSeries(int eventId, int ringerType) {
-        Map<Integer, Integer> eventsMap = getEventRingersMap();
-        eventsMap.put(eventId, ringerType);
-        setEventsRingerMap(eventsMap);
+        return line;
     }
 
     public void unsetRingerTypeForEventSeries(int eventId) {

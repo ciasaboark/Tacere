@@ -45,17 +45,17 @@
         android:paddingRight="16dp"
         android:paddingTop="6dp">
 
-        <CheckBox
-            android:id="@+id/calendar_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="false"
-            android:layout_centerInParent="true"
-            android:checked="false"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
+        <!--<CheckBox-->
+        <!--android:id="@+id/calendar_checkbox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:checked="false"-->
+        <!--android:clickable="true"-->
+        <!--android:focusable="false"-->
+        <!--android:focusableInTouchMode="false"/>-->
 
         <TextView
             android:id="@+id/calendar_name"
@@ -65,7 +65,6 @@
             android:layout_alignParentTop="true"
             android:layout_centerVertical="false"
             android:layout_gravity="fill_horizontal|center_horizontal"
-            android:layout_toLeftOf="@id/calendar_checkbox"
             android:clickable="false"
             android:focusable="false"
             android:focusableInTouchMode="false"

@@ -73,18 +73,17 @@ public class AdvancedSettingsActivity extends Activity {
         drawQuickSilenceWidget();
     }
 
-    private void drawLookaheadWidgets() {
-        // the lookahead interval button
-        TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
-        String lookaheadText = getResources().getString(R.string.pref_list_days);
-        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays()));
-    }
-
-    private void drawEventBufferWidgets() {
-        // the event buffer button
-        TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
-        String bufferText = getResources().getString(R.string.pref_buffer_minutes);
-        bufferTV.setText(String.format(bufferText, prefs.getBufferMinutes()));
+    private void drawFreeTimeWidgets() {
+        // the silence free time state toggle
+        CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
+        TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
+        if (prefs.getSilenceFreeTimeEvents()) {
+            freeCB.setChecked(true);
+            freeTV.setText(R.string.pref_silence_free_enabled);
+        } else {
+            freeCB.setChecked(false);
+            freeTV.setText(R.string.pref_silence_free_disabled);
+        }
     }
 
     private void drawSilenceAllDayWidgets() {
@@ -100,17 +99,18 @@ public class AdvancedSettingsActivity extends Activity {
         }
     }
 
-    private void drawFreeTimeWidgets() {
-        // the silence free time state toggle
-        CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
-        TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
-        if (prefs.getSilenceFreeTimeEvents()) {
-            freeCB.setChecked(true);
-            freeTV.setText(R.string.pref_silence_free_enabled);
-        } else {
-            freeCB.setChecked(false);
-            freeTV.setText(R.string.pref_silence_free_disabled);
-        }
+    private void drawEventBufferWidgets() {
+        // the event buffer button
+        TextView bufferTV = (TextView) findViewById(R.id.bufferMinutesDescription);
+        String bufferText = getResources().getString(R.string.pref_buffer_minutes);
+        bufferTV.setText(String.format(bufferText, prefs.getBufferMinutes()));
+    }
+
+    private void drawLookaheadWidgets() {
+        // the lookahead interval button
+        TextView lookaheadTV = (TextView) findViewById(R.id.lookaheadDaysDescription);
+        String lookaheadText = getResources().getString(R.string.pref_list_days);
+        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays()));
     }
 
     private void drawQuickSilenceWidget() {
@@ -122,6 +122,12 @@ public class AdvancedSettingsActivity extends Activity {
             hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
         }
         quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
+    }
+
+    @Override
+    public void onPause() {
+        // save all changes to the preferences
+        super.onPause();
     }
 
     @Override
@@ -148,12 +154,6 @@ public class AdvancedSettingsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onPause() {
-        // save all changes to the preferences
-        super.onPause();
-    }
-
 //    private void saveSettings() {
 //        prefs.setSilenceFreeTimeEvents(silenceFreeTime);
 //        prefs.setSilenceAllDayEvents(silenceAllDay);
@@ -165,6 +165,12 @@ public class AdvancedSettingsActivity extends Activity {
         prefs.setSilenceFreeTimeEvents(!prefs.getSilenceFreeTimeEvents());
         drawFreeTimeWidgets();
         restartEventSilencerService();
+    }
+
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
     }
 
     public void onClickSilenceAllDay(View v) {
@@ -259,12 +265,6 @@ public class AdvancedSettingsActivity extends Activity {
 
         alert.setView(number);
         alert.show();
-    }
-
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
     }
 
     public void onClickListDays(View v) {

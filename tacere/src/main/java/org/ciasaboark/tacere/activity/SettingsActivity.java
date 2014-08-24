@@ -61,15 +61,43 @@ public class SettingsActivity extends Activity {
         drawAllWidgets();
     }
 
-    /**
-     * Set up the {@link android.app.ActionBar}.
-     */
-    private void setupActionBar() {
-        try {
-            getActionBar().setIcon(R.drawable.action_settings);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings_restore:
+                //restore settings to default values then navigate to the main activity
+                restoreDefaults();
+                //navigate back to the main screen
+                Toast.makeText(getApplicationContext(), R.string.settings_restored, Toast.LENGTH_SHORT).show();
+                return true;
+            case android.R.id.home:
+                // This ID represents the Home or Up button. In the case of this
+                // activity, the Up button is shown. Use NavUtils to allow users
+                // to navigate up one level in the application structure. For
+                // more details, see the Navigation pattern on Android Design:
+                //
+                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+                //
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void restoreDefaults() {
+        prefs.restoreDefaultPreferences();
+        drawAllWidgets();
     }
 
     private void drawAllWidgets() {
@@ -190,12 +218,6 @@ public class SettingsActivity extends Activity {
 
     }
 
-    public void onClickDoNotDisturb(View v) {
-        boolean doNotDisturbEnabled = prefs.getDoNotDisturb();
-        prefs.setDoNotDisturb(!doNotDisturbEnabled);
-        drawDoNotDisturbWidgets();
-    }
-
     private void drawMediaWidgets() {
         TextView mediaTV = (TextView) findViewById(id.settings_mediaText);
         if (prefs.isServiceActivated()) {
@@ -287,7 +309,6 @@ public class SettingsActivity extends Activity {
         });
     }
 
-
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("deprecation")
     private void setImageButtonIcon(ImageButton button, Drawable icon) {
@@ -306,6 +327,23 @@ public class SettingsActivity extends Activity {
     @TargetApi(21)
     private void animateHideView(final View v) {
         v.setVisibility(View.GONE);
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}.
+     */
+    private void setupActionBar() {
+        try {
+            getActionBar().setIcon(R.drawable.action_settings);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
+    }
+
+    public void onClickDoNotDisturb(View v) {
+        boolean doNotDisturbEnabled = prefs.getDoNotDisturb();
+        prefs.setDoNotDisturb(!doNotDisturbEnabled);
+        drawDoNotDisturbWidgets();
     }
 
     public void onClickAdjustAlarm(View v) {
@@ -327,51 +365,6 @@ public class SettingsActivity extends Activity {
     public void onClickAdjustMedia(View v) {
         prefs.setAdjustMedia(!prefs.getAdjustMedia());
         drawMediaWidgets();
-    }
-
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings_restore:
-                //restore settings to default values then navigate to the main activity
-                restoreDefaults();
-                //navigate back to the main screen
-                Toast.makeText(getApplicationContext(), R.string.settings_restored, Toast.LENGTH_SHORT).show();
-                return true;
-            case android.R.id.home:
-                // This ID represents the Home or Up button. In the case of this
-                // activity, the Up button is shown. Use NavUtils to allow users
-                // to navigate up one level in the application structure. For
-                // more details, see the Navigation pattern on Android Design:
-                //
-                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-                //
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void restoreDefaults() {
-        prefs.restoreDefaultPreferences();
-        drawAllWidgets();
-    }
-
-    public void onPause() {
-        super.onPause();
     }
 
     public void onClickSelectCalendars(View v) {
@@ -400,6 +393,12 @@ public class SettingsActivity extends Activity {
                 .create();
 
         alert.show();
+    }
+
+    private void restartEventSilencerService() {
+        Intent i = new Intent(this, EventSilencerService.class);
+        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
+        startService(i);
     }
 
     public void onClickAdvancedSettings(View v) {
