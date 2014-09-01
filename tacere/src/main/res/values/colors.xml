@@ -30,6 +30,8 @@
     <item name="icon_tint" type="color">@color/accent</item>
     <item name="section_background" type="color">#e0e0e0</item>
     <item name="section_text_color" type="color">#607d8b</item>
+    <item name="calendar_list_selected" type="color">#ffd4f1da</item>
+    <item name="calendar_list_unselected" type="color">#ffcccccc</item>
 </resources>
 
 

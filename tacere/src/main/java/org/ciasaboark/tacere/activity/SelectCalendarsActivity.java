@@ -141,8 +141,8 @@ public class SelectCalendarsActivity extends Activity {
     }
 
     private void drawListView() {
-        ListView lv = (ListView) findViewById(R.id.calendar_listview);
-        SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, simpleCalendars);
+        final ListView lv = (ListView) findViewById(R.id.calendar_listview);
+        final SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, simpleCalendars);
         lv.setAdapter(listAdapter);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -150,15 +150,8 @@ public class SelectCalendarsActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 SimpleCalendar simpleCalendar = simpleCalendars.get(position);
                 simpleCalendar.setSelected(!simpleCalendar.isSelected());
-                int backgroundColor;
-                if (simpleCalendar.isSelected()) {
-                    backgroundColor = getResources().getColor(R.color.event_list_active_event);
-                } else {
-                    backgroundColor = getResources().getColor(android.R.color.background_light);
-                }
-                view.setBackgroundColor(backgroundColor);
-
                 toggleSyncCalendar(simpleCalendar);
+                listAdapter.notifyDataSetChanged();
             }
         });
 
@@ -237,9 +230,12 @@ public class SelectCalendarsActivity extends Activity {
 
                 int backgroundColor;
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                    backgroundColor = getResources().getColor(R.color.event_list_active_event);
-                    row.setBackgroundColor(backgroundColor);
+                    backgroundColor = getResources().getColor(R.color.calendar_list_selected);
+                } else {
+                    backgroundColor = getResources().getColor(R.color.calendar_list_unselected);
                 }
+                row.setBackgroundColor(backgroundColor);
+
             } catch (IndexOutOfBoundsException e) {
                 Log.e(TAG, "error getting calendar at position " + position);
                 Log.e(TAG, e.getMessage());
@@ -247,7 +243,7 @@ public class SelectCalendarsActivity extends Activity {
             }
 
             if (prefs.shouldAllCalendarsBeSynced()) {
-                convertView.setBackgroundColor(getResources().getColor(R.color.event_list_active_event));
+                row.setBackgroundColor(getResources().getColor(R.color.event_list_active_event));
                 int disabledTextColor = getResources().getColor(R.color.textColorDisabled);
                 calendarAccountName.setTextColor(disabledTextColor);
                 calendarName.setTextColor(disabledTextColor);
