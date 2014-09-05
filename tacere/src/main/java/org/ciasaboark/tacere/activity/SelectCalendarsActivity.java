@@ -6,8 +6,12 @@
 package org.ciasaboark.tacere.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,20 +23,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.SimpleCalendar;
+import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 public class SelectCalendarsActivity extends Activity {
@@ -145,15 +154,18 @@ public class SelectCalendarsActivity extends Activity {
         final SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, simpleCalendars);
         lv.setAdapter(listAdapter);
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                SimpleCalendar simpleCalendar = simpleCalendars.get(position);
-                simpleCalendar.setSelected(!simpleCalendar.isSelected());
-                toggleSyncCalendar(simpleCalendar);
-                listAdapter.notifyDataSetChanged();
-            }
-        });
+        //the calendars should only be clickable if we arent syncing all calendars
+        if (!prefs.shouldAllCalendarsBeSynced()) {
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    SimpleCalendar simpleCalendar = simpleCalendars.get(position);
+                    simpleCalendar.setSelected(!simpleCalendar.isSelected());
+                    toggleSyncCalendar(simpleCalendar);
+                    listAdapter.notifyDataSetChanged();
+                }
+            });
+        }
 
         boolean syncAllCalendars = prefs.shouldAllCalendarsBeSynced();
         lv.setClickable(!syncAllCalendars);
@@ -188,10 +200,19 @@ public class SelectCalendarsActivity extends Activity {
         error.setVisibility(View.GONE);
     }
 
+    private Drawable getDesaturatedDrawable(Drawable drawable) {
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(1f);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(cm);
+        drawable.setColorFilter(filter);
+        return drawable;
+    }
+
     private class SimpleCalendarListAdapter extends ArrayAdapter<SimpleCalendar> {
         private static final String TAG = "CalendarListAdapter";
         private final Context context;
         private final List<SimpleCalendar> simpleCalendarList;
+        private final SimpleCalendarListAdapter thisAdapter = this;
 
 
         public SimpleCalendarListAdapter(Context ctx, int resourceId, List<SimpleCalendar> simpleCalendars) {
@@ -201,7 +222,7 @@ public class SelectCalendarsActivity extends Activity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View row = convertView;
             if (row == null) {
                 LayoutInflater inflator = ((Activity) context).getLayoutInflater();
@@ -210,16 +231,117 @@ public class SelectCalendarsActivity extends Activity {
             TextView calendarName = (TextView) row.findViewById(R.id.calendar_name);
             TextView calendarAccountName = (TextView) row.findViewById(R.id.calendar_account);
             ImageView calendarSidebar = (ImageView) row.findViewById(R.id.calendar_sidebar);
+            ImageView calendarIcon = (ImageView) row.findViewById(R.id.configure_calendar_icon);
+            ImageButton calendarButton = (ImageButton) row.findViewById(R.id.configure_calendar_button);
 
             try {
-                SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
+                final SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
                 Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar).mutate();
+                int iconColor;
+                if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
+                    iconColor = getResources().getColor(R.color.primary);
+                } else {
+                    iconColor = getResources().getColor(R.color.textColorDisabled);
+                }
+
                 sideBarImage.setColorFilter(simpleCalendar.getColor(), PorterDuff.Mode.MULTIPLY);
-                calendarSidebar.setBackgroundDrawable(sideBarImage); //TODO deprecated method
+                calendarSidebar.setBackgroundDrawable(sideBarImage); //TODO deprecated method use
+
+                Drawable calendarIconDrawable = null;
+                int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
+                switch (calendarRinger) {
+                    case SimpleCalendarEvent.RINGER.NORMAL:
+                        calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_normal);
+                        break;
+                    case SimpleCalendarEvent.RINGER.IGNORE:
+                        calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_ignore);
+                        break;
+                    case SimpleCalendarEvent.RINGER.VIBRATE:
+                        calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_vibrate);
+                        break;
+                    case SimpleCalendarEvent.RINGER.SILENT:
+                        calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_silent);
+                        break;
+                    default:
+                        calendarIconDrawable = getResources().getDrawable(R.drawable.blank);
+                }
+                calendarIconDrawable.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+                calendarIcon.setBackgroundDrawable(calendarIconDrawable);
+
                 Drawable calendarSettingsIcon = (Drawable) getResources().getDrawable(R.drawable.action_settings).mutate();
-                calendarSettingsIcon.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+                calendarSettingsIcon.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+                calendarButton.setBackgroundDrawable(calendarSettingsIcon); //TODO deprecated method use
+
+                calendarButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+                        //clicking the settings button should only show the dialog if this calendar
+                        //has been selected to be synced
+                        if (simpleCalendar.isSelected()) {
+                            //TODO fragile connection to the ringer types
+                            final String[] options = {"Normal", "Vibrate", "Silent", "Ignore"};
+                            final Deque<Integer> selectedItem = new ArrayDeque<Integer>();
+                            int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
+                            if (calendarRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                                calendarRinger++;
+                            } else {
+                                calendarRinger = -1;
+                            }
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Configure calendar");
+                            builder.setSingleChoiceItems(options, calendarRinger, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    selectedItem.clear();
+                                    selectedItem.addFirst(i);
+                                }
+                            });
+                            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    try {
+                                        if (!selectedItem.isEmpty()) {
+                                            prefs.setRingerForCalendar(simpleCalendar.getId(), selectedItem.getFirst() + 1); //selection has to be offset since undefined (ringer type 0) is ommited from the list
+                                            Toast.makeText(context, "set ringer for calendar " + simpleCalendar.getDisplayName() + " to ringer type: " + options[i], Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(context, "no ringer selected", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } catch (Exception e) {
+                                        //TODO
+                                    }
+                                    thisAdapter.notifyDataSetChanged();
+                                }
+                            });
+                            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //nothing to do here
+                                }
+                            });
+                            builder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    try {
+                                        SimpleCalendar calendar = simpleCalendarList.get(position);
+                                        prefs.unsetRingerTypeForCalendar(calendar.getId());
+                                        Toast.makeText(context, "unset ringer for calendar " + calendar.getDisplayName(), Toast.LENGTH_SHORT).show();
+                                    } catch (Exception e) {
+                                        //TODO
+                                    }
+                                    thisAdapter.notifyDataSetChanged();
+                                }
+                            });
+
+                            builder.show();
+                        }
+                    }
+                });
+
                 calendarName.setText(simpleCalendar.getDisplayName());
+                calendarName.setTextColor(iconColor);
                 calendarAccountName.setText(simpleCalendar.getAccountName());
+                calendarAccountName.setTextColor(iconColor);
                 List<Long> selectedCalendars = prefs.getSelectedCalendars();
 
                 if (selectedCalendars.contains(simpleCalendar.getId())) {
@@ -246,12 +368,18 @@ public class SelectCalendarsActivity extends Activity {
                 row.setBackgroundColor(getResources().getColor(R.color.event_list_active_event));
                 int disabledTextColor = getResources().getColor(R.color.textColorDisabled);
                 calendarAccountName.setTextColor(disabledTextColor);
-                calendarName.setTextColor(disabledTextColor);
+
+                //desaturate the drawablese
+//                calendarName.setTextColor(disabledTextColor);
+//                ImageButton settingsButton = (ImageButton) row.findViewById(R.id.configure_calendar_button);
+//                settingsButton.setBackgroundDrawable(getDesaturatedDrawable(settingsButton.getBackground()));
+//
+//                View sidebarImage = (View) row.findViewById(R.id.calendar_sidebar);
+//                sidebarImage.setBackgroundDrawable(getDesaturatedDrawable(sidebarImage.getBackground()));
             }
 
             return row;
         }
-
     }
 
 }

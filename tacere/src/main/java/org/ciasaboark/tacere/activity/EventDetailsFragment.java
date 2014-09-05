@@ -224,7 +224,7 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
+//        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
     }
 

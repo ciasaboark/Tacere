@@ -232,30 +232,31 @@ public class Prefs {
         }
     }
 
-    public int getRingerForEventSeries(int eventId) {
+    public int getRingerForEventSeries(long eventId) {
         int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
-        Map<Integer, Integer> map = getEventRingersMap();
+        Map<Long, Integer> map = getEventRingersMap();
         if (map.containsKey(eventId)) {
             ringerType = map.get(eventId);
         }
         return ringerType;
     }
 
-    private Map<Integer, Integer> getEventRingersMap() {
-        //Event string should be in the format of <event id (int)>:<ringer type (int)>,...
+    private Map<Long, Integer> getEventRingersMap() {
+        //Event string should be in the format of <event id (long)>:<ringer type (int)>,...
+        //i.e.: 134:1,5:2,16000:0,
         String eventsString = sharedPreferences.getString(Keys.EVENT_RINGERS, "");
-        return convertStringToIntegerMap(eventsString);
+        return convertStringToLongIntegerMap(eventsString);
     }
 
-    private Map<Integer, Integer> convertStringToIntegerMap(String line) {
-        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+    private Map<Long, Integer> convertStringToLongIntegerMap(String line) {
+        Map<Long, Integer> map = new HashMap<Long, Integer>();
 
         if (line != "") {
             String[] keyValueTuples = line.split(",");
             for (String tuple : keyValueTuples) {
                 try {
                     String[] keyValuePair = tuple.split(":");
-                    Integer key = Integer.parseInt(keyValuePair[0]);
+                    Long key = Long.parseLong(keyValuePair[0]);
                     Integer value = Integer.parseInt(keyValuePair[1]);
                     map.put(key, value);
                 } catch (NumberFormatException e) {
@@ -267,20 +268,20 @@ public class Prefs {
         return map;
     }
 
-    public void setRingerForEventSeries(int eventId, int ringerType) {
-        Map<Integer, Integer> eventsMap = getEventRingersMap();
+    public void setRingerForEventSeries(long eventId, int ringerType) {
+        Map<Long, Integer> eventsMap = getEventRingersMap();
         eventsMap.put(eventId, ringerType);
         setEventsRingerMap(eventsMap);
     }
 
-    private void setEventsRingerMap(Map<Integer, Integer> map) {
+    private void setEventsRingerMap(Map<Long, Integer> map) {
         String eventRingers = convertMapToString(map);
         editor.putString(Keys.EVENT_RINGERS, eventRingers).commit();
     }
 
-    private String convertMapToString(Map<Integer, Integer> map) {
+    private String convertMapToString(Map<Long, Integer> map) {
         String line = "";
-        for (Integer k : map.keySet()) {
+        for (Long k : map.keySet()) {
             String key = k.toString();
             String value = map.get(k).toString();
             line += key + ":" + value + ",";
@@ -288,8 +289,8 @@ public class Prefs {
         return line;
     }
 
-    public void unsetRingerTypeForEventSeries(int eventId) {
-        Map<Integer, Integer> eventsMap = getEventRingersMap();
+    public void unsetRingerTypeForEventSeries(long eventId) {
+        Map<Long, Integer> eventsMap = getEventRingersMap();
         eventsMap.remove(eventId);
         setEventsRingerMap(eventsMap);
     }
@@ -297,31 +298,31 @@ public class Prefs {
 
     public int getRingerForCalendar(long calendarId) {
         int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
-        Map<Integer, Integer> map = getCalendarRingersMap();
+        Map<Long, Integer> map = getCalendarRingersMap();
         if (map.containsKey(calendarId)) {
             ringerType = map.get(calendarId);
         }
         return ringerType;
     }
 
-    private Map<Integer, Integer> getCalendarRingersMap() {
+    private Map<Long, Integer> getCalendarRingersMap() {
         String eventsString = sharedPreferences.getString(Keys.CALENDAR_RINGERS, "");
-        return convertStringToIntegerMap(eventsString);
+        return convertStringToLongIntegerMap(eventsString);
     }
 
-    private void setCalendarRingersMap(Map<Integer, Integer> map) {
+    private void setCalendarRingersMap(Map<Long, Integer> map) {
         String calendarRingers = convertMapToString(map);
         editor.putString(Keys.CALENDAR_RINGERS, calendarRingers).commit();
     }
 
-    public void setRingerForCalendar(int calendarId, int ringerType) {
-        Map<Integer, Integer> calendarMap = getCalendarRingersMap();
+    public void setRingerForCalendar(long calendarId, int ringerType) {
+        Map<Long, Integer> calendarMap = getCalendarRingersMap();
         calendarMap.put(calendarId, ringerType);
         setCalendarRingersMap(calendarMap);
     }
 
-    public void unsetRingerTypeForCalendar(int calendarId) {
-        Map<Integer, Integer> calendarMap = getCalendarRingersMap();
+    public void unsetRingerTypeForCalendar(long calendarId) {
+        Map<Long, Integer> calendarMap = getCalendarRingersMap();
         calendarMap.remove(calendarId);
         setCalendarRingersMap(calendarMap);
     }

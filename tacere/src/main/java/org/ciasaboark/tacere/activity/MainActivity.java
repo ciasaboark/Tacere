@@ -519,20 +519,34 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         private Drawable getRingerIcon(SimpleCalendarEvent event) {
             Drawable icon;
-            int defaultColor = getResources().getColor(R.color.icon_accent);
-            int primaryColor = getResources().getColor(R.color.primary);
-            int color;
-            if (event.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
-                color = defaultColor;
-            } else {
-                color = primaryColor;
+//            int defaultColor = getResources().getColor(R.color.icon_accent);
+//            int primaryColor = getResources().getColor(R.color.primary);
+
+            int defaultColor = getResources().getColor(android.R.color.holo_red_light);
+            int calendarColor = getResources().getColor(R.color.accent);
+            int eventColor = getResources().getColor(android.R.color.holo_green_light);
+            int instanceColor = getResources().getColor(R.color.primary);
+
+            int color = defaultColor;
+            int defaultRinger = prefs.getRingerType();
+            int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
+            int eventSeriesRinger = prefs.getRingerForEventSeries(event.getEventId());
+
+            int ringerType = defaultRinger;
+            if (calendarRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                ringerType = calendarRinger;
+                color = calendarColor;
+            }
+            if (eventSeriesRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                ringerType = eventSeriesRinger;
+                color = eventColor;
+            }
+            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                ringerType = event.getRingerType();
+                color = instanceColor;
             }
 
-            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                icon = getIconForRinger(event.getRingerType());
-            } else {
-                icon = getIconForRinger(prefs.getRingerType());
-            }
+            icon = getIconForRinger(ringerType);
 
             icon.mutate().setColorFilter(color, Mode.MULTIPLY);
             return icon;

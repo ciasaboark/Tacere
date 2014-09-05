@@ -8,32 +8,21 @@
     android:id="@+id/eventListItem"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="60dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="false"
+    android:descendantFocusability="blocksDescendants"
     android:focusable="false"
     android:focusableInTouchMode="false"
-    android:orientation="horizontal"
-    >
+    android:orientation="horizontal">
 
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/calendar_color"-->
-    <!--android:layout_width="3dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_alignParentTop="true"-->
-
-    <!--android:clickable="false"-->
-    <!--android:focusable="false"-->
-    <!--android:focusableInTouchMode="false">-->
-
-    <!--</RelativeLayout>-->
     <ImageView
         android:id="@+id/calendar_sidebar"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:background="@drawable/sidebar"/>
+        android:background="@drawable/sidebar"
+        android:clickable="false"
+        android:focusable="false"/>
 
     <RelativeLayout
         android:id="@+id/event_textholder"
@@ -85,5 +74,27 @@
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/configure_calendar_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="56dp"
+        android:background="@drawable/blank"
+        android:clickable="false"
+        android:focusable="false"/>
+
+    <ImageButton
+        android:id="@+id/configure_calendar_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/action_settings"
+        android:clickable="false"
+        android:focusable="false"/>
 
 </RelativeLayout>
