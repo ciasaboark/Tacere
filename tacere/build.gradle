@@ -19,11 +19,16 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
 def APP_VERSION_RELEASE = "0 - beta 4";
+
+def dateTime = new Date()
+def DATE_STRING = dateTime.getDateString()
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
@@ -49,6 +54,7 @@ android {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BUILD_DATE", "\"" + DATE_STRING + "\""
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
             buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + "\""
@@ -57,9 +63,10 @@ android {
         debug {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BUILD_DATE", "\"" + DATE_STRING + "\""
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
-            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + " - (debug build)\""
+            buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + "\""
             buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\"";
         }
     }

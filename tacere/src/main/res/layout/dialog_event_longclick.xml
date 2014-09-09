@@ -15,27 +15,56 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/event_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Name"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/calendar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Calendar Name"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <ImageView
+                android:id="@+id/event_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"/>
+
+            <TextView
+                android:id="@+id/event_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Event Name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/event_calendar_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/calendar_icon"/>
+
+            <TextView
+                android:id="@+id/calendar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calendar Name"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/linearLayout13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -125,8 +154,9 @@
             android:id="@+id/all_events_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:checked="false"
-            android:text="Use for all events in this series"/>
+            android:text="@string/event_details_checkbox"/>
 
     </LinearLayout>
 

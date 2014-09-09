@@ -101,7 +101,7 @@ public class DatabaseInterface {
         return eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, null, null, null, null, order, null);
     }
 
-    public void setRingerType(int instanceId, int ringerType) {
+    public void setRingerForInstance(int instanceId, int ringerType) {
         if (ringerType != SimpleCalendarEvent.RINGER.IGNORE && ringerType != SimpleCalendarEvent.RINGER.NORMAL
                 && ringerType != SimpleCalendarEvent.RINGER.SILENT && ringerType != SimpleCalendarEvent.RINGER.UNDEFINED
                 && ringerType != SimpleCalendarEvent.RINGER.VIBRATE) {
@@ -111,13 +111,12 @@ public class DatabaseInterface {
         String[] mSelectionArgs = {String.valueOf(instanceId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
-        values.put(Columns.CUSTOM_RINGER, 1);
         eventsDB.beginTransaction();
         try {
             int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
                     mSelectionClause, mSelectionArgs);
             if (rowsUpdated != 1) {
-                throw new SQLException("setRingerType() should have updated 1 row for instance id " + instanceId + ", updated " + rowsUpdated);
+                throw new SQLException("setRingerForInstance() should have updated 1 row for instance id " + instanceId + ", updated " + rowsUpdated);
             }
             eventsDB.setTransactionSuccessful();
         } catch (Exception e) {
@@ -167,7 +166,6 @@ public class DatabaseInterface {
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
         values.put(Columns.RINGER_TYPE, ringerType);
-        values.put(Columns.CUSTOM_RINGER, 0);
         eventsDB.beginTransaction();
         try {
             int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
@@ -194,6 +192,23 @@ public class DatabaseInterface {
                 * (long) prefs.getBufferMinutes());
     }
 
+    public List<Long> getInstanceIdsForEvent(long eventId) {
+        List<Long> events = new ArrayList<Long>();
+        //TODO make faster with select query to avoid event id check
+        Cursor cursor = getEventCursor();
+        if (cursor.moveToFirst()) {
+            do {
+                long _eventId = cursor.getLong(cursor.getColumnIndex(Columns.EVENT_ID));
+                if (eventId == _eventId) {
+                    long instanceId = cursor.getLong(cursor.getColumnIndex(Columns._ID));
+                    events.add(instanceId);
+                }
+            } while (cursor.moveToNext());
+        }
+        return events;
+    }
+
+
     // returns the event that matches the given Instance id, throws NoSuchEventException if no match
     public SimpleCalendarEvent getEvent(int instanceId) throws NoSuchEventException {
         //TODO use better SQL SELECT
@@ -213,13 +228,10 @@ public class DatabaseInterface {
                     int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
-                    boolean hasCusomRinger = cursor.getInt(cursor.getColumnIndex(Columns.CUSTOM_RINGER)) == 1;
-                    int customRingerInt = cursor.getInt(cursor.getColumnIndex(Columns.CUSTOM_RINGER));
 
                     thisEvent = new SimpleCalendarEvent(cal_id, id, event_id, title, begin, end, description,
                             displayColor, isFreeTime, isAllDay);
                     thisEvent.setRingerType(ringerType);
-                    thisEvent.setHasCutomRinger(hasCusomRinger);
                     break;
                 }
             } while (cursor.moveToNext());
@@ -271,7 +283,6 @@ public class DatabaseInterface {
                 // if the event is already in the local database then we need to preserve
                 // the ringerType, all other values should be read from the system calendar
                 // database
-
                 SimpleCalendarEvent newEvent = new SimpleCalendarEvent(cal_id, id, event_id, event_title, event_begin, event_end,
                         event_description, event_displayColor, (event_availability == 0),
                         (event_allDay == 1));
@@ -279,31 +290,13 @@ public class DatabaseInterface {
                 try {
                     SimpleCalendarEvent oldEvent = getEvent(id);
                     newEvent.setRingerType(oldEvent.getRingerType());
-                    newEvent.setHasCutomRinger(oldEvent.hasCustomRinger());
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
                 }
 
-                //if this event instance does not have a custom ringer then we can look for a default
-                // ringer based on the event series it belongs to and, failing that, the calendar
-                // the event instance belongs to
-                if (!newEvent.hasCustomRinger()) {
-                    //TODO get ringer from calendar settings
-                    if (newEvent.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
-                        int calendarRinger = prefs.getRingerForCalendar(newEvent.getCalendarId());
-                        newEvent.setRingerType(calendarRinger); //TODO this will clobber events with custom UNDEFINED ringer
-                    }
-
-                    if (newEvent.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
-                        int eventRinger = prefs.getRingerForEventSeries(newEvent.getEventId());
-                        newEvent.setRingerType(eventRinger);
-                    }
-                }
-
                 // inserting an event with the same id will clobber all previous data, completing
                 // the synchronization of this event
-                //TODO insert the event only if that calendar is set to synchronize
                 List calendarsToSync = prefs.getSelectedCalendars();
                 long calendarId = newEvent.getCalendarId();
                 if (prefs.shouldAllCalendarsBeSynced() || calendarsToSync.contains(calendarId)) {
@@ -436,8 +429,6 @@ public class DatabaseInterface {
         cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
         cv.put(Columns.CAL_ID, e.getCalendarId());
         cv.put(Columns.EVENT_ID, e.getEventId());
-        cv.put(Columns.CUSTOM_RINGER,
-                e.hasCustomRinger() ? 1 : 0);
         cv.put(Columns.IS_ALLDAY,
                 e.isAllDay() ? 1 : 0);
         cv.put(Columns.IS_FREETIME,

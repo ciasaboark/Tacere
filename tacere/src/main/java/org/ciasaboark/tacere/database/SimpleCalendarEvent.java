@@ -42,15 +42,6 @@ public class SimpleCalendarEvent {
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
         this.ringerType = RINGER.UNDEFINED;
-        this.hasCustomRinger = false;
-    }
-
-    public boolean hasCustomRinger() {
-        return hasCustomRinger;
-    }
-
-    public void setHasCutomRinger(boolean custom) {
-        hasCustomRinger = custom;
     }
 
     public String getLocalBeginTime() {
@@ -96,16 +87,6 @@ public class SimpleCalendarEvent {
         return dateFormatter.format(date);
     }
 
-    public String toString() {
-        DateFormat dateFormatter;
-        dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT,
-                Locale.getDefault());
-        Date date = new Date(end);
-        String fdate = dateFormatter.format(date);
-        return title + ", ends " + fdate;
-    }
-
-
     /**
      * Check if this CalEvent is ongoing between the given times
      *
@@ -138,11 +119,6 @@ public class SimpleCalendarEvent {
     public Integer getDisplayColor() {
         return dispColor;
     }
-
-    public Integer getId() {
-        return instanceId;
-    }
-
 
     public Boolean isAllDay() {
         return isAllDay;
@@ -177,6 +153,19 @@ public class SimpleCalendarEvent {
         }
 
         return getId().equals(((SimpleCalendarEvent) o).getId());
+    }
+
+    public String toString() {
+        DateFormat dateFormatter;
+        dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT,
+                Locale.getDefault());
+        Date date = new Date(end);
+        String fdate = dateFormatter.format(date);
+        return title + ", ends " + fdate;
+    }
+
+    public Integer getId() {
+        return instanceId;
     }
 
     public class RINGER {

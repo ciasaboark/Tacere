@@ -26,6 +26,9 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import java.util.Deque;
 import java.util.List;
 
+import static org.ciasaboark.tacere.database.SimpleCalendarEvent.RINGER.IGNORE;
+import static org.ciasaboark.tacere.database.SimpleCalendarEvent.RINGER.UNDEFINED;
+
 public class EventSilencerService extends IntentService {
     private static final String TAG = "EventSilencerService";
     private static final long TEN_SECONDS = 10000;
@@ -194,29 +197,9 @@ public class EventSilencerService extends IntentService {
         }
     }
 
-    private void silenceEventAndShowNotification(SimpleCalendarEvent event) {
-        ringerState.storeRingerStateIfNeeded();
-        //use the ringer type stored in the event instance if possible, otherwise use the default
-        //ringer
-        if (event.getRingerType() == SimpleCalendarEvent.RINGER.UNDEFINED) {
-            ringerState.setPhoneRinger(prefs.getRingerType());
-        } else {
-            ringerState.setPhoneRinger(event.getRingerType());
-        }
-
-        volumesManager.adjustMediaAndAlarmVolumesIfNeeded();
-        //only vibrate if we are transitioning from no event active to an active event
-        if (!stateManager.isEventActive()) {
-            vibrate();
-        }
-
-        stateManager.setServiceState(ServiceStates.EVENT_ACTIVE);
-        notificationManager.displayEventNotification(event);
-        // the extra ten seconds is to make sure that the event ending is pushed into the
-        // correct minute
-        long wakeAt = event.getEnd()
-                + (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
-        alarmManager.scheduleNormalWakeAt(wakeAt);
+    private void notifyCursorAdapterDataChanged() {
+        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
+        dsm.broadcastDataSetChangedMessage();
     }
 
     /**
@@ -233,11 +216,6 @@ public class EventSilencerService extends IntentService {
         ringerState.setPhoneRinger(ringerState.getStoredRingerState());
         alarmManager.cancelAllAlarms();
         shutdown();
-    }
-
-    private void notifyCursorAdapterDataChanged() {
-        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
-        dsm.broadcastDataSetChangedMessage();
     }
 
     private void vibrate() {
@@ -293,16 +271,74 @@ public class EventSilencerService extends IntentService {
             }
         }
 
+        //the event should be ignored if the highest priority ringer is set to IGNORE
+        boolean eventShouldBeIgnored = false;
+        int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
+        if (calendarRinger == IGNORE) {
+            eventShouldBeIgnored = true;
+        }
+        int eventSeriesRinger = prefs.getRingerForEventSeries(event.getEventId());
+        if (eventSeriesRinger == IGNORE) {
+            eventShouldBeIgnored = true;
+        } else if (eventSeriesRinger != UNDEFINED) {
+            eventShouldBeIgnored = false;
+        }
+        if (event.getRingerType() == IGNORE) {
+            eventShouldBeIgnored = true;
+        } else if (event.getRingerType() != UNDEFINED) {
+            eventShouldBeIgnored = false;
+        }
         //all of this is negated if the event has been marked to be ignored
-        if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
+        if (eventShouldBeIgnored) {
             eventMatches = false;
         }
 
         return eventMatches;
     }
 
+    private void silenceEventAndShowNotification(SimpleCalendarEvent event) {
+        ringerState.storeRingerStateIfNeeded();
+        //use the ringer type stored in the event instance if possible, otherwise use the default
+        //ringer
+        int bestRinger = getHighestPriorityRingerForEvent(event);
+        ringerState.setPhoneRinger(bestRinger);
+
+        volumesManager.adjustMediaAndAlarmVolumesIfNeeded();
+        //only vibrate if we are transitioning from no event active to an active event
+        if (!stateManager.isEventActive()) {
+            vibrate();
+        }
+
+        stateManager.setServiceState(ServiceStates.EVENT_ACTIVE);
+        notificationManager.displayEventNotification(event);
+        // the extra ten seconds is to make sure that the event ending is pushed into the
+        // correct minute
+        long wakeAt = event.getEnd()
+                + (SimpleCalendarEvent.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
+        alarmManager.scheduleNormalWakeAt(wakeAt);
+    }
+
     private void shutdown() {
         stopSelf();
+    }
+
+    private int getHighestPriorityRingerForEvent(SimpleCalendarEvent event) {
+        int bestRinger = prefs.getRingerType();
+
+        int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
+        if (calendarRinger != UNDEFINED) {
+            bestRinger = calendarRinger;
+        }
+
+        int eventRinger = prefs.getRingerForEventSeries(event.getEventId());
+        if (eventRinger != UNDEFINED) {
+            bestRinger = eventRinger;
+        }
+
+        if (event.getRingerType() != UNDEFINED) {
+            bestRinger = event.getRingerType();
+        }
+        return bestRinger;
     }
 
 }

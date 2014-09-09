@@ -31,7 +31,7 @@ public class SkipEventService extends IntentService {
             int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
             if (eventId != -1) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
-                dbIface.setRingerType(eventId, SimpleCalendarEvent.RINGER.IGNORE);
+                dbIface.setRingerForInstance(eventId, SimpleCalendarEvent.RINGER.IGNORE);
 
                 Intent i = new Intent(this, EventSilencerService.class);
                 i.putExtra("type", "activityRestart");

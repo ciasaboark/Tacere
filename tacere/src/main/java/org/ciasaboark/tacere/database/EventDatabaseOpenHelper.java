@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 class EventDatabaseOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_EVENTS = "events";
     private static final String DB_NAME = "events.sqlite";
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     public EventDatabaseOpenHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
@@ -29,8 +29,8 @@ class EventDatabaseOpenHelper extends SQLiteOpenHelper {
                 Columns.DESCRIPTION + " varchar(100), " + Columns.BEGIN + " integer, " +
                 Columns.END + " integer, " + Columns.IS_ALLDAY + " integer, " +
                 Columns.IS_FREETIME + " integer, " + Columns.RINGER_TYPE + " integer, " +
-                Columns.DISPLAY_COLOR + " integer, " + Columns.CAL_ID + " integer, " +
-                Columns.CUSTOM_RINGER + " integer " + ")");
+                Columns.DISPLAY_COLOR + " integer, " + Columns.CAL_ID + " integer " +
+                ")");
     }
 
     @Override

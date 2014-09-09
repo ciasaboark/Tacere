@@ -126,4 +126,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="clear">clear</string>
 
+    <!-- event details dialog -->
+    <string name="event_details_checkbox">Use for all repetitions of this event</string>
+
 </resources>

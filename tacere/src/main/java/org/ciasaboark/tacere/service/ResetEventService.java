@@ -32,7 +32,7 @@ public class ResetEventService extends IntentService {
             int eventId = b.getInt("org.ciasaboark.tacere.eventId", BOGUS_EVENT_ID);
             if (eventId != BOGUS_EVENT_ID) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
-                dbIface.setRingerType(eventId, SimpleCalendarEvent.RINGER.UNDEFINED);
+                dbIface.setRingerForInstance(eventId, SimpleCalendarEvent.RINGER.UNDEFINED);
 
                 Intent i = new Intent(this, EventSilencerService.class);
                 i.putExtra("type", "activityRestart");

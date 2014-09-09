@@ -9,9 +9,14 @@ import org.ciasaboark.tacere.BuildConfig;
 
 public class Versioning {
     public static String getVersionCode() {
-        return BuildConfig.APP_VERSION_MAJOR + "."
+        String versionCode = BuildConfig.APP_VERSION_MAJOR + "."
                 + BuildConfig.APP_VERSION_MINOR + "."
                 + BuildConfig.APP_VERSION_RELEASE;
+        if (BuildConfig.DEBUG) {
+            versionCode += " pre-release debug build (" + BuildConfig.BUILD_DATE + ")";
+        }
+
+        return versionCode;
     }
 
     public static String getReleaseName() {

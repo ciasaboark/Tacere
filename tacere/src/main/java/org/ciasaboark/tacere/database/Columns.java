@@ -11,7 +11,7 @@ package org.ciasaboark.tacere.database;
  * @author Jonathan Nelson <ciasaboark@gmail.com>
  */
 public class Columns {
-    public static final String _ID = "_id"; //primary key, tied to the events instance id
+    public static final String _ID = "_id"; //primary key, tied to the event's instance id
     public static final String EVENT_ID = "event_id";
     public static final String TITLE = "title";
     public static final String CAL_ID = "cal_id";
@@ -22,6 +22,4 @@ public class Columns {
     public static final String DISPLAY_COLOR = "display_color";
     public static final String IS_ALLDAY = "is_allday";
     public static final String IS_FREETIME = "is_freetime";
-    public static final String CUSTOM_RINGER = "custom_ringer";
-
 }

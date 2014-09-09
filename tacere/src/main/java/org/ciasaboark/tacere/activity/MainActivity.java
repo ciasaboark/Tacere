@@ -378,7 +378,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             if (nextRingerType > SimpleCalendarEvent.RINGER.IGNORE) {
                 nextRingerType = SimpleCalendarEvent.RINGER.NORMAL;
             }
-            databaseInterface.setRingerType((int) id, nextRingerType);
+            databaseInterface.setRingerForInstance((int) id, nextRingerType);
             eventListview.getAdapter().getView(position, view, eventListview);
 
             // since the database has changed we need to wake the service
@@ -478,7 +478,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
                 sidebar.setBackgroundDrawable(coloredSidebar);
 
-                // an image button to show the ringer state for this event
+                // an icon to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
                 if (eventIV != null) {
                     eventIV.setImageDrawable(this.getRingerIcon(thisEvent));

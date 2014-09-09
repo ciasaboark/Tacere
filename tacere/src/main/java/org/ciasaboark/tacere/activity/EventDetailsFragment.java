@@ -16,8 +16,10 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,9 +30,8 @@ import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.prefs.Prefs;
 
-/**
- * Created by ciasaboark on 8/9/14.
- */
+import java.util.List;
+
 public class EventDetailsFragment extends DialogFragment {
     private static final String TAG = "EventLongClickFragment";
     private DatabaseInterface databaseInterface;
@@ -68,12 +69,18 @@ public class EventDetailsFragment extends DialogFragment {
         setupWidgetsForView();
         thisDialog.setView(view);
 
-        thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                resetEvent();
-            }
-        });
+        //the clear button should only be visible if the event has a custom ringer or if the events
+        //series has a custom ringer set
+        if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED ||
+                prefs.getRingerForEventSeries(event.getEventId()) != SimpleCalendarEvent.RINGER.UNDEFINED) {
+            thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    resetEvent();
+                }
+            });
+        }
+
 
         thisDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -81,6 +88,10 @@ public class EventDetailsFragment extends DialogFragment {
                 //nothing to do here
             }
         });
+
+        //the positive button should only be enabled if the selected ringer is not UNDEFINED
+        AlertDialog dialog = thisDialog.create();
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
 
         thisDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -96,8 +107,19 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void setupWidgetsForView() {
+        int primaryColor = getResources().getColor(R.color.primary);
+        ImageView eventIconView = (ImageView) view.findViewById(R.id.event_icon);
+        Drawable eventIcon = getResources().getDrawable(R.drawable.info_icon).mutate();
+        eventIcon.setColorFilter(primaryColor, PorterDuff.Mode.MULTIPLY);
+        eventIconView.setBackgroundDrawable(eventIcon);
+
         TextView eventTitle = (TextView) view.findViewById(R.id.event_title);
         eventTitle.setText(event.getTitle());
+
+        ImageView calendarIconView = (ImageView) view.findViewById(R.id.event_calendar_icon);
+        Drawable calendarIcon = getResources().getDrawable(R.drawable.calendar_icon).mutate();
+        calendarIcon.setColorFilter(primaryColor, PorterDuff.Mode.MULTIPLY);
+        calendarIconView.setBackgroundDrawable(calendarIcon);
 
         TextView calendarTitle = (TextView) view.findViewById(R.id.calendar_title);
         calendarTitle.setText(databaseInterface.getCalendarNameForId(event.getCalendarId()));
@@ -136,6 +158,15 @@ public class EventDetailsFragment extends DialogFragment {
                 setRingerType(SimpleCalendarEvent.RINGER.IGNORE);
             }
         });
+
+        //only display the checkbox if there are multiple instances of this event
+        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
+        List<Long> instanceIds = databaseInterface.getInstanceIdsForEvent(event.getEventId());
+        if (instanceIds.size() <= 1) {
+            cb.setVisibility(View.GONE);
+        } else {
+            cb.setText(R.string.event_details_checkbox);
+        }
     }
 
     private void resetEvent() {
@@ -143,7 +174,7 @@ public class EventDetailsFragment extends DialogFragment {
         if (cb.isChecked()) {
             resetAllEvents();
         } else {
-            databaseInterface.setRingerType(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
+            databaseInterface.setRingerForInstance(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
         }
         notifyDatasetChanged();
     }
@@ -151,9 +182,12 @@ public class EventDetailsFragment extends DialogFragment {
     private void saveSettings() {
         CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
         if (cb.isChecked()) {
+            //if the checkbox is checked then we need to make sure to erase any previously chosen
+            //ringers for all instances before saving the current settings
+            resetAllEvents();
             saveSettingsForAllEvents();
         } else {
-            databaseInterface.setRingerType(event.getId(), event.getRingerType());
+            databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
         }
         notifyDatasetChanged();
     }
@@ -214,8 +248,9 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void resetAllEvents() {
-        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), SimpleCalendarEvent.RINGER.UNDEFINED);
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
+                SimpleCalendarEvent.RINGER.UNDEFINED);
     }
 
     private void notifyDatasetChanged() {
@@ -224,7 +259,6 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-//        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(), event.getRingerType());
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
     }
 
