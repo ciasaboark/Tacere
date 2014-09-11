@@ -32,6 +32,12 @@
     <item name="section_text_color" type="color">#607d8b</item>
     <item name="calendar_list_selected" type="color">#ffd4f1da</item>
     <item name="calendar_list_unselected" type="color">#ffcccccc</item>
+
+    <!-- ringer icon colors -->
+    <item name="ringer_default" type="color">#ffc0c0c0</item>
+    <item name="ringer_calendar" type="color">#ff716c95</item>
+    <item name="ringer_series" type="color">#ff669560</item>
+    <item name="ringer_instance" type="color">#ff1b1b1b</item>
 </resources>
 
 

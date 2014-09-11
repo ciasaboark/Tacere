@@ -207,13 +207,6 @@
 
             </RelativeLayout>
 
-            <SeekBar
-                android:id="@+id/mediaSeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
-
             <View style="@style/Divider"/>
 
             <RelativeLayout
@@ -244,12 +237,6 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             </RelativeLayout>
-
-            <SeekBar
-                android:id="@+id/alarmSeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/textView10"

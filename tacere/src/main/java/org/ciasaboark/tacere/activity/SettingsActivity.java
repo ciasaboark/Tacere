@@ -23,8 +23,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +30,6 @@ import android.widget.Toast;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
 import org.ciasaboark.tacere.database.SimpleCalendarEvent;
-import org.ciasaboark.tacere.manager.VolumesManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -228,42 +225,13 @@ public class SettingsActivity extends Activity {
 
         //the media volumes toggle
         Switch mediaSwitch = (Switch) findViewById(id.adjustMediaCheckBox);
-        SeekBar mediaSB = (SeekBar) findViewById(id.mediaSeekBar);
-        if (prefs.getAdjustMedia()) {
+        if (prefs.shouldMediaVolumeBeSilenced()) {
             mediaSwitch.setChecked(true);
         } else {
             mediaSwitch.setChecked(false);
         }
         mediaSwitch.setEnabled(prefs.isServiceActivated());
         findViewById(id.settings_mediaBox).setEnabled(prefs.isServiceActivated());
-
-
-        //the media volumes slider
-        mediaSB.setMax(VolumesManager.getMaxMediaVolume());
-        mediaSB.setProgress(prefs.getCurMediaVolume());
-        if (prefs.getAdjustMedia() && prefs.isServiceActivated()) {
-            this.animateRevealView(mediaSB);
-            mediaSB.setEnabled(true);
-        } else {
-            mediaSB.setEnabled(false);
-            this.animateHideView(mediaSB);
-        }
-        mediaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                prefs.setCurMediaVolume(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
-        });
     }
 
     private void drawAlarmWidgets() {
@@ -276,37 +244,9 @@ public class SettingsActivity extends Activity {
 
         //the alarm volumes toggle
         Switch alarmSwitch = (Switch) findViewById(id.adjustAlarmCheckBox);
-        alarmSwitch.setChecked(prefs.getAdjustAlarm());
+        alarmSwitch.setChecked(prefs.shouldAlarmVolumeBeSilenced());
         alarmSwitch.setEnabled(prefs.isServiceActivated());
         findViewById(id.settings_alarmBox).setEnabled(prefs.isServiceActivated());
-
-        //the alarm volumes slider
-        SeekBar alarmSB = (SeekBar) findViewById(id.alarmSeekBar);
-        alarmSB.setMax(VolumesManager.getMaxAlarmVolume());
-        alarmSB.setProgress(prefs.getCurAlarmVolume());
-        if (prefs.getAdjustAlarm() && prefs.isServiceActivated()) {
-            this.animateRevealView(alarmSB);
-            alarmSB.setEnabled(true);
-        } else {
-            alarmSB.setEnabled(false);
-            this.animateHideView(alarmSB);
-        }
-        alarmSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                prefs.setCurAlarmVolume(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //required stub
-            }
-        });
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -347,7 +287,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void onClickAdjustAlarm(View v) {
-        prefs.setAdjustAlarm(!prefs.getAdjustAlarm());
+        prefs.setAlarmVolumeShouldSilence(!prefs.shouldAlarmVolumeBeSilenced());
         drawAlarmWidgets();
     }
 
@@ -363,7 +303,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void onClickAdjustMedia(View v) {
-        prefs.setAdjustMedia(!prefs.getAdjustMedia());
+        prefs.setMediaVolumeShouldSilence(!prefs.shouldMediaVolumeBeSilenced());
         drawMediaWidgets();
     }
 

@@ -51,26 +51,46 @@ public class VolumesManager {
         }
 
         ringerState.clearStoredRingerState();
+        restoreAlarmVolume();
+        restoreMediaVolume();
+    }
 
-        if (prefs.getAdjustMedia()) {
-            audio.setStreamVolume(AudioManager.STREAM_MUSIC, prefs.getDefaultMediaVolume(), 0);
+    private void restoreAlarmVolume() {
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int storedAlarmVolume = prefs.getStoredAlarmVolume();
+        audio.setStreamVolume(AudioManager.STREAM_ALARM, storedAlarmVolume, 0);
+    }
+
+    private void restoreMediaVolume() {
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int storedMediaVolume = prefs.getStoredMediaVolume();
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, storedMediaVolume, 0);
+
+    }
+
+    public void silenceMediaAndAlarmVolumesIfNeeded() {
+        // change media volume, and alarm volume
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        if (prefs.shouldMediaVolumeBeSilenced()) {
+            storeMediaVolume();
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
         }
 
-        if (prefs.getAdjustAlarm()) {
-            audio.setStreamVolume(AudioManager.STREAM_ALARM, prefs.getDefaultAlarmVolume(), 0);
+        if (prefs.shouldAlarmVolumeBeSilenced()) {
+            storeAlarmVolume();
+            audio.setStreamVolume(AudioManager.STREAM_ALARM, 0, 0);
         }
     }
 
-
-    public void adjustMediaAndAlarmVolumesIfNeeded() {
-        // change media volume, and alarm volume
+    private void storeMediaVolume() {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        if (prefs.getAdjustMedia()) {
-            audio.setStreamVolume(AudioManager.STREAM_MUSIC, prefs.getCurMediaVolume(), 0);
-        }
+        int mediaVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        prefs.storeMediaVolume(mediaVolume);
+    }
 
-        if (prefs.getAdjustAlarm()) {
-            audio.setStreamVolume(AudioManager.STREAM_ALARM, prefs.getCurAlarmVolume(), 0);
-        }
+    private void storeAlarmVolume() {
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int alarmVolume = audio.getStreamVolume(AudioManager.STREAM_ALARM);
+        prefs.storeAlarmVolume(alarmVolume);
     }
 }

@@ -304,7 +304,12 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
         int lookaheadDays = prefs.getLookaheadDays();
         DateConverter dateConverter = new DateConverter(lookaheadDays);
-        String errorText = String.format(getString(R.string.no_events), dateConverter.toString());
+        String errorText;
+        if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendars().isEmpty()) {
+            errorText = getString(R.string.list_error_no_calendars);
+        } else {
+            errorText = String.format(getString(R.string.list_error_no_events), dateConverter.toString());
+        }
         noEventsTv.setText(errorText);
     }
 
@@ -522,10 +527,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 //            int defaultColor = getResources().getColor(R.color.icon_accent);
 //            int primaryColor = getResources().getColor(R.color.primary);
 
-            int defaultColor = getResources().getColor(android.R.color.holo_red_light);
-            int calendarColor = getResources().getColor(R.color.accent);
-            int eventColor = getResources().getColor(android.R.color.holo_green_light);
-            int instanceColor = getResources().getColor(R.color.primary);
+            int defaultColor = getResources().getColor(R.color.ringer_default);
+            int calendarColor = getResources().getColor(R.color.ringer_calendar);
+            int eventColor = getResources().getColor(R.color.ringer_series);
+            int instanceColor = getResources().getColor(R.color.ringer_instance);
 
             int color = defaultColor;
             int defaultRinger = prefs.getRingerType();

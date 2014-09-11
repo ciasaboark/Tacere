@@ -59,6 +59,7 @@ public class Prefs {
         //setting specific calendar ids to sync should clear the preference to sync all calendars
         setSyncAllCalendars(false);
         List<Long> noDuplicates = new ArrayList<Long>();
+        //remove any duplicate entries
         for (Long l : calendarList) {
             if (!noDuplicates.contains(l)) {
                 noDuplicates.add(l);
@@ -116,38 +117,6 @@ public class Prefs {
 
     public void setRingerType(int ringerType) {
         editor.putInt(Keys.RINGER_TYPE, ringerType).commit();
-    }
-
-    public Boolean getAdjustMedia() {
-        return sharedPreferences.getBoolean(Keys.ADJUST_MEDIA, DefaultPrefs.ADJUST_MEDIA);
-    }
-
-    public void setAdjustMedia(Boolean adjustMedia) {
-        editor.putBoolean(Keys.ADJUST_MEDIA, adjustMedia).commit();
-    }
-
-    public Boolean getAdjustAlarm() {
-        return sharedPreferences.getBoolean(Keys.ADJUST_ALARM, DefaultPrefs.ADJUST_ALARM);
-    }
-
-    public void setAdjustAlarm(Boolean adjustAlarm) {
-        editor.putBoolean(Keys.ADJUST_ALARM, adjustAlarm).commit();
-    }
-
-    public int getCurMediaVolume() {
-        return sharedPreferences.getInt(Keys.MEDIA_VOLUME, DefaultPrefs.MEDIA_VOLUME);
-    }
-
-    public void setCurMediaVolume(int curMediaVolume) {
-        editor.putInt(Keys.MEDIA_VOLUME, curMediaVolume).commit();
-    }
-
-    public int getCurAlarmVolume() {
-        return sharedPreferences.getInt(Keys.ALARM_VOLUME, DefaultPrefs.ALARM_VOLUME);
-    }
-
-    public void setCurAlarmVolume(int curAlarmVolume) {
-        editor.putInt(Keys.ALARM_VOLUME, curAlarmVolume).commit();
     }
 
     public int getQuicksilenceMinutes() {
@@ -357,16 +326,44 @@ public class Prefs {
         sharedPreferences.edit().remove(key).apply();
     }
 
+    public boolean shouldMediaVolumeBeSilenced() {
+        return sharedPreferences.getBoolean(Keys.SILENCE_MEDIA, DefaultPrefs.SILENCE_MEDIA);
+    }
+
+    public void setMediaVolumeShouldSilence(boolean shouldSilence) {
+        editor.putBoolean(Keys.SILENCE_MEDIA, shouldSilence).commit();
+    }
+
+    public boolean shouldAlarmVolumeBeSilenced() {
+        return sharedPreferences.getBoolean(Keys.SILENCE_ALARM, DefaultPrefs.SILENCE_ALARM);
+    }
+
+    public void setAlarmVolumeShouldSilence(boolean shouldSilence) {
+        editor.putBoolean(Keys.SILENCE_ALARM, shouldSilence).commit();
+    }
+
+    public void storeMediaVolume(int curVolume) {
+        editor.putInt(Keys.MEDIA_VOLUME, curVolume).commit();
+    }
+
+    public void storeAlarmVolume(int curVolume) {
+        editor.putInt(Keys.ALARM_VOLUME, curVolume).commit();
+    }
+
+    public int getStoredMediaVolume() {
+        return sharedPreferences.getInt(Keys.MEDIA_VOLUME, DefaultPrefs.MEDIA_VOLUME);
+    }
+
+    public int getStoredAlarmVolume() {
+        return sharedPreferences.getInt(Keys.ALARM_VOLUME, DefaultPrefs.ALARM_VOLUME);
+    }
+
 
     private static class Keys {
         public static final String IS_SERVICE_ACTIVATED = "IS_ACTIVATED";
         public static final String SILENCE_FREE_TIME_EVENTS = "SILENCE_FREE_TIME_EVENTS";
         public static final String SILENCE_ALL_DAY_EVENTS = "SILENCE_ALL_DAY_EVENTS";
         public static final String RINGER_TYPE = "RINGER_TYPE";
-        public static final String ADJUST_MEDIA = "ADJUST_MEDIA";
-        public static final String ADJUST_ALARM = "ADJUST_ALARM";
-        public static final String MEDIA_VOLUME = "MEDIA_VOLUME";
-        public static final String ALARM_VOLUME = "ALARM_VOLUME";
         public static final String QUICKSILENCE_MINUTES = "QUICK_SILENCE_MINUTES";
         public static final String QUICKSILENCE_HOURS = "QUICK_SILENCE_HOURS";
         public static final String BUFFER_MINUTES = "BUFFER_MINUTES";
@@ -374,11 +371,11 @@ public class Prefs {
         public static final String DO_NOT_DISTURB = "DO_NOT_DISTURB";
         public static final String SELECTED_CALENDARS = "SELECTED_CALENDARS";
         public static final String SYNC_ALL_CALENDARS = "SYNC_ALL_CALENDARS";
-
-        //TODO work these in as replacements for adjusting alarm and media volume
         public static final String SILENCE_MEDIA = "SILENCE_MEDIA";
         public static final String SILENCE_ALARM = "SILENCE_ALARM";
         public static final String EVENT_RINGERS = "EVENT_RINGERS";
         public static final String CALENDAR_RINGERS = "CALENDAR_RINGERS";
+        public static final String MEDIA_VOLUME = "MEDIA_VOLUME";
+        public static final String ALARM_VOLUME = "ALARM_VOLUME";
     }
 }

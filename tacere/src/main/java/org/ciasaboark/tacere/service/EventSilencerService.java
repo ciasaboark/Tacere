@@ -298,12 +298,13 @@ public class EventSilencerService extends IntentService {
 
     private void silenceEventAndShowNotification(SimpleCalendarEvent event) {
         ringerState.storeRingerStateIfNeeded();
+
         //use the ringer type stored in the event instance if possible, otherwise use the default
         //ringer
         int bestRinger = getHighestPriorityRingerForEvent(event);
         ringerState.setPhoneRinger(bestRinger);
 
-        volumesManager.adjustMediaAndAlarmVolumesIfNeeded();
+        volumesManager.silenceMediaAndAlarmVolumesIfNeeded();
         //only vibrate if we are transitioning from no event active to an active event
         if (!stateManager.isEventActive()) {
             vibrate();
