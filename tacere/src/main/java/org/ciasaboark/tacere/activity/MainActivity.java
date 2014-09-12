@@ -171,7 +171,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 settingsButton = findViewById(R.id.action_settings);
                 if (settingsButton != null && (showCalendarPopup || prefs.isFirstRun())) {
                     if (settingsPopup == null) {
-                        settingsPopup = new ChromeHelpPopup(MainActivity.this, "Select Calendars to sync");
+                        settingsPopup = new ChromeHelpPopup(MainActivity.this, "Select calendars to sync");
                         int color = getApplicationContext().getResources().getColor(android.R.color.holo_red_light);
                         settingsPopup.setHighlightColor(color);
                         settingsPopup.show(settingsButton);
