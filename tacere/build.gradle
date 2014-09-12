@@ -21,11 +21,13 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
-def APP_VERSION_RELEASE = "0 - beta 4";
+def APP_VERSION_RELEASE = "0 - beta 5";
 
 def dateTime = new Date()
 def DATE_STRING = dateTime.getDateString()
