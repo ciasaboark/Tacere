@@ -4,6 +4,7 @@
   -->
 
 <resources>
+
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowBackground">@color/windowBackground</item>
@@ -11,7 +12,7 @@
         <item name="android:actionMenuTextAppearance">@color/menu_text</item>
     </style>
 
-    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog" />
+    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog"/>
 
     <style name="Header" parent="AppTheme">
         <item name="android:colorBackground">@color/windowBackground</item>
@@ -27,6 +28,26 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+
+    <!-- Used with popup overlay -->
+    <style name="ChromeStylePopup" parent="android:Widget.TextView">
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:minWidth">75dp</item>
+        <item name="android:maxWidth">150dp</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:background">@drawable/blue_bg</item>
+    </style>
+
+    <style name="ChromeStylePopupShadow">
+        <item name="android:minWidth">75dp</item>
+        <item name="android:maxWidth">150dp</item>
     </style>
 
 

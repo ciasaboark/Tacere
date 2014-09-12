@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/arrow_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-30dp"
+        android:background="@drawable/up_arrow"/>
+
+    <TextView
+        android:id="@+id/text"
+        style="@style/ChromeStylePopup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/blue_bg"
+        android:scrollbars="vertical"/>
+
+    <ImageView
+        android:id="@+id/arrow_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-10dip"
+        android:background="@drawable/down_arrow"/>
+
+</LinearLayout>

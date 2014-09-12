@@ -241,7 +241,7 @@ public class SelectCalendarsActivity extends Activity {
 
             try {
                 final SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
-                Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar).mutate();
+                Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar_round).mutate();
                 int iconColor;
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
                     iconColor = getResources().getColor(R.color.primary);

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <rotate
+            android:fromDegrees="45"
+            android:pivotX="-40%"
+            android:pivotY="87%"
+            android:toDegrees="45">
+            <shape
+                android:shape="rectangle">
+                <stroke
+                    android:width="10dp"
+                    android:color="#00ffffff"/>
+                <solid
+                    android:color="@color/primary"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

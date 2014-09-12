@@ -358,6 +358,14 @@ public class Prefs {
         return sharedPreferences.getInt(Keys.ALARM_VOLUME, DefaultPrefs.ALARM_VOLUME);
     }
 
+    public boolean isFirstRun() {
+        return sharedPreferences.getBoolean(Keys.IS_FIRSTRUN, true);
+    }
+
+    public void disableFirstRun() {
+        editor.putBoolean(Keys.IS_FIRSTRUN, false).commit();
+    }
+
 
     private static class Keys {
         public static final String IS_SERVICE_ACTIVATED = "IS_ACTIVATED";
@@ -377,5 +385,6 @@ public class Prefs {
         public static final String CALENDAR_RINGERS = "CALENDAR_RINGERS";
         public static final String MEDIA_VOLUME = "MEDIA_VOLUME";
         public static final String ALARM_VOLUME = "ALARM_VOLUME";
+        public static final String IS_FIRSTRUN = "IS_FIRSTRUN";
     }
 }

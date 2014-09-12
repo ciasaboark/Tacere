@@ -1,25 +1,29 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/action_add_event"
+        android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_new"
-        android:title="@string/action_add_event" />
+        android:title="@string/action_add_event"/>
 
     <item
         android:id="@+id/action_about"
+        android:icon="@drawable/info_icon"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/info_icon"
-        android:title="@string/action_about" />
+        android:title="@string/action_about"/>
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom|withText"
         android:icon="@drawable/action_settings"
-        android:title="@string/action_settings" />
-
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_settings"/>
 
 
 </menu>

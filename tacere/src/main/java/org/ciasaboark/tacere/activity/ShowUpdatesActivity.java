@@ -23,6 +23,14 @@ public class ShowUpdatesActivity extends Activity {
     private Prefs prefs;
     private boolean showingUpdatesFromMainScreen = false;
 
+    public ShowUpdatesActivity(Context ctx) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("context can not be null");
+        }
+
+        this.prefs = new Prefs(ctx);
+    }
+
     public static void showUpdatesDialogIfNeeded(Context ctx) {
         boolean showUpdates = shouldChangelogForCurrentAppVersionBeShown(ctx);
         if (showUpdates) {
@@ -33,7 +41,17 @@ public class ShowUpdatesActivity extends Activity {
     }
 
     private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("context can not be null");
+        }
+
+        //if this is the first run then disable showing the updates dialog for the current version
         Prefs staticPrefs = new Prefs(ctx);
+        if (staticPrefs.isFirstRun()) {
+            ShowUpdatesActivity sua = new ShowUpdatesActivity(ctx);
+            sua.hideChangelogForCurrentAppVersion();
+        }
+
         boolean shouldChangelogBeShown = false;
         //the updates dialog should be shown if no value has been stored for the current app version
         try {
@@ -41,7 +59,16 @@ public class ShowUpdatesActivity extends Activity {
         } catch (IllegalArgumentException e) {
             shouldChangelogBeShown = true;
         }
+
         return shouldChangelogBeShown;
+    }
+
+    private void hideChangelogForCurrentAppVersion() {
+        try {
+            prefs.storePreference(Versioning.getVersionCode(), false);
+        } catch (IllegalArgumentException e) {
+            //boolean values are accepted, should not reach here
+        }
     }
 
     public static void showUpdatesDialog(Context ctx) {
@@ -99,13 +126,5 @@ public class ShowUpdatesActivity extends Activity {
                 finish();
             }
         });
-    }
-
-    private void hideChangelogForCurrentAppVersion() {
-        try {
-            prefs.storePreference(Versioning.getVersionCode(), false);
-        } catch (IllegalArgumentException e) {
-            //boolean values are accepted, should not reach here
-        }
     }
 }
