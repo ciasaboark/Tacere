@@ -48,8 +48,9 @@ import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.database.EventManager;
 import org.ciasaboark.tacere.database.NoSuchEventException;
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.database.TooltipManager;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
@@ -488,10 +489,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
-            SimpleCalendarEvent thisEvent = databaseInterface.getEvent((int) id);
-            int nextRingerType = thisEvent.getRingerType() + 1;
-            if (nextRingerType > SimpleCalendarEvent.RINGER.IGNORE) {
-                nextRingerType = SimpleCalendarEvent.RINGER.NORMAL;
+            EventInstance thisEvent = databaseInterface.getEvent((int) id);
+            int nextRingerType = thisEvent.getInstanceRinger() + 1;
+            if (nextRingerType > EventInstance.RINGER.IGNORE) {
+                nextRingerType = EventInstance.RINGER.NORMAL;
             }
             databaseInterface.setRingerForInstance((int) id, nextRingerType);
             eventListview.getAdapter().getView(position, view, eventListview);
@@ -524,7 +525,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         try {
-            SimpleCalendarEvent event = databaseInterface.getEvent((int) id);
+            EventInstance event = databaseInterface.getEvent((int) id);
 
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
             EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event.getId());
@@ -554,7 +555,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         public void bindView(View view, final Context context, final Cursor cursor) {
             int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
             try {
-                SimpleCalendarEvent thisEvent = databaseInterface.getEvent(id);
+                EventInstance thisEvent = databaseInterface.getEvent(id);
                 // a text view to show the event title
                 TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
                 if (descriptionTV != null) {
@@ -632,7 +633,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             }
         }
 
-        private Drawable getRingerIcon(SimpleCalendarEvent event) {
+        private Drawable getRingerIcon(EventInstance event) {
             Drawable icon;
 //            int defaultColor = getResources().getColor(R.color.icon_accent);
 //            int primaryColor = getResources().getColor(R.color.primary);
@@ -647,19 +648,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
             int eventSeriesRinger = prefs.getRingerForEventSeries(event.getEventId());
 
-            int ringerType = defaultRinger;
-            if (calendarRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                ringerType = calendarRinger;
-                color = calendarColor;
-            }
-            if (eventSeriesRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                ringerType = eventSeriesRinger;
-                color = eventColor;
-            }
-            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
-                ringerType = event.getRingerType();
-                color = instanceColor;
-            }
+            EventManager eventManager = new EventManager(getApplicationContext(), event);
+            int ringerType = eventManager.getBestRinger();
 
             icon = getIconForRinger(ringerType);
 
@@ -671,16 +661,16 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             Drawable icon;
 
             switch (ringerType) {
-                case SimpleCalendarEvent.RINGER.NORMAL:
+                case EventInstance.RINGER.NORMAL:
                     icon = getResources().getDrawable(R.drawable.ic_state_normal);
                     break;
-                case SimpleCalendarEvent.RINGER.VIBRATE:
+                case EventInstance.RINGER.VIBRATE:
                     icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                     break;
-                case SimpleCalendarEvent.RINGER.SILENT:
+                case EventInstance.RINGER.SILENT:
                     icon = getResources().getDrawable(R.drawable.ic_state_silent);
                     break;
-                case SimpleCalendarEvent.RINGER.IGNORE:
+                case EventInstance.RINGER.IGNORE:
                     icon = getResources().getDrawable(R.drawable.ic_state_ignore);
                     break;
                 default:
@@ -690,7 +680,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             return icon;
         }
 
-        private boolean shouldEventSilence(SimpleCalendarEvent event) {
+        private boolean shouldEventSilence(EventInstance event) {
             boolean eventMatches = false;
 
             // if the event is marked as busy (but is not an all day event)
@@ -702,19 +692,19 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
             // all day events
             boolean allDay = false;
-            if (prefs.getSilenceAllDayEvents() && event.isAllDay()) {
+            if (prefs.shouldAllDayEventsSilence() && event.isAllDay()) {
                 allDay = true;
             }
 
             // events marked as 'free' or 'available'
             boolean free_notAllDay = false;
-            if (prefs.getSilenceFreeTimeEvents() && event.isFreeTime() && !event.isAllDay()) {
+            if (prefs.shouldAvailableEventsSilence() && event.isFreeTime() && !event.isAllDay()) {
                 free_notAllDay = true;
             }
 
             // events with a custom ringer set should always use that ringer
             boolean isCustomRingerSet = false;
-            if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED) {
+            if (event.getInstanceRinger() != EventInstance.RINGER.UNDEFINED) {
                 isCustomRingerSet = true;
             }
 
@@ -723,7 +713,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             }
 
             //all of this is negated if the event has been marked to be ignored
-            if (event.getRingerType() == SimpleCalendarEvent.RINGER.IGNORE) {
+            if (event.getInstanceRinger() == EventInstance.RINGER.IGNORE) {
                 eventMatches = false;
             }
 

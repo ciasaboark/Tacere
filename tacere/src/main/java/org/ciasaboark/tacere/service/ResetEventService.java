@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+import org.ciasaboark.tacere.database.EventInstance;
 
 public class ResetEventService extends IntentService {
     private static final String TAG = "ResetEventService";
@@ -32,7 +32,7 @@ public class ResetEventService extends IntentService {
             int eventId = b.getInt("org.ciasaboark.tacere.eventId", BOGUS_EVENT_ID);
             if (eventId != BOGUS_EVENT_ID) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
-                dbIface.setRingerForInstance(eventId, SimpleCalendarEvent.RINGER.UNDEFINED);
+                dbIface.setRingerForInstance(eventId, EventInstance.RINGER.UNDEFINED);
 
                 Intent i = new Intent(this, EventSilencerService.class);
                 i.putExtra("type", "activityRestart");

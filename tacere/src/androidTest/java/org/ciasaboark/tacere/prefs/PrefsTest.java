@@ -52,15 +52,15 @@ public class PrefsTest extends TestCase {
         assert(prefs.getAdjustAlarm() == DefaultPrefs.ADJUST_ALARM);
         assert(prefs.getAdjustMedia() == DefaultPrefs.ADJUST_MEDIA);
         assert(prefs.isServiceActivated() == DefaultPrefs.IS_ACTIVATED);
-        assert(prefs.getSilenceAllDayEvents() == DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
-        assert(prefs.getSilenceFreeTimeEvents() == DefaultPrefs.SILENCE_FREE_TIME);
+        assert(prefs.shouldAllDayEventsSilence() == DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
+        assert(prefs.shouldAvailableEventsSilence() == DefaultPrefs.SILENCE_FREE_TIME);
         assert(prefs.getBufferMinutes() == DefaultPrefs.BUFFER_MINUTES);
         assert(prefs.getCurAlarmVolume() == DefaultPrefs.ALARM_VOLUME);
         assert(prefs.getCurMediaVolume() == DefaultPrefs.MEDIA_VOLUME);
         assert(prefs.getLookaheadDays() == DefaultPrefs.LOOKAHEAD_DAYS);
         assert(prefs.getQuickSilenceHours() == DefaultPrefs.QUICK_SILENCE_HOURS);
         assert(prefs.getQuicksilenceMinutes() == DefaultPrefs.QUICK_SILENCE_MINUTES);
-        assert(prefs.getRingerType() == DefaultPrefs.RINGER_TYPE);
+        assert(prefs.getInstanceRinger() == DefaultPrefs.RINGER_TYPE);
     }
 
 

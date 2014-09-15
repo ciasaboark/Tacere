@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+import org.ciasaboark.tacere.database.EventInstance;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -155,15 +155,15 @@ public class SettingsActivity extends Activity {
 
         Drawable icon;
         switch (prefs.getRingerType()) {
-            case SimpleCalendarEvent.RINGER.NORMAL:
+            case EventInstance.RINGER.NORMAL:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
                 icon = getResources().getDrawable(R.drawable.ic_state_normal);
                 break;
-            case SimpleCalendarEvent.RINGER.VIBRATE:
+            case EventInstance.RINGER.VIBRATE:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
                 icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                 break;
-            case SimpleCalendarEvent.RINGER.SILENT:
+            case EventInstance.RINGER.SILENT:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
                 icon = getResources().getDrawable(R.drawable.ic_state_silent);
                 break;

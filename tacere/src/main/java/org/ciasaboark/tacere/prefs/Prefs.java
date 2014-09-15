@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+import org.ciasaboark.tacere.database.EventInstance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class Prefs {
         editor.putBoolean(Keys.IS_SERVICE_ACTIVATED, isServiceActivated).commit();
     }
 
-    public Boolean getSilenceFreeTimeEvents() {
+    public Boolean shouldAvailableEventsSilence() {
         return sharedPreferences.getBoolean(Keys.SILENCE_FREE_TIME_EVENTS, DefaultPrefs.SILENCE_FREE_TIME_EVENTS);
     }
 
@@ -103,7 +103,7 @@ public class Prefs {
 
     }
 
-    public Boolean getSilenceAllDayEvents() {
+    public Boolean shouldAllDayEventsSilence() {
         return sharedPreferences.getBoolean(Keys.SILENCE_ALL_DAY_EVENTS, DefaultPrefs.SILENCE_ALL_DAY_EVENTS);
     }
 
@@ -202,7 +202,7 @@ public class Prefs {
     }
 
     public int getRingerForEventSeries(long eventId) {
-        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
+        int ringerType = EventInstance.RINGER.UNDEFINED;
         Map<Long, Integer> map = getEventRingersMap();
         if (map.containsKey(eventId)) {
             ringerType = map.get(eventId);
@@ -266,7 +266,7 @@ public class Prefs {
 
 
     public int getRingerForCalendar(long calendarId) {
-        int ringerType = SimpleCalendarEvent.RINGER.UNDEFINED;
+        int ringerType = EventInstance.RINGER.UNDEFINED;
         Map<Long, Integer> map = getCalendarRingersMap();
         if (map.containsKey(calendarId)) {
             ringerType = map.get(calendarId);

@@ -34,9 +34,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.database.Calendar;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.SimpleCalendar;
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+import org.ciasaboark.tacere.database.EventInstance;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -49,7 +49,7 @@ public class SelectCalendarsActivity extends Activity {
     @SuppressWarnings("unused")
     private final String TAG = "CalendarsActivity";
     private Prefs prefs;
-    private List<SimpleCalendar> simpleCalendars;
+    private List<Calendar> calendars;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,9 +104,9 @@ public class SelectCalendarsActivity extends Activity {
 
     private void buildSimpleCalendarList() {
         DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
-        simpleCalendars = databaseInterface.getCalendarIdList();
+        calendars = databaseInterface.getCalendarIdList();
         List<Long> calendarsToSync = prefs.getSelectedCalendars();
-        for (SimpleCalendar c : simpleCalendars) {
+        for (Calendar c : calendars) {
             if (calendarsToSync.contains(c.getId())) {
                 c.setSelected(true);
             }
@@ -119,7 +119,7 @@ public class SelectCalendarsActivity extends Activity {
     }
 
     private void drawDialogBodyOrError() {
-        if (simpleCalendars.isEmpty()) {
+        if (calendars.isEmpty()) {
             drawError();
         } else {
             drawDialogBody();
@@ -152,7 +152,7 @@ public class SelectCalendarsActivity extends Activity {
 
     private void drawListView() {
         final ListView lv = (ListView) findViewById(R.id.calendar_listview);
-        final SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, simpleCalendars);
+        final SimpleCalendarListAdapter listAdapter = new SimpleCalendarListAdapter(this, R.layout.calendar_list_item, calendars);
         lv.setAdapter(listAdapter);
 
         //the calendars should only be clickable if we arent syncing all calendars
@@ -160,9 +160,9 @@ public class SelectCalendarsActivity extends Activity {
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                    SimpleCalendar simpleCalendar = simpleCalendars.get(position);
-                    simpleCalendar.setSelected(!simpleCalendar.isSelected());
-                    toggleSyncCalendar(simpleCalendar);
+                    Calendar calendar = calendars.get(position);
+                    calendar.setSelected(!calendar.isSelected());
+                    toggleSyncCalendar(calendar);
                     listAdapter.notifyDataSetChanged();
                 }
             });
@@ -175,7 +175,7 @@ public class SelectCalendarsActivity extends Activity {
         lv.setClickable(!syncAllCalendars);
     }
 
-    private void toggleSyncCalendar(SimpleCalendar calendar) {
+    private void toggleSyncCalendar(Calendar calendar) {
         if (calendar.isSelected()) {
             addCalendarToSyncList(calendar);
         } else {
@@ -183,14 +183,14 @@ public class SelectCalendarsActivity extends Activity {
         }
     }
 
-    private void removeCalendarFromSyncList(SimpleCalendar calendar) {
+    private void removeCalendarFromSyncList(Calendar calendar) {
         List<Long> calendarsToSync = prefs.getSelectedCalendars();
         long calendarId = calendar.getId();
         calendarsToSync.remove(calendarId);
         prefs.setSelectedCalendars(calendarsToSync);
     }
 
-    private void addCalendarToSyncList(SimpleCalendar calendar) {
+    private void addCalendarToSyncList(Calendar calendar) {
         List<Long> calendarsToSync = prefs.getSelectedCalendars();
         long calendarId = calendar.getId();
         if (!calendarsToSync.contains(calendarId)) {
@@ -212,17 +212,17 @@ public class SelectCalendarsActivity extends Activity {
         return drawable;
     }
 
-    private class SimpleCalendarListAdapter extends ArrayAdapter<SimpleCalendar> {
+    private class SimpleCalendarListAdapter extends ArrayAdapter<Calendar> {
         private static final String TAG = "CalendarListAdapter";
         private final Context context;
-        private final List<SimpleCalendar> simpleCalendarList;
+        private final List<Calendar> calendarList;
         private final SimpleCalendarListAdapter thisAdapter = this;
 
 
-        public SimpleCalendarListAdapter(Context ctx, int resourceId, List<SimpleCalendar> simpleCalendars) {
-            super(ctx, resourceId, simpleCalendars);
+        public SimpleCalendarListAdapter(Context ctx, int resourceId, List<Calendar> calendars) {
+            super(ctx, resourceId, calendars);
             this.context = ctx;
-            this.simpleCalendarList = simpleCalendars;
+            this.calendarList = calendars;
         }
 
         @Override
@@ -240,7 +240,7 @@ public class SelectCalendarsActivity extends Activity {
             CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
 
             try {
-                final SimpleCalendar simpleCalendar = simpleCalendarList.get(position);
+                final Calendar simpleCalendar = calendarList.get(position);
                 Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar_round).mutate();
                 int iconColor;
                 if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
@@ -255,16 +255,16 @@ public class SelectCalendarsActivity extends Activity {
                 Drawable calendarIconDrawable = null;
                 int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
                 switch (calendarRinger) {
-                    case SimpleCalendarEvent.RINGER.NORMAL:
+                    case EventInstance.RINGER.NORMAL:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_normal);
                         break;
-                    case SimpleCalendarEvent.RINGER.IGNORE:
+                    case EventInstance.RINGER.IGNORE:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_ignore);
                         break;
-                    case SimpleCalendarEvent.RINGER.VIBRATE:
+                    case EventInstance.RINGER.VIBRATE:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_vibrate);
                         break;
-                    case SimpleCalendarEvent.RINGER.SILENT:
+                    case EventInstance.RINGER.SILENT:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_silent);
                         break;
                     default:
@@ -285,7 +285,7 @@ public class SelectCalendarsActivity extends Activity {
                             final String[] options = {"Normal", "Vibrate", "Silent", "Ignore"};
                             final Deque<Integer> selectedItem = new ArrayDeque<Integer>();
                             int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
-                            if (calendarRinger != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                            if (calendarRinger != EventInstance.RINGER.UNDEFINED) {
                                 calendarRinger++;
                             } else {
                                 calendarRinger = -1;
@@ -324,12 +324,12 @@ public class SelectCalendarsActivity extends Activity {
                             });
 
                             //the clear button should only be visible if a ringer has been set
-                            if (prefs.getRingerForCalendar(simpleCalendar.getId()) != SimpleCalendarEvent.RINGER.UNDEFINED) {
+                            if (prefs.getRingerForCalendar(simpleCalendar.getId()) != EventInstance.RINGER.UNDEFINED) {
                                 builder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         try {
-                                            SimpleCalendar calendar = simpleCalendarList.get(position);
+                                            Calendar calendar = calendarList.get(position);
                                             prefs.unsetRingerTypeForCalendar(calendar.getId());
                                             //TODO stringify
                                             Toast.makeText(context, "Unset ringer for calendar " + calendar.getDisplayName(), Toast.LENGTH_SHORT).show();

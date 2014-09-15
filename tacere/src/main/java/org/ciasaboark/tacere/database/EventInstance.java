@@ -9,7 +9,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class SimpleCalendarEvent {
+public class EventInstance {
     public static final long MILLISECONDS_IN_SECOND = 1000;
     public static final long MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
     public static final long MILLISECONDS_IN_DAY = MILLISECONDS_IN_MINUTE * 60 * 24;
@@ -29,8 +29,8 @@ public class SimpleCalendarEvent {
     private boolean isAllDay;
 
 
-    public SimpleCalendarEvent(long calendarId, int instanceId, int eventId, String title, long begin, long end,
-                               String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+    public EventInstance(long calendarId, int instanceId, int eventId, String title, long begin, long end,
+                         String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
         this.eventId = eventId;
@@ -128,11 +128,11 @@ public class SimpleCalendarEvent {
         return isFreeTime;
     }
 
-    public Integer getRingerType() {
+    public Integer getInstanceRinger() {
         return ringerType;
     }
 
-    public void setRingerType(int ringerType) {
+    public void setInstanceRinger(int ringerType) {
         this.ringerType = ringerType;
     }
 
@@ -148,11 +148,11 @@ public class SimpleCalendarEvent {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof SimpleCalendarEvent)) {
+        if (!(o instanceof EventInstance)) {
             return false;
         }
 
-        return getId().equals(((SimpleCalendarEvent) o).getId());
+        return getId().equals(((EventInstance) o).getId());
     }
 
     public String toString() {

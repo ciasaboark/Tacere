@@ -77,7 +77,7 @@ public class AdvancedSettingsActivity extends Activity {
         // the silence free time state toggle
         CheckBox freeCB = (CheckBox) findViewById(R.id.silenceFreeTimeCheckBox);
         TextView freeTV = (TextView) findViewById(R.id.silenceFreeTimeDescription);
-        if (prefs.getSilenceFreeTimeEvents()) {
+        if (prefs.shouldAvailableEventsSilence()) {
             freeCB.setChecked(true);
             freeTV.setText(R.string.pref_silence_free_enabled);
         } else {
@@ -90,7 +90,7 @@ public class AdvancedSettingsActivity extends Activity {
         // the silence all day state toggle
         CheckBox dayCB = (CheckBox) findViewById(R.id.silenceAllDayCheckBox);
         TextView dayTV = (TextView) findViewById(R.id.silenceAllDayDescription);
-        if (prefs.getSilenceAllDayEvents()) {
+        if (prefs.shouldAllDayEventsSilence()) {
             dayCB.setChecked(true);
             dayTV.setText(R.string.pref_all_day_enabled);
         } else {
@@ -162,7 +162,7 @@ public class AdvancedSettingsActivity extends Activity {
 //    }
 
     public void onClickSilenceFreeTime(View v) {
-        prefs.setSilenceFreeTimeEvents(!prefs.getSilenceFreeTimeEvents());
+        prefs.setSilenceFreeTimeEvents(!prefs.shouldAvailableEventsSilence());
         drawFreeTimeWidgets();
         restartEventSilencerService();
     }
@@ -174,7 +174,7 @@ public class AdvancedSettingsActivity extends Activity {
     }
 
     public void onClickSilenceAllDay(View v) {
-        prefs.setSilenceAllDayEvents(!prefs.getSilenceAllDayEvents());
+        prefs.setSilenceAllDayEvents(!prefs.shouldAllDayEventsSilence());
         drawSilenceAllDayWidgets();
         restartEventSilencerService();
     }

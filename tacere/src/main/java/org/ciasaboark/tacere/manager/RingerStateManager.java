@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
+import org.ciasaboark.tacere.database.EventInstance;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class RingerStateManager {
@@ -20,6 +20,22 @@ public class RingerStateManager {
     public RingerStateManager(Context ctx) {
         this.context = ctx;
         this.prefs = new Prefs(ctx);
+    }
+
+    /**
+     * Remove stored ringer state from preferences
+     */
+    public void clearStoredRingerState() {
+        prefs.remove("curRinger");
+    }
+
+    public void storeRingerStateIfNeeded() {
+        // only store the current ringer state if we are not transitioning from one event to the
+        // next and we are not in a quick silence period
+        ServiceStateManager stateManager = new ServiceStateManager(context);
+        if (stateManager.getServiceState().equals(ServiceStateManager.ServiceStates.NOT_ACTIVE)) {
+            storeRingerState();
+        }
     }
 
     /**
@@ -34,11 +50,12 @@ public class RingerStateManager {
         prefs.storePreference("curRinger", curRinger);
     }
 
-    /**
-     * Remove stored ringer state from preferences
-     */
-    public void clearStoredRingerState() {
-        prefs.remove("curRinger");
+    public void restorePhoneRinger() {
+        int storedRinger = getStoredRingerState();
+        if (storedRinger == EventInstance.RINGER.UNDEFINED) {
+            storedRinger = EventInstance.RINGER.NORMAL;
+        }
+        setPhoneRinger(storedRinger);
     }
 
     /**
@@ -49,20 +66,20 @@ public class RingerStateManager {
     public int getStoredRingerState() {
         SharedPreferences preferences = context.getSharedPreferences(
                 "org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-        return preferences.getInt("curRinger", SimpleCalendarEvent.RINGER.UNDEFINED);
+        return preferences.getInt("curRinger", EventInstance.RINGER.UNDEFINED);
     }
 
     public void setPhoneRinger(int ringerType) {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         switch (ringerType) {
-            case SimpleCalendarEvent.RINGER.VIBRATE:
+            case EventInstance.RINGER.VIBRATE:
                 audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 break;
-            case SimpleCalendarEvent.RINGER.SILENT:
+            case EventInstance.RINGER.SILENT:
                 audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 break;
-            case SimpleCalendarEvent.RINGER.IGNORE:
+            case EventInstance.RINGER.IGNORE:
                 //ignore this event
                 break;
             default:
@@ -70,22 +87,5 @@ public class RingerStateManager {
                 break;
 
         }
-    }
-
-    public void storeRingerStateIfNeeded() {
-        // only store the current ringer state if we are not transitioning from one event to the
-        // next and we are not in a quick silence period
-        ServiceStateManager stateManager = new ServiceStateManager(context);
-        if (stateManager.getServiceState().equals(ServiceStateManager.ServiceStates.NOT_ACTIVE)) {
-            storeRingerState();
-        }
-    }
-
-    public void restorePhoneRinger() {
-        int storedRinger = getStoredRingerState();
-        if (storedRinger == SimpleCalendarEvent.RINGER.UNDEFINED) {
-            storedRinger = SimpleCalendarEvent.RINGER.NORMAL;
-        }
-        setPhoneRinger(storedRinger);
     }
 }

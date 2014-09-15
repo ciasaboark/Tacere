@@ -26,8 +26,8 @@ import android.widget.TextView;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.database.EventInstance;
 import org.ciasaboark.tacere.database.NoSuchEventException;
-import org.ciasaboark.tacere.database.SimpleCalendarEvent;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class EventDetailsFragment extends DialogFragment {
     private static final String TAG = "EventLongClickFragment";
     private DatabaseInterface databaseInterface;
     private Prefs prefs;
-    private SimpleCalendarEvent event;
+    private EventInstance event;
     private int instanceId;
     private Context context;
     private View view;
@@ -71,8 +71,8 @@ public class EventDetailsFragment extends DialogFragment {
 
         //the clear button should only be visible if the event has a custom ringer or if the events
         //series has a custom ringer set
-        if (event.getRingerType() != SimpleCalendarEvent.RINGER.UNDEFINED ||
-                prefs.getRingerForEventSeries(event.getEventId()) != SimpleCalendarEvent.RINGER.UNDEFINED) {
+        if (event.getInstanceRinger() != EventInstance.RINGER.UNDEFINED ||
+                prefs.getRingerForEventSeries(event.getEventId()) != EventInstance.RINGER.UNDEFINED) {
             thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -134,28 +134,28 @@ public class EventDetailsFragment extends DialogFragment {
         buttonNormal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(SimpleCalendarEvent.RINGER.NORMAL);
+                setRingerType(EventInstance.RINGER.NORMAL);
             }
         });
 
         buttonVibrate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(SimpleCalendarEvent.RINGER.VIBRATE);
+                setRingerType(EventInstance.RINGER.VIBRATE);
             }
         });
 
         buttonSilent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(SimpleCalendarEvent.RINGER.SILENT);
+                setRingerType(EventInstance.RINGER.SILENT);
             }
         });
 
         buttonIgnore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(SimpleCalendarEvent.RINGER.IGNORE);
+                setRingerType(EventInstance.RINGER.IGNORE);
             }
         });
 
@@ -174,7 +174,7 @@ public class EventDetailsFragment extends DialogFragment {
         if (cb.isChecked()) {
             resetAllEvents();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), SimpleCalendarEvent.RINGER.UNDEFINED);
+            databaseInterface.setRingerForInstance(event.getId(), EventInstance.RINGER.UNDEFINED);
         }
         notifyDatasetChanged();
     }
@@ -187,7 +187,7 @@ public class EventDetailsFragment extends DialogFragment {
             resetAllEvents();
             saveSettingsForAllEvents();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
+            databaseInterface.setRingerForInstance(event.getId(), event.getInstanceRinger());
         }
         notifyDatasetChanged();
     }
@@ -213,27 +213,27 @@ public class EventDetailsFragment extends DialogFragment {
 
         int colorActive = getResources().getColor(R.color.accent);
         int colorInactive = getResources().getColor(R.color.primary);
-        int ringerMode = event.getRingerType();
+        int ringerMode = event.getInstanceRinger();
 
-        if (ringerMode == SimpleCalendarEvent.RINGER.NORMAL) {
+        if (ringerMode == EventInstance.RINGER.NORMAL) {
             indicatorNormal.setBackgroundColor(colorActive);
         } else {
             indicatorNormal.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == SimpleCalendarEvent.RINGER.VIBRATE) {
+        if (ringerMode == EventInstance.RINGER.VIBRATE) {
             indicatorVibrate.setBackgroundColor(colorActive);
         } else {
             indicatorVibrate.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == SimpleCalendarEvent.RINGER.SILENT) {
+        if (ringerMode == EventInstance.RINGER.SILENT) {
             indicatorSilent.setBackgroundColor(colorActive);
         } else {
             indicatorSilent.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == SimpleCalendarEvent.RINGER.IGNORE) {
+        if (ringerMode == EventInstance.RINGER.IGNORE) {
             indicatorIgnore.setBackgroundColor(colorActive);
         } else {
             indicatorIgnore.setBackgroundColor(colorInactive);
@@ -241,7 +241,7 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void setRingerType(int type) {
-        event.setRingerType(type);
+        event.setInstanceRinger(type);
 
         drawIndicators();
 //        notifyDatasetChanged();
@@ -250,7 +250,7 @@ public class EventDetailsFragment extends DialogFragment {
     private void resetAllEvents() {
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
         databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
-                SimpleCalendarEvent.RINGER.UNDEFINED);
+                EventInstance.RINGER.UNDEFINED);
     }
 
     private void notifyDatasetChanged() {
@@ -259,7 +259,7 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
+        prefs.setRingerForEventSeries(event.getEventId(), event.getInstanceRinger());
     }
 
     private Drawable getColorizedIcon(Drawable d) {
