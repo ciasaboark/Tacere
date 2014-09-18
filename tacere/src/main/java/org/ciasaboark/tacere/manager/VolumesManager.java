@@ -36,13 +36,13 @@ public class VolumesManager {
     public void restoreVolumes() {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         switch (ringerState.getStoredRingerState()) {
-            case AudioManager.RINGER_MODE_NORMAL:
+            case NORMAL:
                 audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 break;
-            case AudioManager.RINGER_MODE_SILENT:
+            case SILENT:
                 audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 break;
-            case AudioManager.RINGER_MODE_VIBRATE:
+            case VIBRATE:
                 audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 break;
             default:

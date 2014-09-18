@@ -26,8 +26,9 @@ import android.widget.TextView;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventInstance;
 import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.List;
@@ -71,8 +72,8 @@ public class EventDetailsFragment extends DialogFragment {
 
         //the clear button should only be visible if the event has a custom ringer or if the events
         //series has a custom ringer set
-        if (event.getInstanceRinger() != EventInstance.RINGER.UNDEFINED ||
-                prefs.getRingerForEventSeries(event.getEventId()) != EventInstance.RINGER.UNDEFINED) {
+        if (event.getRingerType() != RingerType.UNDEFINED ||
+                prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED) {
             thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -134,28 +135,28 @@ public class EventDetailsFragment extends DialogFragment {
         buttonNormal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(EventInstance.RINGER.NORMAL);
+                setRingerType(RingerType.NORMAL);
             }
         });
 
         buttonVibrate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(EventInstance.RINGER.VIBRATE);
+                setRingerType(RingerType.VIBRATE);
             }
         });
 
         buttonSilent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(EventInstance.RINGER.SILENT);
+                setRingerType(RingerType.SILENT);
             }
         });
 
         buttonIgnore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setRingerType(EventInstance.RINGER.IGNORE);
+                setRingerType(RingerType.IGNORE);
             }
         });
 
@@ -174,7 +175,7 @@ public class EventDetailsFragment extends DialogFragment {
         if (cb.isChecked()) {
             resetAllEvents();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), EventInstance.RINGER.UNDEFINED);
+            databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
         }
         notifyDatasetChanged();
     }
@@ -187,7 +188,7 @@ public class EventDetailsFragment extends DialogFragment {
             resetAllEvents();
             saveSettingsForAllEvents();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), event.getInstanceRinger());
+            databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
         }
         notifyDatasetChanged();
     }
@@ -213,44 +214,42 @@ public class EventDetailsFragment extends DialogFragment {
 
         int colorActive = getResources().getColor(R.color.accent);
         int colorInactive = getResources().getColor(R.color.primary);
-        int ringerMode = event.getInstanceRinger();
+        RingerType ringerMode = event.getRingerType();
 
-        if (ringerMode == EventInstance.RINGER.NORMAL) {
+        if (ringerMode == RingerType.NORMAL) {
             indicatorNormal.setBackgroundColor(colorActive);
         } else {
             indicatorNormal.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == EventInstance.RINGER.VIBRATE) {
+        if (ringerMode == RingerType.VIBRATE) {
             indicatorVibrate.setBackgroundColor(colorActive);
         } else {
             indicatorVibrate.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == EventInstance.RINGER.SILENT) {
+        if (ringerMode == RingerType.SILENT) {
             indicatorSilent.setBackgroundColor(colorActive);
         } else {
             indicatorSilent.setBackgroundColor(colorInactive);
         }
 
-        if (ringerMode == EventInstance.RINGER.IGNORE) {
+        if (ringerMode == RingerType.IGNORE) {
             indicatorIgnore.setBackgroundColor(colorActive);
         } else {
             indicatorIgnore.setBackgroundColor(colorInactive);
         }
     }
 
-    private void setRingerType(int type) {
-        event.setInstanceRinger(type);
-
+    private void setRingerType(RingerType type) {
+        event.setRingerType(type);
         drawIndicators();
-//        notifyDatasetChanged();
     }
 
     private void resetAllEvents() {
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
         databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
-                EventInstance.RINGER.UNDEFINED);
+                RingerType.UNDEFINED);
     }
 
     private void notifyDatasetChanged() {
@@ -259,7 +258,7 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-        prefs.setRingerForEventSeries(event.getEventId(), event.getInstanceRinger());
+        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
     }
 
     private Drawable getColorizedIcon(Drawable d) {

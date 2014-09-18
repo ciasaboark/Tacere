@@ -34,9 +34,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
-import org.ciasaboark.tacere.database.Calendar;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.Calendar;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -253,18 +253,18 @@ public class SelectCalendarsActivity extends Activity {
                 calendarSidebar.setBackgroundDrawable(sideBarImage); //TODO deprecated method use
 
                 Drawable calendarIconDrawable = null;
-                int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
+                RingerType calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
                 switch (calendarRinger) {
-                    case EventInstance.RINGER.NORMAL:
+                    case NORMAL:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_normal);
                         break;
-                    case EventInstance.RINGER.IGNORE:
+                    case IGNORE:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_ignore);
                         break;
-                    case EventInstance.RINGER.VIBRATE:
+                    case VIBRATE:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_vibrate);
                         break;
-                    case EventInstance.RINGER.SILENT:
+                    case SILENT:
                         calendarIconDrawable = getResources().getDrawable(R.drawable.ic_state_silent);
                         break;
                     default:
@@ -282,30 +282,30 @@ public class SelectCalendarsActivity extends Activity {
                     public void onClick(final View view) {
                         if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
                             //TODO fragile connection to the ringer types
-                            final String[] options = {"Normal", "Vibrate", "Silent", "Ignore"};
-                            final Deque<Integer> selectedItem = new ArrayDeque<Integer>();
-                            int calendarRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
-                            if (calendarRinger != EventInstance.RINGER.UNDEFINED) {
-                                calendarRinger++;
-                            } else {
-                                calendarRinger = -1;
+                            final Deque<Integer> selectedItemHolder = new ArrayDeque<Integer>();
+                            final String[] options = RingerType.names();
+                            int selectedRinger;
+                            try {
+                                selectedRinger = prefs.getRingerForCalendar(simpleCalendar.getId()).value;
+                            } catch (IllegalArgumentException e) {
+                                selectedRinger = -1;
                             }
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setTitle("Configure calendar");
-                            builder.setSingleChoiceItems(options, calendarRinger, new DialogInterface.OnClickListener() {
+                            builder.setSingleChoiceItems(options, selectedRinger, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedItem.clear();
-                                    selectedItem.addFirst(i);
+                                    selectedItemHolder.clear();
+                                    selectedItemHolder.addFirst(i);
                                 }
                             });
                             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     try {
-                                        if (!selectedItem.isEmpty()) {
-                                            prefs.setRingerForCalendar(simpleCalendar.getId(), selectedItem.getFirst() + 1); //selection has to be offset since undefined (ringer type 0) is ommited from the list
+                                        if (!selectedItemHolder.isEmpty()) {
+                                            prefs.setRingerForCalendar(simpleCalendar.getId(), selectedItemHolder.getFirst() + 1); //selection has to be offset since undefined (ringer type 0) is ommited from the list
                                             Toast.makeText(context, "set ringer for calendar " + simpleCalendar.getDisplayName() + " to ringer type: " + options[i], Toast.LENGTH_SHORT).show();
                                         } else {
                                             Toast.makeText(context, "no ringer selected", Toast.LENGTH_SHORT).show();
@@ -324,7 +324,7 @@ public class SelectCalendarsActivity extends Activity {
                             });
 
                             //the clear button should only be visible if a ringer has been set
-                            if (prefs.getRingerForCalendar(simpleCalendar.getId()) != EventInstance.RINGER.UNDEFINED) {
+                            if (prefs.getRingerForCalendar(simpleCalendar.getId()) != RingerType.UNDEFINED) {
                                 builder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {

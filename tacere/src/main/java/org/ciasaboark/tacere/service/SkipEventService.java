@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 
 public class SkipEventService extends IntentService {
     private static final String TAG = "SkipEventService";
@@ -31,7 +31,7 @@ public class SkipEventService extends IntentService {
             int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
             if (eventId != -1) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
-                dbIface.setRingerForInstance(eventId, EventInstance.RINGER.IGNORE);
+                dbIface.setRingerForInstance(eventId, RingerType.IGNORE);
 
                 Intent i = new Intent(this, EventSilencerService.class);
                 i.putExtra("type", "activityRestart");

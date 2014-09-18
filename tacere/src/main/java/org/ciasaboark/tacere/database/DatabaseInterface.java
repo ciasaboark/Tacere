@@ -15,6 +15,9 @@ import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
+import org.ciasaboark.tacere.event.Calendar;
+import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.sql.SQLException;
@@ -101,16 +104,16 @@ public class DatabaseInterface {
         return eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, null, null, null, null, order, null);
     }
 
-    public void setRingerForInstance(int instanceId, int ringerType) {
-        if (ringerType != EventInstance.RINGER.IGNORE && ringerType != EventInstance.RINGER.NORMAL
-                && ringerType != EventInstance.RINGER.SILENT && ringerType != EventInstance.RINGER.UNDEFINED
-                && ringerType != EventInstance.RINGER.VIBRATE) {
+    public void setRingerForInstance(int instanceId, RingerType ringerType) {
+        if (ringerType != RingerType.IGNORE && ringerType != RingerType.NORMAL
+                && ringerType != RingerType.SILENT && ringerType != RingerType.UNDEFINED
+                && ringerType != RingerType.VIBRATE) {
             throw new IllegalArgumentException("unknown ringer type: " + ringerType);
         }
         String mSelectionClause = Columns._ID + " = ?";
         String[] mSelectionArgs = {String.valueOf(instanceId)};
         ContentValues values = new ContentValues();
-        values.put(Columns.RINGER_TYPE, ringerType);
+        values.put(Columns.RINGER_TYPE, ringerType.value);
         eventsDB.beginTransaction();
         try {
             int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
@@ -161,11 +164,11 @@ public class DatabaseInterface {
         return events;
     }
 
-    public void setRingerForAllInstancesOfEvent(int eventId, int ringerType) {
+    public void setRingerForAllInstancesOfEvent(int eventId, RingerType ringerType) {
         String mSelectionClause = Columns.EVENT_ID + " = ?";
         String[] mSelectionArgs = {String.valueOf(eventId)};
         ContentValues values = new ContentValues();
-        values.put(Columns.RINGER_TYPE, ringerType);
+        values.put(Columns.RINGER_TYPE, ringerType.value);
         eventsDB.beginTransaction();
         try {
             int rowsUpdated = eventsDB.update(EventDatabaseOpenHelper.TABLE_EVENTS, values,
@@ -224,14 +227,15 @@ public class DatabaseInterface {
                     long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
                     long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
                     String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
-                    int ringerType = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
+                    int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
                     int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
                     boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
                     boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
 
                     thisEvent = new EventInstance(cal_id, id, event_id, title, begin, end, description,
                             displayColor, isFreeTime, isAllDay);
-                    thisEvent.setInstanceRinger(ringerType);
+                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
+                    thisEvent.setRingerType(ringerType);
                     break;
                 }
             } while (cursor.moveToNext());
@@ -289,7 +293,7 @@ public class DatabaseInterface {
 
                 try {
                     EventInstance oldEvent = getEvent(id);
-                    newEvent.setInstanceRinger(oldEvent.getInstanceRinger());
+                    newEvent.setRingerType(oldEvent.getRingerType());
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
@@ -425,7 +429,7 @@ public class DatabaseInterface {
         cv.put(Columns.BEGIN, e.getBegin());
         cv.put(Columns.END, e.getEnd());
         cv.put(Columns.DESCRIPTION, e.getDescription());
-        cv.put(Columns.RINGER_TYPE, e.getInstanceRinger());
+        cv.put(Columns.RINGER_TYPE, e.getRingerType().value);
         cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
         cv.put(Columns.CAL_ID, e.getCalendarId());
         cv.put(Columns.EVENT_ID, e.getEventId());

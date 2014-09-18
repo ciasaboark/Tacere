@@ -48,10 +48,11 @@ import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventInstance;
-import org.ciasaboark.tacere.database.EventManager;
 import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.database.TooltipManager;
+import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.EventManager;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
@@ -490,10 +491,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
             EventInstance thisEvent = databaseInterface.getEvent((int) id);
-            int nextRingerType = thisEvent.getInstanceRinger() + 1;
-            if (nextRingerType > EventInstance.RINGER.IGNORE) {
-                nextRingerType = EventInstance.RINGER.NORMAL;
-            }
+            RingerType nextRingerType = thisEvent.getRingerType().getNext();
+
             databaseInterface.setRingerForInstance((int) id, nextRingerType);
             eventListview.getAdapter().getView(position, view, eventListview);
 
@@ -644,12 +643,9 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             int instanceColor = getResources().getColor(R.color.ringer_instance);
 
             int color = defaultColor;
-            int defaultRinger = prefs.getRingerType();
-            int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
-            int eventSeriesRinger = prefs.getRingerForEventSeries(event.getEventId());
 
             EventManager eventManager = new EventManager(getApplicationContext(), event);
-            int ringerType = eventManager.getBestRinger();
+            RingerType ringerType = eventManager.getBestRinger();
 
             icon = getIconForRinger(ringerType);
 
@@ -657,20 +653,20 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             return icon;
         }
 
-        private Drawable getIconForRinger(int ringerType) {
+        private Drawable getIconForRinger(RingerType ringerType) {
             Drawable icon;
 
             switch (ringerType) {
-                case EventInstance.RINGER.NORMAL:
+                case NORMAL:
                     icon = getResources().getDrawable(R.drawable.ic_state_normal);
                     break;
-                case EventInstance.RINGER.VIBRATE:
+                case VIBRATE:
                     icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                     break;
-                case EventInstance.RINGER.SILENT:
+                case SILENT:
                     icon = getResources().getDrawable(R.drawable.ic_state_silent);
                     break;
-                case EventInstance.RINGER.IGNORE:
+                case IGNORE:
                     icon = getResources().getDrawable(R.drawable.ic_state_ignore);
                     break;
                 default:
@@ -678,46 +674,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             }
 
             return icon;
-        }
-
-        private boolean shouldEventSilence(EventInstance event) {
-            boolean eventMatches = false;
-
-            // if the event is marked as busy (but is not an all day event)
-            // + then we need no further tests
-            boolean busy_notAllDay = false;
-            if (!event.isFreeTime() && !event.isAllDay()) {
-                busy_notAllDay = true;
-            }
-
-            // all day events
-            boolean allDay = false;
-            if (prefs.shouldAllDayEventsSilence() && event.isAllDay()) {
-                allDay = true;
-            }
-
-            // events marked as 'free' or 'available'
-            boolean free_notAllDay = false;
-            if (prefs.shouldAvailableEventsSilence() && event.isFreeTime() && !event.isAllDay()) {
-                free_notAllDay = true;
-            }
-
-            // events with a custom ringer set should always use that ringer
-            boolean isCustomRingerSet = false;
-            if (event.getInstanceRinger() != EventInstance.RINGER.UNDEFINED) {
-                isCustomRingerSet = true;
-            }
-
-            if (busy_notAllDay || allDay || free_notAllDay || isCustomRingerSet) {
-                eventMatches = true;
-            }
-
-            //all of this is negated if the event has been marked to be ignored
-            if (event.getInstanceRinger() == EventInstance.RINGER.IGNORE) {
-                eventMatches = false;
-            }
-
-            return eventMatches;
         }
     }
 }

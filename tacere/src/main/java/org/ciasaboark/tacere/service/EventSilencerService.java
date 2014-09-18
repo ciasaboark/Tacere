@@ -13,8 +13,9 @@ import android.util.Log;
 
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventInstance;
-import org.ciasaboark.tacere.database.EventManager;
+import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.EventManager;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.NotificationManagerWrapper;
@@ -25,10 +26,6 @@ import org.ciasaboark.tacere.manager.VolumesManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.Deque;
-import java.util.List;
-
-import static org.ciasaboark.tacere.database.EventInstance.RINGER.IGNORE;
-import static org.ciasaboark.tacere.database.EventInstance.RINGER.UNDEFINED;
 
 public class EventSilencerService extends IntentService {
     private static final String TAG = "EventSilencerService";
@@ -129,7 +126,7 @@ public class EventSilencerService extends IntentService {
 
 
         //quick silence requests are always explicitly request to silence the ringer
-        ringerState.setPhoneRinger(EventInstance.RINGER.SILENT);
+        ringerState.setPhoneRinger(RingerType.SILENT);
         vibrate();
         notificationManager.displayQuickSilenceNotification(durationMinutes);
     }
@@ -225,83 +222,21 @@ public class EventSilencerService extends IntentService {
         vibrator.vibrate(pattern, -1);
     }
 
-    // check all events in the database to see if they match the user's criteria
-    // + for silencing. Returns the first event that matches. Does not check
-    // + whether that event is active
     private boolean shouldEventSilence(EventInstance event) {
-        boolean eventMatches = false;
-
-        // if the event is marked as busy (but is not an all day event)
-        // + then we need no further tests
-        boolean busy_notAllDay = false;
-        if (!event.isFreeTime() && !event.isAllDay()) {
-            busy_notAllDay = true;
+        boolean eventShouldSilence = false;
+        EventManager eventManger = new EventManager(this, event);
+        if (eventManger.getBestRinger() != RingerType.IGNORE) {
+            eventShouldSilence = true;
         }
 
-        // all day events
-        boolean allDay = false;
-        if (prefs.shouldAllDayEventsSilence() && event.isAllDay()) {
-            allDay = true;
-        }
-
-        // events marked as 'free' or 'available'
-        boolean free_notAllDay = false;
-        if (prefs.shouldAvailableEventsSilence() && event.isFreeTime() && !event.isAllDay()) {
-            free_notAllDay = true;
-        }
-
-        // events with a custom ringer set should always use that ringer
-        boolean isCustomRingerSet = false;
-        if (event.getInstanceRinger() != EventInstance.RINGER.UNDEFINED) {
-            isCustomRingerSet = true;
-        }
-
-        if (busy_notAllDay || allDay || free_notAllDay || isCustomRingerSet) {
-            eventMatches = true;
-        }
-
-        //only silence events if they belong to one of the selected calendars
-        //TODO this might be needed, selecting calendars should strip all events not in one of the
-        //selected calendars, so we should not have to check it here
-        boolean syncAllCalendars = prefs.shouldAllCalendarsBeSynced();
-        List<Long> calendarsToSync = prefs.getSelectedCalendars();
-        long calendarId = event.getCalendarId();
-        if (!syncAllCalendars) {
-            if (!calendarsToSync.contains(calendarId)) {
-                eventMatches = false;
-            }
-        }
-
-        //the event should be ignored if the highest priority ringer is set to IGNORE
-        boolean eventShouldBeIgnored = false;
-        int calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
-        if (calendarRinger == IGNORE) {
-            eventShouldBeIgnored = true;
-        }
-        int eventSeriesRinger = prefs.getRingerForEventSeries(event.getEventId());
-        if (eventSeriesRinger == IGNORE) {
-            eventShouldBeIgnored = true;
-        } else if (eventSeriesRinger != UNDEFINED) {
-            eventShouldBeIgnored = false;
-        }
-        if (event.getInstanceRinger() == IGNORE) {
-            eventShouldBeIgnored = true;
-        } else if (event.getInstanceRinger() != UNDEFINED) {
-            eventShouldBeIgnored = false;
-        }
-        //all of this is negated if the event has been marked to be ignored
-        if (eventShouldBeIgnored) {
-            eventMatches = false;
-        }
-
-        return eventMatches;
+        return eventShouldSilence;
     }
 
     private void silenceEventAndShowNotification(EventInstance event) {
         ringerState.storeRingerStateIfNeeded();
 
         EventManager eventManager = new EventManager(this, event);
-        int bestRinger = eventManager.getBestRinger();
+        RingerType bestRinger = eventManager.getBestRinger();
         ringerState.setPhoneRinger(bestRinger);
 
         volumesManager.silenceMediaAndAlarmVolumesIfNeeded();

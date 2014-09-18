@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class RingerStateManager {
@@ -51,9 +51,9 @@ public class RingerStateManager {
     }
 
     public void restorePhoneRinger() {
-        int storedRinger = getStoredRingerState();
-        if (storedRinger == EventInstance.RINGER.UNDEFINED) {
-            storedRinger = EventInstance.RINGER.NORMAL;
+        RingerType storedRinger = getStoredRingerState();
+        if (storedRinger == RingerType.UNDEFINED) {
+            storedRinger = RingerType.NORMAL;
         }
         setPhoneRinger(storedRinger);
     }
@@ -63,23 +63,25 @@ public class RingerStateManager {
      *
      * @return the stored ringer state. Returned value can be compared to CalEvent.RINGER types
      */
-    public int getStoredRingerState() {
+    public RingerType getStoredRingerState() {
         SharedPreferences preferences = context.getSharedPreferences(
                 "org.ciasaboark.tacere.preferences", Context.MODE_PRIVATE);
-        return preferences.getInt("curRinger", EventInstance.RINGER.UNDEFINED);
+        int ringerInt = preferences.getInt("curRinger", RingerType.UNDEFINED.value);
+        RingerType ringer = RingerType.getTypeForInt(ringerInt);
+        return ringer;
     }
 
-    public void setPhoneRinger(int ringerType) {
+    public void setPhoneRinger(RingerType ringerType) {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         switch (ringerType) {
-            case EventInstance.RINGER.VIBRATE:
+            case VIBRATE:
                 audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 break;
-            case EventInstance.RINGER.SILENT:
+            case SILENT:
                 audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 break;
-            case EventInstance.RINGER.IGNORE:
+            case IGNORE:
                 //ignore this event
                 break;
             default:

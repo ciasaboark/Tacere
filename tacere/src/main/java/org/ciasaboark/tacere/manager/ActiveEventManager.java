@@ -5,7 +5,7 @@
 
 package org.ciasaboark.tacere.manager;
 
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.EventInstance;
 
 public class ActiveEventManager {
     private static EventInstance activeEvent = null;

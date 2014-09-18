@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,8 +111,9 @@ public class Prefs {
         editor.putBoolean(Keys.SILENCE_ALL_DAY_EVENTS, silenceAllDayEvents).commit();
     }
 
-    public int getRingerType() {
-        return sharedPreferences.getInt(Keys.RINGER_TYPE, DefaultPrefs.RINGER_TYPE);
+    public RingerType getRingerType() {
+        int ringerInt = sharedPreferences.getInt(Keys.RINGER_TYPE, DefaultPrefs.RINGER_TYPE);
+        return RingerType.getTypeForInt(ringerInt);
     }
 
     public void setRingerType(int ringerType) {
@@ -201,14 +202,23 @@ public class Prefs {
         }
     }
 
-    public int getRingerForEventSeries(long eventId) {
-        int ringerType = EventInstance.RINGER.UNDEFINED;
+    public RingerType getRingerForEventSeries(long eventId) {
+        RingerType ringer = null;
+
         Map<Long, Integer> map = getEventRingersMap();
         if (map.containsKey(eventId)) {
-            ringerType = map.get(eventId);
+            int ringerInt = map.get(eventId);
+            try {
+                ringer = RingerType.getTypeForInt(ringerInt);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, e.getMessage());
+                throw e;
+            }
         }
-        return ringerType;
+
+        return ringer;
     }
+
 
     private Map<Long, Integer> getEventRingersMap() {
         //Event string should be in the format of <event id (long)>:<ringer type (int)>,...
@@ -237,9 +247,9 @@ public class Prefs {
         return map;
     }
 
-    public void setRingerForEventSeries(long eventId, int ringerType) {
+    public void setRingerForEventSeries(long eventId, RingerType ringerType) {
         Map<Long, Integer> eventsMap = getEventRingersMap();
-        eventsMap.put(eventId, ringerType);
+        eventsMap.put(eventId, ringerType.value);
         setEventsRingerMap(eventsMap);
     }
 
@@ -265,13 +275,21 @@ public class Prefs {
     }
 
 
-    public int getRingerForCalendar(long calendarId) {
-        int ringerType = EventInstance.RINGER.UNDEFINED;
+    public RingerType getRingerForCalendar(long calendarId) {
+        RingerType ringer = null;
+
         Map<Long, Integer> map = getCalendarRingersMap();
         if (map.containsKey(calendarId)) {
-            ringerType = map.get(calendarId);
+            int ringerInt = map.get(calendarId);
+            try {
+                ringer = RingerType.getTypeForInt(ringerInt);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, e.getMessage());
+                throw e;
+            }
         }
-        return ringerType;
+
+        return ringer;
     }
 
     private Map<Long, Integer> getCalendarRingersMap() {

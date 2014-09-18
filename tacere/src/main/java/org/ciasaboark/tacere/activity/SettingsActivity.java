@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
-import org.ciasaboark.tacere.database.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -148,22 +148,22 @@ public class SettingsActivity extends Activity {
 
     }
 
-    private void drawRingerWidgets() {
+    private void drawRingerWidgets() { //TODO add support for ignoring events
         //the ringer type description
         TextView ringerDescriptionTV = (TextView) findViewById(id.ringerTypeDescription);
         TextView ringerTV = (TextView) findViewById(id.settings_ringerTitle);
 
         Drawable icon;
         switch (prefs.getRingerType()) {
-            case EventInstance.RINGER.NORMAL:
+            case NORMAL:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
                 icon = getResources().getDrawable(R.drawable.ic_state_normal);
                 break;
-            case EventInstance.RINGER.VIBRATE:
+            case VIBRATE:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
                 icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                 break;
-            case EventInstance.RINGER.SILENT:
+            case SILENT:
                 ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
                 icon = getResources().getDrawable(R.drawable.ic_state_silent);
                 break;
@@ -313,15 +313,11 @@ public class SettingsActivity extends Activity {
 
     public void onClickRingerType(View v) {
         //TODO this is a fragile connection to the ringer types, should be replaced with an enum
-        String[] ringerTypes = {
-                "Normal",
-                "Vibrate",
-                "Silent",
-        };
+        String[] ringerTypes = RingerType.names();
 
         final AlertDialog alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.pref_ringer_type_title)
-                .setSingleChoiceItems(ringerTypes, prefs.getRingerType() - 1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(ringerTypes, prefs.getRingerType().value, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         prefs.setRingerType(which + 1);

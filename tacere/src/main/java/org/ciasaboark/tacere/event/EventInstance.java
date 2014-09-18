@@ -3,7 +3,9 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.database;
+package org.ciasaboark.tacere.event;
+
+import org.ciasaboark.tacere.event.ringer.RingerType;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -22,7 +24,7 @@ public class EventInstance {
     private long begin;
     private long end; // in milliseconds from epoch
     private String description;
-    private int ringerType;
+    private RingerType ringer;
     private boolean hasCustomRinger;
     private int dispColor;
     private boolean isFreeTime;
@@ -41,7 +43,20 @@ public class EventInstance {
         this.dispColor = displayColor;
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
-        this.ringerType = RINGER.UNDEFINED;
+        this.ringer = RingerType.UNDEFINED;
+    }
+
+    public RingerType getRingerType() {
+        return ringer == null ?
+                RingerType.UNDEFINED :
+                ringer;
+    }
+
+    public void setRingerType(RingerType newRinger) {
+        if (newRinger == null) {
+            throw new IllegalArgumentException("New ringer can not be null");
+        }
+        this.ringer = newRinger;
     }
 
     public String getLocalBeginTime() {
@@ -128,14 +143,6 @@ public class EventInstance {
         return isFreeTime;
     }
 
-    public Integer getInstanceRinger() {
-        return ringerType;
-    }
-
-    public void setInstanceRinger(int ringerType) {
-        this.ringerType = ringerType;
-    }
-
     public String getTitle() {
         String result;
         if (title == null || title.equals("")) {
@@ -166,13 +173,5 @@ public class EventInstance {
 
     public Integer getId() {
         return instanceId;
-    }
-
-    public class RINGER {
-        public static final int UNDEFINED = 0;
-        public static final int NORMAL = 1;
-        public static final int VIBRATE = 2;
-        public static final int SILENT = 3;
-        public static final int IGNORE = 4;
     }
 }
