@@ -12,10 +12,9 @@ class DefaultPrefs {
     // whether or not the service should run
     static final boolean IS_SERVICE_ACTIVATED = true;
     // events marked as free time (or available) will be silenced
-    static final boolean SILENCE_FREE_TIME_EVENTS = true;
+    static final boolean SILENCE_FREE_TIME_EVENTS = false;
     // events marked as all day will be silenced
     static final boolean SILENCE_ALL_DAY_EVENTS = false;
-    // 1: normal mode, 2: vibrate, 3: silent
     static final RingerType RINGER_TYPE = RingerType.SILENT;
     // change the media volume during an event
     static final boolean ADJUST_MEDIA = false;

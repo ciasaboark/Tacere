@@ -12,9 +12,12 @@ import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class EventManager {
-    private EventInstance event;
-    private Prefs prefs;
-    private Context context;
+    private final EventInstance event;
+    private final Context context;
+    private final Prefs prefs;
+    private RingerType ringerType = null;
+    private RingerSource ringerSource = null;
+    private Boolean shouldEventByIgnoredByDefault = null;
 
     public EventManager(Context ctx, EventInstance event) {
         if (ctx == null) {
@@ -30,55 +33,85 @@ public class EventManager {
     }
 
     public RingerType getBestRinger() {
-        RingerType defaultRinger = prefs.getRingerType();
-        RingerType eventRinger = prefs.getRingerForEventSeries(event.getEventId());
-        RingerType calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
+        if (ringerType != null) {
+            return ringerType;
+        } else {
+            RingerType defaultRinger = prefs.getRingerType();
+            RingerType eventRinger = prefs.getRingerForEventSeries(event.getEventId());
+            RingerType calendarRinger = prefs.getRingerForCalendar(event.getCalendarId());
 
-        RingerType bestRinger = defaultRinger;
-        if (calendarRinger != RingerType.UNDEFINED) {
-            bestRinger = calendarRinger;
-        }
+            RingerType bestRinger = defaultRinger;
+            if (calendarRinger != RingerType.UNDEFINED) {
+                bestRinger = calendarRinger;
+            }
 
-        if (eventRinger != RingerType.UNDEFINED) {
-            bestRinger = eventRinger;
-        }
-
-        //if the user has selected to ignore all day events then the event should be ignored
-        if (!prefs.shouldAllDayEventsSilence() && event.isAllDay()) {
-            bestRinger = RingerType.IGNORE;
-        }
-
-        //If the user has selected to ignore available events then the event should be ignored
-        //This should only be applied if the event is not all day
-        if (!prefs.shouldAvailableEventsSilence() && event.isFreeTime()) {
-            if ((!prefs.shouldAllDayEventsSilence() && event.isAllDay())) {
+            //if the user has selected to ignore all day events then the event should be ignored,
+            //this will be overridden by either a event series ringer, or an instance specific ringer
+            if (shouldEventBeIgnoredByDefault()) {
                 bestRinger = RingerType.IGNORE;
             }
-        }
 
-        //if the event has a specific ringer set then the above preferences should be ignored
-        //for this particular instance
-        if (event.getRingerType() != RingerType.UNDEFINED) {
-            bestRinger = event.getRingerType();
-        }
+            if (eventRinger != RingerType.UNDEFINED) {
+                bestRinger = eventRinger;
+            }
 
-        return bestRinger;
+            //if the event has a specific ringer set then the above preferences should be ignored
+            //for this particular instance
+            if (event.getRingerType() != RingerType.UNDEFINED) {
+                bestRinger = event.getRingerType();
+            }
+            this.ringerType = bestRinger;
+            return bestRinger;
+        }
+    }
+
+    private boolean shouldEventBeIgnoredByDefault() {
+        if (shouldEventByIgnoredByDefault != null) {
+            return shouldEventByIgnoredByDefault;
+        } else {
+            boolean ignoreEvent = false;
+            if (event.isAllDay()) {
+                //if the event is all day then we don't need to consider whether or not it is available
+                if (!prefs.shouldAllDayEventsSilence()) {
+                    ignoreEvent = true;
+                }
+            } else if (event.isFreeTime()) {
+                if (!prefs.shouldAvailableEventsSilence()) {
+                    ignoreEvent = true;
+                }
+            } else {
+                //if the event is neither an all day event nor marked as available then we do not ignore
+                //by default
+            }
+            shouldEventByIgnoredByDefault = ignoreEvent;
+            return ignoreEvent;
+        }
     }
 
     public RingerSource getRingerSource() {
-        RingerSource source = RingerSource.DEFAULT;
-        if (prefs.getRingerForCalendar(event.getCalendarId()) != RingerType.UNDEFINED) {
-            source = RingerSource.CALENDAR;
-        }
+        if (ringerSource != null) {
+            return ringerSource;
+        } else {
+            RingerSource source = RingerSource.DEFAULT;
+            if (prefs.getRingerForCalendar(event.getCalendarId()) != RingerType.UNDEFINED) {
+                //a calendar specific ringer has been set, but this should only be applied to events that
+                //should not be ignored by default
+                if (!shouldEventBeIgnoredByDefault()) {
+                    source = RingerSource.CALENDAR;
+                } else {
+                    source = RingerSource.DEFAULT;
+                }
+            }
 
-        if (prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED) {
-            source = RingerSource.EVENT_SERIES;
-        }
+            if (prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED) {
+                source = RingerSource.EVENT_SERIES;
+            }
 
-        if (event.getRingerType() != RingerType.UNDEFINED) {
-            source = RingerSource.INSTANCE;
+            if (event.getRingerType() != RingerType.UNDEFINED) {
+                source = RingerSource.INSTANCE;
+            }
+            this.ringerSource = source;
+            return source;
         }
-
-        return source;
     }
 }
