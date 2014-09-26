@@ -40,7 +40,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
@@ -49,7 +48,6 @@ import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
-import org.ciasaboark.tacere.database.TooltipManager;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerSource;
@@ -62,8 +60,6 @@ import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 //import android.graphics.Outline;
 
@@ -77,7 +73,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private int listViewIndex = 0;
     private Prefs prefs;
     private long animationDuration = 300;
-    //    private View settingsButton = null;
     private ChromeHelpPopup settingsPopup = null;
     private ChromeHelpPopup addEventPopup = null;
     private View settingsButton;
@@ -85,9 +80,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private boolean showEventPopup = false;
     private boolean showCalendarPopup = false;
     private boolean showingTooltips = false;
-    private List<ChromeHelpPopup> tooltips = new CopyOnWriteArrayList<ChromeHelpPopup>();
-//    private Outline outline;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,16 +87,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         setContentView(R.layout.activity_main);
         databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
         prefs = new Prefs(this);
-        BroadcastReceiver tooltipReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                for (ChromeHelpPopup tooltip : tooltips) {
-                    tooltips.remove(tooltip);
-                    Log.d(TAG, "dismissing tooltip with text:" + tooltip.getText());
-                    tooltip.dismiss();
-                }
-            }
-        };
+
 
         BroadcastReceiver datasetChangedReceiver = new BroadcastReceiver() {
             private static final String TAG = "datasetChangedReceiver";
@@ -137,8 +120,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         // register to receive broadcast messages
         LocalBroadcastManager.getInstance(this).registerReceiver(datasetChangedReceiver,
                 new IntentFilter(DataSetManager.BROADCAST_MESSAGE_KEY));
-        LocalBroadcastManager.getInstance(this).registerReceiver(tooltipReceiver,
-                new IntentFilter(TooltipManager.BROADCAST_MESSAGE_KEY));
+
 
         // display the updates dialog if it hasn't been shown yet
         ShowUpdatesActivity.showUpdatesDialogIfNeeded(this);
@@ -146,7 +128,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);
 
-        showTooltipsIfNeeded();
+        showFirstRunWizardIfNeeded();
     }
 
     private void setupAndDrawActionButtons() {
@@ -163,68 +145,26 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         startService(i);
     }
 
-    private void showTooltipsIfNeeded() {
+    private void showFirstRunWizardIfNeeded() {
         //show tooltips for action bar buttons
+        final FirstRunWizard firstRunWizard = new FirstRunWizard(MainActivity.this, this);
         final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+//        new Handler().post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (prefs.isFirstRun()) {
+//                    //show the first run wizard
+//                    firstRunWizard.showAllTooltips();
+//                }
+//            }
+//        });
+
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                //the 'select calendars to sync' tooltip should be shown once at first run, then again
-                //only if there are no calendars selected
-                settingsButton = findViewById(R.id.action_settings);
-                if (settingsButton != null && (showCalendarPopup || prefs.isFirstRun())) {
-                    if (settingsPopup == null) {
-                        settingsPopup = new ChromeHelpPopup(MainActivity.this, "Select calendars to sync");
-                        int color = getApplicationContext().getResources().getColor(android.R.color.holo_red_light);
-                        settingsPopup.setHighlightColor(color);
-                        settingsPopup.show(settingsButton);
-                        settingsPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                            @Override
-                            public void onDismiss() {
-                                TooltipManager ttm = new TooltipManager(this, getApplicationContext());
-                                ttm.broadcastTooltipDismissedMessage();
-                            }
-                        });
-                        tooltips.add(settingsPopup);
-                    }
-
-                }
-
-                addEventButton = findViewById(R.id.action_add_event);
-                if (addEventButton != null && (showEventPopup || prefs.isFirstRun())) {
-                    if (addEventPopup == null) {
-                        addEventPopup = new ChromeHelpPopup(MainActivity.this, "Add an event");
-                        addEventPopup.setHighlightColor(getResources().getColor(android.R.color.holo_orange_light));
-                        addEventPopup.show(addEventButton);
-                        addEventPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                            @Override
-                            public void onDismiss() {
-                                TooltipManager ttm = new TooltipManager(this, getApplicationContext());
-                                ttm.broadcastTooltipDismissedMessage();
-                            }
-                        });
-                        tooltips.add(addEventPopup);
-                    }
-                }
-
-                //show tooltips for main view widgets once
-                if (prefs.isFirstRun() && !showingTooltips) {
-                    showingTooltips = true;
-                    ChromeHelpPopup quicksilenceTooltip = new ChromeHelpPopup(MainActivity.this, "Toggle quicksilence");
-                    View quicksilenceButton = findViewById(R.id.quickSilenceButton);
-                    if (quicksilenceButton != null) {
-                        quicksilenceTooltip.show(quicksilenceButton);
-                        quicksilenceTooltip.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                            @Override
-                            public void onDismiss() {
-                                TooltipManager ttm = new TooltipManager(this, getApplicationContext());
-                                ttm.broadcastTooltipDismissedMessage();
-                            }
-                        });
-                        tooltips.add(quicksilenceTooltip);
-                    }
-
-                    prefs.disableFirstRun();
+                if (prefs.isFirstRun()) {
+                    //show the first run wizard
+                    firstRunWizard.showAllTooltips();
                 }
 
                 if (viewTreeObserver.isAlive()) {

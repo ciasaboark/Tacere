@@ -43,7 +43,6 @@ public class ChromeHelpPopup {
 
     public ChromeHelpPopup(Context context, String text) {
         this(context);
-
         setText(text);
     }
 
