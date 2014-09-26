@@ -7,6 +7,7 @@ package org.ciasaboark.tacere.event;
 
 import android.content.Context;
 
+import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
@@ -47,11 +48,12 @@ public class EventManager {
             bestRinger = RingerType.IGNORE;
         }
 
-        //if the user has selected to ignore available events then the event should be ignored
-        //TODO all day events are by default marked as available, this could lead to unexpected
-        //consequences if all day events have not also been marked to be ignored
+        //If the user has selected to ignore available events then the event should be ignored
+        //This should only be applied if the event is not all day
         if (!prefs.shouldAvailableEventsSilence() && event.isFreeTime()) {
-            bestRinger = RingerType.IGNORE;
+            if ((!prefs.shouldAllDayEventsSilence() && event.isAllDay())) {
+                bestRinger = RingerType.IGNORE;
+            }
         }
 
         //if the event has a specific ringer set then the above preferences should be ignored
@@ -61,5 +63,22 @@ public class EventManager {
         }
 
         return bestRinger;
+    }
+
+    public RingerSource getRingerSource() {
+        RingerSource source = RingerSource.DEFAULT;
+        if (prefs.getRingerForCalendar(event.getCalendarId()) != RingerType.UNDEFINED) {
+            source = RingerSource.CALENDAR;
+        }
+
+        if (prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED) {
+            source = RingerSource.EVENT_SERIES;
+        }
+
+        if (event.getRingerType() != RingerType.UNDEFINED) {
+            source = RingerSource.INSTANCE;
+        }
+
+        return source;
     }
 }

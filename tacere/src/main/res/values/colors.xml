@@ -35,9 +35,9 @@
 
     <!-- ringer icon colors -->
     <item name="ringer_default" type="color">#ffc0c0c0</item>
-    <item name="ringer_calendar" type="color">#ff716c95</item>
-    <item name="ringer_series" type="color">#ff669560</item>
-    <item name="ringer_instance" type="color">#ff1b1b1b</item>
+    <item name="ringer_calendar" type="color">#ffff9800</item>
+    <item name="ringer_series" type="color">#cddc39</item>
+    <item name="ringer_instance" type="color">#40c4ff</item>
 </resources>
 
 

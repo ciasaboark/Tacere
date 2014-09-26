@@ -6,11 +6,12 @@
 package org.ciasaboark.tacere.event.ringer;
 
 public enum RingerType {
+    UNDEFINED(0),
     NORMAL(1),
     VIBRATE(2),
     SILENT(3),
-    IGNORE(4),
-    UNDEFINED(5);
+    IGNORE(4);
+
     public final int value;
 
     RingerType(int value) {
@@ -32,6 +33,32 @@ public enum RingerType {
         return ringer;
     }
 
+    public static int getIntForStringValue(String type) {
+        if (type == null) {
+            throw new IllegalArgumentException("type can not be null");
+        }
+        type = type.toUpperCase();
+        Integer intValue = null;
+        //no switching on strings in java 6
+        if (type.equals(UNDEFINED.toString().toUpperCase())) {
+            intValue = UNDEFINED.value;
+        } else if (type.equals(NORMAL.toString().toUpperCase())) {
+            intValue = NORMAL.value;
+        } else if (type.equals(VIBRATE.toString().toUpperCase())) {
+            intValue = VIBRATE.value;
+        } else if (type.equals(SILENT.toString().toUpperCase())) {
+            intValue = SILENT.value;
+        } else if (type.equals(IGNORE.toString().toUpperCase())) {
+            intValue = IGNORE.value;
+        }
+
+        if (intValue == null) {
+            throw new IllegalArgumentException("Unknown type: " + type);
+        }
+
+        return intValue;
+    }
+
     public static String[] names() {
         RingerType[] states = values();
         String[] names = new String[states.length];
@@ -44,8 +71,10 @@ public enum RingerType {
     }
 
     public RingerType getNext() {
-        return this.ordinal() < RingerType.values().length - 1
+        RingerType nextType = this.ordinal() < RingerType.values().length - 1
                 ? RingerType.values()[this.ordinal() + 1]
                 : RingerType.values()[0];
+        //the UNDEFINED type is omitted from the cycle
+        return nextType == UNDEFINED ? NORMAL : nextType;
     }
 }

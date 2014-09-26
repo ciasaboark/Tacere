@@ -41,8 +41,8 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SelectCalendarsActivity extends Activity {
@@ -281,14 +281,26 @@ public class SelectCalendarsActivity extends Activity {
                     @Override
                     public void onClick(final View view) {
                         if (simpleCalendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                            //TODO fragile connection to the ringer types
-                            final Deque<Integer> selectedItemHolder = new ArrayDeque<Integer>();
-                            final String[] options = RingerType.names();
-                            int selectedRinger;
+                            final ArrayList<String> ringerTypes = new ArrayList<String>(Arrays.asList(RingerType.names()));
+                            String undefinedString = RingerType.UNDEFINED.toString();
+                            ringerTypes.remove(undefinedString);
+                            for (int i = 0; i < ringerTypes.size(); i++) {
+                                String type = ringerTypes.get(i);
+                                Character firstChar = type.charAt(0);
+                                type = firstChar.toString().toUpperCase() + type.substring(1).toLowerCase();
+                                ringerTypes.set(i, type);
+                            }
+                            final String[] options = ringerTypes.toArray(new String[]{});
+
+                            //set the pre-selected option to the value previously selected
+                            int selectedRinger = -1;
                             try {
-                                selectedRinger = prefs.getRingerForCalendar(simpleCalendar.getId()).value;
+                                RingerType storedRinger = prefs.getRingerForCalendar(simpleCalendar.getId());
+                                if (storedRinger != RingerType.UNDEFINED) {
+                                    selectedRinger = ringerTypes.indexOf(storedRinger.toString());
+                                }
                             } catch (IllegalArgumentException e) {
-                                selectedRinger = -1;
+                                //nothing to do here
                             }
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -296,24 +308,16 @@ public class SelectCalendarsActivity extends Activity {
                             builder.setSingleChoiceItems(options, selectedRinger, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedItemHolder.clear();
-                                    selectedItemHolder.addFirst(i);
+                                    String selectedRinger = options[i];
+                                    int selectedRingerInt = RingerType.getIntForStringValue(selectedRinger);
+                                    prefs.setRingerForCalendar(simpleCalendar.getId(), selectedRingerInt);
+                                    thisAdapter.notifyDataSetChanged();
                                 }
                             });
                             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    try {
-                                        if (!selectedItemHolder.isEmpty()) {
-                                            prefs.setRingerForCalendar(simpleCalendar.getId(), selectedItemHolder.getFirst() + 1); //selection has to be offset since undefined (ringer type 0) is ommited from the list
-                                            Toast.makeText(context, "set ringer for calendar " + simpleCalendar.getDisplayName() + " to ringer type: " + options[i], Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(context, "no ringer selected", Toast.LENGTH_SHORT).show();
-                                        }
-                                    } catch (Exception e) {
-                                        //TODO
-                                    }
-                                    thisAdapter.notifyDataSetChanged();
+                                    //nothing to do here
                                 }
                             });
                             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -324,22 +328,20 @@ public class SelectCalendarsActivity extends Activity {
                             });
 
                             //the clear button should only be visible if a ringer has been set
-                            if (prefs.getRingerForCalendar(simpleCalendar.getId()) != RingerType.UNDEFINED) {
-                                builder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        try {
-                                            Calendar calendar = calendarList.get(position);
-                                            prefs.unsetRingerTypeForCalendar(calendar.getId());
-                                            //TODO stringify
-                                            Toast.makeText(context, "Unset ringer for calendar " + calendar.getDisplayName(), Toast.LENGTH_SHORT).show();
-                                        } catch (Exception e) {
-                                            //TODO
-                                        }
-                                        thisAdapter.notifyDataSetChanged();
+                            builder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    try {
+                                        Calendar calendar = calendarList.get(position);
+                                        prefs.unsetRingerTypeForCalendar(calendar.getId());
+                                        //TODO stringify
+                                        Toast.makeText(context, "Unset ringer for calendar " + calendar.getDisplayName(), Toast.LENGTH_SHORT).show();
+                                    } catch (Exception e) {
+                                        //TODO
                                     }
-                                });
-                            }
+                                    thisAdapter.notifyDataSetChanged();
+                                }
+                            });
 
                             builder.show();
                         }

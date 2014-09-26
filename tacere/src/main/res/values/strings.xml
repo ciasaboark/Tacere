@@ -124,7 +124,7 @@
 
     <string name="title_activity_event_longclick">EventLongclickActivity</string>
     <string name="hello_world">Hello world!</string>
-    <string name="clear">clear</string>
+    <string name="clear">Reset</string>
 
     <!-- event details dialog -->
     <string name="event_details_checkbox">Use for all repetitions of this event</string>

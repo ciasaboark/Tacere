@@ -28,13 +28,15 @@ import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.EventManager;
+import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.List;
 
 public class EventDetailsFragment extends DialogFragment {
-    private static final String TAG = "EventLongClickFragment";
+    public static final String TAG = "EventLongClickFragment";
     private DatabaseInterface databaseInterface;
     private Prefs prefs;
     private EventInstance event;
@@ -72,8 +74,10 @@ public class EventDetailsFragment extends DialogFragment {
 
         //the clear button should only be visible if the event has a custom ringer or if the events
         //series has a custom ringer set
-        if (event.getRingerType() != RingerType.UNDEFINED ||
-                prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED) {
+        EventManager eventManager = new EventManager(context, event);
+
+        if (eventManager.getRingerSource() == RingerSource.EVENT_SERIES ||
+                eventManager.getRingerSource() == RingerSource.INSTANCE) {
             thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

@@ -112,8 +112,14 @@ public class Prefs {
     }
 
     public RingerType getRingerType() {
-        int ringerInt = sharedPreferences.getInt(Keys.RINGER_TYPE, DefaultPrefs.RINGER_TYPE);
-        return RingerType.getTypeForInt(ringerInt);
+        final int NO_STORED_RINGER = -1;
+        RingerType storedRinger = DefaultPrefs.RINGER_TYPE;
+        int ringerInt = sharedPreferences.getInt(Keys.RINGER_TYPE, NO_STORED_RINGER);
+
+        if (ringerInt != NO_STORED_RINGER) {
+            storedRinger = RingerType.getTypeForInt(ringerInt);
+        }
+        return storedRinger;
     }
 
     public void setRingerType(int ringerType) {
@@ -203,7 +209,7 @@ public class Prefs {
     }
 
     public RingerType getRingerForEventSeries(long eventId) {
-        RingerType ringer = null;
+        RingerType ringer = RingerType.UNDEFINED;
 
         Map<Long, Integer> map = getEventRingersMap();
         if (map.containsKey(eventId)) {
@@ -276,7 +282,7 @@ public class Prefs {
 
 
     public RingerType getRingerForCalendar(long calendarId) {
-        RingerType ringer = null;
+        RingerType ringer = RingerType.UNDEFINED;
 
         Map<Long, Integer> map = getCalendarRingersMap();
         if (map.containsKey(calendarId)) {

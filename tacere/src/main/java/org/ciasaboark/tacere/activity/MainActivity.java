@@ -52,6 +52,7 @@ import org.ciasaboark.tacere.database.NoSuchEventException;
 import org.ciasaboark.tacere.database.TooltipManager;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
+import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
@@ -528,8 +529,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
             EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event.getId());
-            dialogFragment.show(fm, "foo");
-
+            dialogFragment.show(fm, EventDetailsFragment.TAG);
         } catch (NoSuchEventException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
@@ -596,7 +596,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 // an icon to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
                 if (eventIV != null) {
-                    eventIV.setImageDrawable(this.getRingerIcon(thisEvent));
+                    Drawable ringerIcon = getRingerIcon(thisEvent);
+                    eventIV.setImageDrawable(ringerIcon);
                     eventIV.setContentDescription(getBaseContext().getString(
                             R.string.icon_alt_text_normal));
                 }
@@ -644,33 +645,52 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
             int color = defaultColor;
 
+
             EventManager eventManager = new EventManager(getApplicationContext(), event);
             RingerType ringerType = eventManager.getBestRinger();
-
             icon = getIconForRinger(ringerType);
 
+            RingerSource ringerSource = eventManager.getRingerSource();
+            switch (ringerSource) {
+                case CALENDAR:
+                    color = calendarColor;
+                    break;
+                case EVENT_SERIES:
+                    color = eventColor;
+                    break;
+                case INSTANCE:
+                    color = instanceColor;
+            }
+
             icon.mutate().setColorFilter(color, Mode.MULTIPLY);
+
+            if (icon == null) {
+                throw new AssertionError(this.getClass().getName() + "Ringer icon should not be null");
+            }
             return icon;
         }
 
         private Drawable getIconForRinger(RingerType ringerType) {
             Drawable icon;
-
-            switch (ringerType) {
-                case NORMAL:
-                    icon = getResources().getDrawable(R.drawable.ic_state_normal);
-                    break;
-                case VIBRATE:
-                    icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
-                    break;
-                case SILENT:
-                    icon = getResources().getDrawable(R.drawable.ic_state_silent);
-                    break;
-                case IGNORE:
-                    icon = getResources().getDrawable(R.drawable.ic_state_ignore);
-                    break;
-                default:
-                    icon = getResources().getDrawable(R.drawable.blank);
+            if (ringerType == null) {
+                icon = getResources().getDrawable(R.drawable.blank);
+            } else {
+                switch (ringerType) {
+                    case NORMAL:
+                        icon = getResources().getDrawable(R.drawable.ic_state_normal);
+                        break;
+                    case VIBRATE:
+                        icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
+                        break;
+                    case SILENT:
+                        icon = getResources().getDrawable(R.drawable.ic_state_silent);
+                        break;
+                    case IGNORE:
+                        icon = getResources().getDrawable(R.drawable.ic_state_ignore);
+                        break;
+                    default:
+                        icon = getResources().getDrawable(R.drawable.blank);
+                }
             }
 
             return icon;

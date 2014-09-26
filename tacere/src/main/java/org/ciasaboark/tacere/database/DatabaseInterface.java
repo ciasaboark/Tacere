@@ -293,7 +293,8 @@ public class DatabaseInterface {
 
                 try {
                     EventInstance oldEvent = getEvent(id);
-                    newEvent.setRingerType(oldEvent.getRingerType());
+                    RingerType oldRinger = oldEvent.getRingerType();
+                    newEvent.setRingerType(oldRinger);
                 } catch (NoSuchEventException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet

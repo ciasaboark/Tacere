@@ -5,6 +5,8 @@
 
 package org.ciasaboark.tacere.prefs;
 
+import org.ciasaboark.tacere.event.ringer.RingerType;
+
 class DefaultPrefs {
     static final boolean DO_NOT_DISTURB = false;
     // whether or not the service should run
@@ -14,7 +16,7 @@ class DefaultPrefs {
     // events marked as all day will be silenced
     static final boolean SILENCE_ALL_DAY_EVENTS = false;
     // 1: normal mode, 2: vibrate, 3: silent
-    static final int RINGER_TYPE = 3;
+    static final RingerType RINGER_TYPE = RingerType.SILENT;
     // change the media volume during an event
     static final boolean ADJUST_MEDIA = false;
     // change the alarm volume during an event
