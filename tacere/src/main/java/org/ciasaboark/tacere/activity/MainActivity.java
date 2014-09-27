@@ -73,13 +73,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private int listViewIndex = 0;
     private Prefs prefs;
     private long animationDuration = 300;
-    private ChromeHelpPopup settingsPopup = null;
-    private ChromeHelpPopup addEventPopup = null;
-    private View settingsButton;
-    private View addEventButton;
-    private boolean showEventPopup = false;
-    private boolean showCalendarPopup = false;
-    private boolean showingTooltips = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +121,18 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);
 
-        showFirstRunWizardIfNeeded();
+        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showFirstRunWizardIfNeeded();
+                    }
+                }, 5000);
+            }
+        });
     }
 
     private void setupAndDrawActionButtons() {
@@ -147,33 +151,17 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     private void showFirstRunWizardIfNeeded() {
         //show tooltips for action bar buttons
-        final FirstRunWizard firstRunWizard = new FirstRunWizard(MainActivity.this, this);
-        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-//        new Handler().post(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (prefs.isFirstRun()) {
-//                    //show the first run wizard
-//                    firstRunWizard.showAllTooltips();
-//                }
-//            }
-//        });
-
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (prefs.isFirstRun()) {
-                    //show the first run wizard
-                    firstRunWizard.showAllTooltips();
-                }
-
-                if (viewTreeObserver.isAlive()) {
-                    viewTreeObserver.removeGlobalOnLayoutListener(this);
-                }
+        if (prefs.isFirstRun()) {
+            //show the first run wizard
+            View settingsButton = findViewById(R.id.action_settings);
+            View addEventButton = findViewById(R.id.action_add_event);
+            if (settingsButton != null && addEventButton != null) {
+                final FirstRunWizard firstRunWizard = new FirstRunWizard(MainActivity.this, this, settingsButton, addEventButton);
+                firstRunWizard.showAllTooltips();
+            } else {
+                Log.e(TAG, "error showing first run wizard, one or more views could not be found");
             }
-        });
-
-
+        }
     }
 
     private void setupActionButtons() {
@@ -353,15 +341,15 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         String errorText = "";
         if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendars().isEmpty()) {
             errorText = getString(R.string.list_error_no_calendars);
-            showCalendarPopup = true;
-            showEventPopup = false;
+//            showCalendarPopup = true;
+//            showEventPopup = false;
         } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendars().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
             errorText = String.format(getString(R.string.list_error_no_events), dateConverter.toString());
-            showEventPopup = true;
-            showCalendarPopup = false;
+//            showEventPopup = true;
+//            showCalendarPopup = false;
         } else {
-            showEventPopup = false;
-            showCalendarPopup = false;
+//            showEventPopup = false;
+//            showCalendarPopup = false;
         }
         noEventsTv.setText(errorText);
     }
@@ -398,7 +386,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -528,7 +516,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 }
 
                 ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar);
-                Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar_round);
+                Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar);
                 int displayColor = thisEvent.getDisplayColor();
                 coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
                 sidebar.setBackgroundDrawable(coloredSidebar);
