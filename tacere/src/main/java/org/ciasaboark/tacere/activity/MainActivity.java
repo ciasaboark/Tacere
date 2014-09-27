@@ -297,22 +297,23 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void showFirstRunWizardIfNeeded() {
-        if (!showingTutorial) {
-            final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    startActivity(new Intent(getApplicationContext(), Tutorial.class));
+        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!showingTutorial) {
                     showingTutorial = true;
+                    startActivity(new Intent(getApplicationContext(), Tutorial.class));
+                }
+                if (viewTreeObserver.isAlive()) {
                     if (Build.VERSION.SDK_INT >= 16) {
                         viewTreeObserver.removeOnGlobalLayoutListener(this);
                     } else {
                         viewTreeObserver.removeGlobalOnLayoutListener(this);
                     }
                 }
-            });
-
-        }
+            }
+        });
     }
 
     private void setupListView() {

@@ -6,12 +6,14 @@
 package org.ciasaboark.tacere.activity;
 
 import android.app.Activity;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import org.ciasaboark.tacere.R;
@@ -28,18 +30,38 @@ public class Tutorial extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
+        colorizeIcons();
+    }
 
+    private void colorizeIcons() {
+        ImageView defaultView = (ImageView) findViewById(R.id.tutorial_icon_ringer_default);
+        colorizeIcon(defaultView, getResources().getColor(R.color.ringer_default));
+
+        ImageView calendarView = (ImageView) findViewById(R.id.tutorial_icon_ringer_calendar);
+        colorizeIcon(calendarView, getResources().getColor(R.color.ringer_calendar));
+
+        ImageView eventSeriesView = (ImageView) findViewById(R.id.tutorial_icon_ringer_event_series);
+        colorizeIcon(eventSeriesView, getResources().getColor(R.color.ringer_series));
+
+        ImageView instanceView = (ImageView) findViewById(R.id.tutorial_icon_ringer_instance);
+        colorizeIcon(instanceView, getResources().getColor(R.color.ringer_instance));
+    }
+
+    private void colorizeIcon(ImageView view, int color) {
+        Drawable d = view.getBackground();
+        d.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        view.setBackgroundDrawable(d);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        frame1 = (RelativeLayout) findViewById(R.id.tutorial_frame_1);
+        frame1 = (RelativeLayout) findViewById(R.id.tutorial_frame_welcome);
         frame1.setVisibility(View.VISIBLE);
-        frame2 = (RelativeLayout) findViewById(R.id.tutorial_frame_2);
-        frame1.setVisibility(View.GONE);
-        frame3 = (RelativeLayout) findViewById(R.id.tutorial_frame_3);
-        frame1.setVisibility(View.GONE);
+        frame2 = (RelativeLayout) findViewById(R.id.tutorial_frame_event_list);
+        frame2.setVisibility(View.GONE);
+        frame3 = (RelativeLayout) findViewById(R.id.tutorial_frame_ringers);
+        frame3.setVisibility(View.GONE);
         final Button skipTutorialButton = (Button) findViewById(R.id.tutorial_button_skip);
         skipTutorialButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +70,7 @@ public class Tutorial extends Activity {
             }
         });
 
-        Button nextButton = (Button) findViewById(R.id.tutorial_button_next);
+        final Button nextButton = (Button) findViewById(R.id.tutorial_button_next);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,13 +87,13 @@ public class Tutorial extends Activity {
                         frame2.setVisibility(View.GONE);
                         frame3.setVisibility(View.VISIBLE);
                         showingFrame = 3;
+                        skipTutorialButton.setVisibility(View.GONE);
+                        nextButton.setText("Close");
                         break;
                     case 3:
                         skipTutorialButton.performClick();
                         break;
                     default:
-                        Log.e(TAG, "showingFrame was not one of [1,2,3], this should not have " +
-                                "happened, closing tutorial activity.");
                         skipTutorialButton.performClick();
                 }
             }
