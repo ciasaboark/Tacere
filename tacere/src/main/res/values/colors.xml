@@ -38,6 +38,8 @@
     <item name="ringer_calendar" type="color">#ffff9800</item>
     <item name="ringer_series" type="color">#cddc39</item>
     <item name="ringer_instance" type="color">#40c4ff</item>
+
+    <item name="tutorial_background" type="color">#5540c4ff</item>
 </resources>
 
 

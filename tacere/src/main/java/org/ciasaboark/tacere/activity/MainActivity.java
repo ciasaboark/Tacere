@@ -73,6 +73,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private int listViewIndex = 0;
     private Prefs prefs;
     private long animationDuration = 300;
+    private boolean showingTutorial = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,19 +121,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         // display the "thank you" dialog once if the donation key is installed
         DonationActivity.showDonationDialogIfNeeded(this);
-
-        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showFirstRunWizardIfNeeded();
-                    }
-                }, 5000);
-            }
-        });
     }
 
     private void setupAndDrawActionButtons() {
@@ -147,21 +135,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         Intent i = new Intent(this, EventSilencerService.class);
         i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
         startService(i);
-    }
-
-    private void showFirstRunWizardIfNeeded() {
-        //show tooltips for action bar buttons
-        if (prefs.isFirstRun()) {
-            //show the first run wizard
-            View settingsButton = findViewById(R.id.action_settings);
-            View addEventButton = findViewById(R.id.action_add_event);
-            if (settingsButton != null && addEventButton != null) {
-                final FirstRunWizard firstRunWizard = new FirstRunWizard(MainActivity.this, this, settingsButton, addEventButton);
-                firstRunWizard.showAllTooltips();
-            } else {
-                Log.e(TAG, "error showing first run wizard, one or more views could not be found");
-            }
-        }
     }
 
     private void setupActionButtons() {
@@ -302,7 +275,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         restartEventSilencerService();
         setupAndDrawActionButtons();
         drawEventListOrError();
-
+        showFirstRunWizardIfNeeded();
     }
 
     private void drawEventListOrError() {
@@ -320,6 +293,25 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         } else {
             hideError();
             drawEventList();
+        }
+    }
+
+    private void showFirstRunWizardIfNeeded() {
+        if (!showingTutorial) {
+            final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    startActivity(new Intent(getApplicationContext(), Tutorial.class));
+                    showingTutorial = true;
+                    if (Build.VERSION.SDK_INT >= 16) {
+                        viewTreeObserver.removeOnGlobalLayoutListener(this);
+                    } else {
+                        viewTreeObserver.removeGlobalOnLayoutListener(this);
+                    }
+                }
+            });
+
         }
     }
 

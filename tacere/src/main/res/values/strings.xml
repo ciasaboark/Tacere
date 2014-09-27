@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
 <resources>
 
     <string name="app_name">Tacere</string>
@@ -129,5 +127,6 @@
     <!-- event details dialog -->
     <string name="event_details_checkbox">Use for all repetitions of this event</string>
     <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
+    <string name="title_activity_tutorial">Tutorial</string>
 
 </resources>

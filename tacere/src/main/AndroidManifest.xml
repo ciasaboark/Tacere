@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
@@ -136,6 +135,12 @@
                 <data android:host="com.android.calendar"/>
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".activity.Tutorial"
+            android:label="@string/title_activity_tutorial"
+            android:theme="@style/Transparent">
+        </activity>
     </application>
 
 </manifest>
