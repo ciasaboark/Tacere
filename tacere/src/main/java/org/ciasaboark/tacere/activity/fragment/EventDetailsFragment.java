@@ -3,7 +3,7 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.activity.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

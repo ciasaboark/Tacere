@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Tacere.iml" filepath="$PROJECT_DIR$/Tacere.iml" />
       <module fileurl="file://$PROJECT_DIR$/donate-key/donate-key.iml" filepath="$PROJECT_DIR$/donate-key/donate-key.iml" />
       <module fileurl="file://$PROJECT_DIR$/tacere/tacere.iml" filepath="$PROJECT_DIR$/tacere/tacere.iml" />
+      <module fileurl="file://$PROJECT_DIR$/viewPagerIndicator/viewPagerIndicator.iml" filepath="$PROJECT_DIR$/viewPagerIndicator/viewPagerIndicator.iml" />
     </modules>
   </component>
 </project>

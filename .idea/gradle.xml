@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/donate-key" />
             <option value="$PROJECT_DIR$/tacere" />
+            <option value="$PROJECT_DIR$/viewPagerIndicator" />
           </set>
         </option>
       </GradleProjectSettings>

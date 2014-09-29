@@ -3,7 +3,7 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.activity.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,13 +13,14 @@ import android.view.ViewGroup;
 
 import org.ciasaboark.tacere.R;
 
-public class ScreenSlidePageFragment extends Fragment {
+public class TutorialWelcomeFragment extends Fragment {
+    private int layout = R.layout.fragment_tutorial_page_welcome;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_screen_slide_page, container, false);
+                layout, container, false);
 
         return rootView;
     }

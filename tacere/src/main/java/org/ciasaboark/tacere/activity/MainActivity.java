@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -42,6 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.activity.fragment.EventDetailsFragment;
 import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
@@ -296,24 +298,23 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void showFirstRunWizardIfNeeded() {
-//        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-//        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                if (!showingTutorial) {
-//                    showingTutorial = true;
-//                    startActivity(new Intent(getApplicationContext(), Tutorial.class));
-//                }
-//                if (viewTreeObserver.isAlive()) {
-//                    if (Build.VERSION.SDK_INT >= 16) {
-//                        viewTreeObserver.removeOnGlobalLayoutListener(this);
-//                    } else {
-//                        viewTreeObserver.removeGlobalOnLayoutListener(this);
-//                    }
-//                }
-//            }
-//        });
-        startActivity(new Intent(this, ScreenSlidePagerActivity.class));
+        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!showingTutorial) {
+                    showingTutorial = true;
+                    startActivity(new Intent(getApplicationContext(), TutorialActivity.class));
+                }
+                if (viewTreeObserver.isAlive()) {
+                    if (Build.VERSION.SDK_INT >= 16) {
+                        viewTreeObserver.removeOnGlobalLayoutListener(this);
+                    } else {
+                        viewTreeObserver.removeGlobalOnLayoutListener(this);
+                    }
+                }
+            }
+        });
     }
 
     private void setupListView() {

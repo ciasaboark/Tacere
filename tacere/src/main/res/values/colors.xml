@@ -39,9 +39,10 @@
     <item name="ringer_series" type="color">#259b24</item>
     <item name="ringer_instance" type="color">#40c4ff</item>
 
-    <item name="tutorial_background" type="color">#a8ffffff</item>
+    <item name="tutorial_background" type="color">#5677fc</item>
     <item name="tutorial_frame_background" type="color">#a8919191</item>
-    <item name="tutorial_buttons_background" type="color">#a8595959</item>
+    <item name="tutorial_buttons_background" type="color">#00ffffff</item>
+    <item name="tutorial_button_skip_color" type="color">#afbfff</item>
     <item name="tutorial_frame_welcome" type="color">#a8ff5bfc</item>
     <item name="tutorial_frame_ringer" type="color">#a8ff3a1a</item>
     <item name="tutorial_frame_events" type="color">#a83dffc5</item>

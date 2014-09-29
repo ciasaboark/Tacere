@@ -4,6 +4,7 @@
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
+
 <resources>
 
     <string name="app_name">Tacere</string>
@@ -131,5 +132,19 @@
     <string name="title_activity_tutorial">Tutorial</string>
 
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+
+    <!-- Tutorial Pages -->
+    <!-- Ringer priority tutorial -->
+    <string name="tutorial_ringer_priority_title">Ringer Priorities</string>
+    <string name="tutorial_ringer_priority_intro">When an event starts Tacere will try to find the most appropriate way to adjust your device\'s ringer.  Settings can be applied on a per-calendar and per event basis.  Repeating events can share their settings, or have separate ringers applied to each instance.</string>
+    <string name="tutorial_ringer_priority_continued">If an event has more than one setting, I\'ll use the one that\'t closest to the event instance.</string>
+    <string name="tutorial_ringer_priority_end">In order of increasing precedence I\'ll look for:\n\n
+        * A calendar specific ringer\n
+        * An event series ringer\n
+        * An event instance ringer.\n\n
+        If none of these are set, I\'ll use the default setting.</string>
+
+    <string name="tutorial_welcome_skip">If you just want your device to silence during meetings, then you don\'t need to adjust anything.  By default I\'ll silence the device during all events that are not all day or are not marked as available.</string>
+
 
 </resources>

@@ -12,7 +12,7 @@
         <item name="android:actionMenuTextAppearance">@color/menu_text</item>
     </style>
 
-    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog"/>
+    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog" />
 
     <style name="Header" parent="AppTheme">
         <item name="android:colorBackground">@color/windowBackground</item>
@@ -51,13 +51,18 @@
     </style>
 
     <!-- Transparent style used for tutorial activity -->
-    <style name="Transparent" parent="AppTheme">
+    <style name="Tutorial" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/tutorial_background</item>
+        <item name="android:textColor">#ffffff</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="WhiteText" parent="AppTheme">
+        <item name="android:textColor">#ffffff</item>
     </style>
 
 
