@@ -6,6 +6,7 @@
   -->
 
 <resources>
+    <!-- Basic theme colors -->
     <item name="primary_dark" type="color">#263238</item>
     <item name="primary" type="color">#37474f</item>
     <item name="header_background" type="color">#616161</item>
@@ -22,16 +23,27 @@
     <item name="textColorDisabled" type="color">#ff777777</item>
     <item name="textColorMenu" type="color">#ffffffff</item>
     <item name="windowBackground" type="color">#eceff1</item>
-    <item name="event_list_future_background" type="color">#ffe6e9eb</item>
-    <item name="event_list_future_text" type="color">#ff4c4c4c</item>
-    <item name="event_list_active_event" type="color">#ffd4f1da</item>
     <item name="menu_background" type="color">#ffffff</item>
     <item name="menu_text" type="color">#000000</item>
     <item name="icon_tint" type="color">@color/accent</item>
     <item name="section_background" type="color">#e0e0e0</item>
     <item name="section_text_color" type="color">#607d8b</item>
+
+    <!-- Select calendars activity -->
     <item name="calendar_list_selected" type="color">#ffd4f1da</item>
     <item name="calendar_list_unselected" type="color">#ffcccccc</item>
+
+    <!-- Main view event list -->
+    <item name="event_list_item_background" type="color">@color/windowBackground</item>
+    <item name="event_list_item_future_background" type="color">#ffe6e9eb</item>
+    <item name="event_list_item_future_text" type="color">#ff4c4c4c</item>
+    <item name="event_list_item_active_event" type="color">#ffd4f1da</item>
+
+    <!-- Floating action button colors -->
+    <item name="fab_quicksilence_normal" type="color">@color/accent</item>
+    <item name="fab_quicksilence_pressed" type="color">#80d8ff</item>
+    <item name="fab_stop_normal" type="color">@color/primary</item>
+    <item name="fab_stop_pressed" type="color">#455a64</item>
 
     <!-- ringer icon colors -->
     <item name="ringer_default" type="color">#ffc0c0c0</item>
@@ -39,69 +51,13 @@
     <item name="ringer_series" type="color">#259b24</item>
     <item name="ringer_instance" type="color">#40c4ff</item>
 
-    <item name="tutorial_background" type="color">#5677fc</item>
+    <!-- Tutorial Activity -->
+    <item name="tutorial_background" type="color">#00bcd4</item>
     <item name="tutorial_frame_background" type="color">#a8919191</item>
-    <item name="tutorial_buttons_background" type="color">#00ffffff</item>
-    <item name="tutorial_button_skip_color" type="color">#afbfff</item>
+    <item name="tutorial_next_button_background" type="color">#ff3650fc</item>
+    <item name="tutorial_buttons_background" type="color">#92929292</item>
+    <item name="tutorial_button_skip_color" type="color">#b2ebf2</item>
     <item name="tutorial_frame_welcome" type="color">#a8ff5bfc</item>
     <item name="tutorial_frame_ringer" type="color">#a8ff3a1a</item>
     <item name="tutorial_frame_events" type="color">#a83dffc5</item>
 </resources>
-
-
-    <!-- Teal w/pink accents
-    <resources>
-        <item name="primary_dark" type="color">#0097a7</item>
-        <item name="primary" type="color">#00bcd4</item>
-        <item name="header_background" type="color">#4dd0e1</item>
-        <item name="header_text_color" type="color">#ff4c4c4c</item>
-        <item name="header_accent" type="color">#ff4081</item>
-        <item name="button_ongoing" type="color">#64ffda</item>
-        <item name="accent" type="color">#ff4081</item>
-        <item name="icon_accent" type="color">#b0bec5</item>
-        <item name="textcolor" type="color">#ff000000</item>
-        <item name="textColorPrimary" type="color">#ff000000</item>
-        <item name="textColorHeading" type="color">#ff555555</item>
-        <item name="textColorDisabled" type="color">#ff777777</item>
-        <item name="textColorMenu" type="color">#ffffffff</item>
-        <item name="windowBackground" type="color">#eceff1</item>
-    </resources>
-    -->
-
-    <!-- grey w/ yellow accents
-    <resources>
-    <item name="primary_dark" type="color">#263238</item>
-    <item name="primary" type="color">#37474f</item>
-    <item name="header_background" type="color">#455a64</item>
-    <item name="header_text_color" type="color">#9e9e9e</item>
-    <item name="header_accent" type="color">#ffab40</item>
-    <item name="button_ongoing" type="color">#64ffda</item>
-    <item name="accent" type="color">#ffab40</item>
-    <item name="icon_accent" type="color">#b0bec5</item>
-    <item name="textcolor" type="color">#ff000000</item>
-    <item name="textColorPrimary" type="color">#ff000000</item>
-    <item name="textColorHeading" type="color">#ff555555</item>
-    <item name="textColorDisabled" type="color">#ff777777</item>
-    <item name="textColorMenu" type="color">#ffffffff</item>
-    <item name="windowBackground" type="color">#eceff1</item>
-    </resources>
-    -->
-
-    <!-- Pink w/ teal accents
-    <resources>
-    <item name="primary_dark" type="color">#d81b60</item>
-    <item name="primary" type="color">#e91e63</item>
-    <item name="header_background" type="color">#ec407a</item>
-    <item name="header_text_color" type="color">#ff4c4c4c</item>
-    <item name="header_accent" type="color">#18ffff</item>
-    <item name="button_ongoing" type="color">#64ffda</item>
-    <item name="accent" type="color">#18ffff</item>
-    <item name="icon_accent" type="color">#b0bec5</item>
-    <item name="textcolor" type="color">#ff000000</item>
-    <item name="textColorPrimary" type="color">#ff000000</item>
-    <item name="textColorHeading" type="color">#ff555555</item>
-    <item name="textColorDisabled" type="color">#ff777777</item>
-    <item name="textColorMenu" type="color">#ffffffff</item>
-    <item name="windowBackground" type="color">#eceff1</item>
-    </resources>
-    -->

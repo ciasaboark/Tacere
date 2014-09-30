@@ -4,6 +4,7 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:fab="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -60,30 +61,19 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
-        >
-
-    <ImageButton
-            android:id="@+id/quickSilenceButton"
-            android:layout_width="@dimen/fab_size"
-            android:layout_height="@dimen/fab_size"
-            android:layout_gravity="bottom|right"
-            android:layout_marginBottom="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/action_button_quicksilence"
-            android:src="@drawable/ic_state_silent"
-            android:text="@string/placeholder"
-            android:visibility="gone"/>
-
-        <ImageButton
-            android:id="@+id/cancel_quickSilenceButton"
-            android:layout_width="@dimen/fab_size"
-            android:layout_height="@dimen/fab_size"
-            android:layout_gravity="bottom|right"
-            android:layout_marginBottom="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/action_button_cancel_quicksilence"
-            android:src="@drawable/ic_state_normal"
-            android:text="@string/placeholder"
-            android:visibility="gone"/>
+        android:animateFirstView="false">
     </ViewFlipper>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/quickSilenceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_state_silent"
+        fab:fab_colorNormal="@color/fab_quicksilence_normal"
+        fab:fab_colorPressed="@color/fab_quicksilence_pressed"/>
 </RelativeLayout>

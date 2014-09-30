@@ -28,31 +28,20 @@ import org.ciasaboark.tacere.activity.fragment.TutorialRingerSourceFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialWelcomeFragment;
 
 public class TutorialActivity extends FragmentActivity {
-    /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
-    private static final int NUM_PAGES = 5;
-
-    /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
-     */
-    private ViewPager mPager;
-
-    /**
-     * The pager adapter, which provides the pages to the view pager widget.
-     */
-    private PagerAdapter mPagerAdapter;
+    private static final int TOTAL_PAGES = 5;
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
+    private int currentPage = 0;
 
     @Override
     public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
+        if (viewPager.getCurrentItem() == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
             super.onBackPressed();
         } else {
             // Otherwise, select the previous step.
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
         }
     }
 
@@ -62,27 +51,16 @@ public class TutorialActivity extends FragmentActivity {
         setContentView(R.layout.activity_tutorial);
 
         // Instantiate a ViewPager and a PagerAdapter.
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-
-        CirclePageIndicator pageIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
-        pageIndicator.setViewPager(mPager);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(pagerAdapter);
 
         final Button nextButton = (Button) findViewById(R.id.tutorial_button_next);
+//        nextButton.setBackgroundColor(getResources().getColor(R.color.tutorial_next_button_background));
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
-                if (mPager.getCurrentItem() + 1 == mPager.getChildCount()) { //current item 0 indexed, count is not
-                    nextButton.setText("Close");
-                    nextButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            finish();
-                        }
-                    });
-                }
+                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
             }
         });
 
@@ -93,12 +71,46 @@ public class TutorialActivity extends FragmentActivity {
                 finish();
             }
         });
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == TOTAL_PAGES) {
+                    nextButton.setText(R.string.close);
+                    nextButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            finish();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+        CirclePageIndicator pageIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
+        pageIndicator.setViewPager(viewPager);
     }
 
-    /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
-     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentPage = viewPager.getCurrentItem();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        viewPager.setCurrentItem(currentPage);
+    }
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -129,7 +141,7 @@ public class TutorialActivity extends FragmentActivity {
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return TOTAL_PAGES;
         }
     }
 }

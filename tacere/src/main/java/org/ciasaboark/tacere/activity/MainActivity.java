@@ -5,8 +5,6 @@
 
 package org.ciasaboark.tacere.activity;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -36,11 +34,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CursorAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.melnykov.fab.FloatingActionButton;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.fragment.EventDetailsFragment;
@@ -139,76 +138,54 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void setupActionButtons() {
-        final ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
-        final ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
-        quickSilenceImageButton.setVisibility(View.GONE);
-        cancelQuickSilenceButton.setVisibility(View.GONE);
+        final FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        quickSilenceImageButton.attachToListView(eventListview);
 
         quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 quickSilenceImageButton.setEnabled(false);
-                fadeImageButtonsInAndOut(cancelQuickSilenceButton, quickSilenceImageButton);
-                startQuicksilence();
-                quickSilenceImageButton.setEnabled(true);
-            }
-        });
+                quickSilenceImageButton.hide();
+                quickSilenceImageButton.setVisibility(View.GONE);
 
-        cancelQuickSilenceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancelQuickSilenceButton.setEnabled(false);
-                fadeImageButtonsInAndOut(quickSilenceImageButton, cancelQuickSilenceButton);
-                stopOngoingQuicksilence();
-                cancelQuickSilenceButton.setEnabled(true);
+                ServiceStateManager ssManager = new ServiceStateManager(getApplicationContext());
+                if (ssManager.isQuickSilenceActive()) {
+                    stopOngoingQuicksilence();
+                    drawStartQuicksilenceActionButton();
+                } else {
+                    startQuicksilence();
+                    drawStopQuicksilenceActionButton();
+                }
+
+                quickSilenceImageButton.setVisibility(View.VISIBLE);
+                quickSilenceImageButton.show();
+                quickSilenceImageButton.setEnabled(true);
             }
         });
     }
 
     private void drawActionButton() {
-        ImageButton quickSilenceImageButton = (ImageButton) findViewById(R.id.quickSilenceButton);
-        ImageButton cancelQuickSilenceButton = (ImageButton) findViewById(R.id.cancel_quickSilenceButton);
-
+        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
         ServiceStateManager ssManager = new ServiceStateManager(this);
 
         if (ssManager.isQuickSilenceActive()) {
-            quickSilenceImageButton.setVisibility(View.GONE);
-            cancelQuickSilenceButton.setVisibility(View.VISIBLE);
+            drawStopQuicksilenceActionButton();
         } else {
-            quickSilenceImageButton.setVisibility(View.VISIBLE);
-            cancelQuickSilenceButton.setVisibility(View.GONE);
+            drawStartQuicksilenceActionButton();
         }
     }
 
-    private void fadeImageButtonsInAndOut(final ImageButton fadeInImageButton, final ImageButton fadeOutImageButton) {
-        fadeInImageButton.setAlpha(0f);
-        fadeOutImageButton.setAlpha(1f);
-        ObjectAnimator animator = ObjectAnimator.ofFloat(fadeOutImageButton, "alpha", 1f, 0f);
-        animator.setDuration(animationDuration);
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                fadeOutImageButton.setVisibility(View.VISIBLE);
-            }
+    private void stopOngoingQuicksilence() {
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
+        startService(i);
+    }
 
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                fadeOutImageButton.setVisibility(View.GONE);
-                fadeOutImageButton.setAlpha(1f);
-                flipIn(fadeInImageButton);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-        animator.start();
+    private void drawStartQuicksilenceActionButton() {
+        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_quicksilence_normal));
+        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_quicksilence_pressed));
+        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_silent));
     }
 
     private void startQuicksilence() {
@@ -221,39 +198,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         startService(i);
     }
 
-    private void stopOngoingQuicksilence() {
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-        startService(i);
-    }
-
-    private void flipIn(final ImageButton button) {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
-        animator.setDuration(animationDuration);
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                button.setAlpha(0f);
-                button.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-        animator.start();
-
-
+    private void drawStopQuicksilenceActionButton() {
+        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_stop_normal));
+        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_stop_pressed));
+        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_normal));
     }
 
     @Override
@@ -274,8 +223,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         setContentView(R.layout.activity_main);
         // start the background service
         restartEventSilencerService();
-        setupAndDrawActionButtons();
         drawEventListOrError();
+        setupAndDrawActionButtons();
         showFirstRunWizardIfNeeded();
     }
 
@@ -322,7 +271,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         eventListview.setOnItemClickListener(this);
         eventListview.setOnItemLongClickListener(this);
         eventListview.setFadingEdgeLength(32);
-        eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_future_background));
+        eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_item_future_background));
         cursor = databaseInterface.getEventCursor();
         cursorAdapter = new EventCursorAdapter(this, cursor);
         eventListview.setAdapter(cursorAdapter);
@@ -335,15 +284,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         String errorText = "";
         if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendars().isEmpty()) {
             errorText = getString(R.string.list_error_no_calendars);
-//            showCalendarPopup = true;
-//            showEventPopup = false;
         } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendars().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
             errorText = String.format(getString(R.string.list_error_no_events), dateConverter.toString());
-//            showEventPopup = true;
-//            showCalendarPopup = false;
-        } else {
-//            showEventPopup = false;
-//            showCalendarPopup = false;
         }
         noEventsTv.setText(errorText);
     }
@@ -539,11 +481,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
                 if (ActiveEventManager.isActiveEvent(thisEvent)) {
                     backgroundColor = getResources()
-                            .getColor(R.color.event_list_active_event);
+                            .getColor(R.color.event_list_item_active_event);
                 } else if (eventBegin >= tomorrowMidnight) {
                     backgroundColor = getResources()
-                            .getColor(R.color.event_list_future_background);
-                    textColor = getResources().getColor(R.color.event_list_future_text);
+                            .getColor(R.color.event_list_item_future_background);
+                    textColor = getResources().getColor(R.color.event_list_item_future_text);
                 }
 
                 view.setBackgroundColor(backgroundColor);
@@ -557,14 +499,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         private Drawable getRingerIcon(EventInstance event) {
             Drawable icon;
-//            int defaultColor = getResources().getColor(R.color.icon_accent);
-//            int primaryColor = getResources().getColor(R.color.primary);
-
             int defaultColor = getResources().getColor(R.color.ringer_default);
             int calendarColor = getResources().getColor(R.color.ringer_calendar);
             int eventColor = getResources().getColor(R.color.ringer_series);
             int instanceColor = getResources().getColor(R.color.ringer_instance);
-
             int color = defaultColor;
 
 
