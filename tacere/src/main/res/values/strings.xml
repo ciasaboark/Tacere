@@ -1,10 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
 <resources>
 
     <string name="app_name">Tacere</string>
@@ -130,7 +127,6 @@
     <string name="event_details_checkbox">Use for all repetitions of this event</string>
     <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
     <string name="title_activity_tutorial">Tutorial</string>
-
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
     <!-- Tutorial Pages -->
@@ -143,8 +139,6 @@
         * An event series ringer\n
         * An event instance ringer.\n\n
         If none of these are set, I\'ll use the default setting.</string>
-
     <string name="tutorial_welcome_skip">If you just want your device to silence during meetings, then you don\'t need to adjust anything.  By default I\'ll silence the device during all events that are not all day or are not marked as available.</string>
-
 
 </resources>

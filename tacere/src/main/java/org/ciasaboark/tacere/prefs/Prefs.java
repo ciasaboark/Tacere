@@ -122,8 +122,12 @@ public class Prefs {
         return storedRinger;
     }
 
-    public void setRingerType(int ringerType) {
-        editor.putInt(Keys.RINGER_TYPE, ringerType).commit();
+    public void setRingerType(RingerType ringerType) {
+        if (ringerType == null) {
+            throw new IllegalArgumentException("Given ringer type must not be null");
+        }
+        Log.d(TAG, "Storing new default ringer type: " + ringerType.toString());
+        editor.putInt(Keys.RINGER_TYPE, ringerType.value).commit();
     }
 
     public int getQuicksilenceMinutes() {

@@ -397,7 +397,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         } catch (NoSuchEventException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
-
         return true;
     }
 
