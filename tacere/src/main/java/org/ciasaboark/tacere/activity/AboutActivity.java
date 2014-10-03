@@ -108,12 +108,19 @@ public class AboutActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean itemProcessedHere = false;
         switch (item.getItemId()) {
+            case id.action_about_tutorial:
+                Intent tutorialIntent = new Intent(this, TutorialActivity.class);
+                startActivity(tutorialIntent);
+                itemProcessedHere = true;
+                break;
             case R.id.action_about_license:
-                Intent i = new Intent(this, org.ciasaboark.tacere.activity.AboutLicenseActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
-                return true;
+                Intent licenseIntent = new Intent(this, org.ciasaboark.tacere.activity.AboutLicenseActivity.class);
+                licenseIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(licenseIntent);
+                itemProcessedHere = true;
+                break;
             case android.R.id.home:
                 // This ID represents the Home or Up button. In the case of this
                 // activity, the Up button is shown. Use NavUtils to allow users
@@ -123,12 +130,15 @@ public class AboutActivity extends Activity {
                 // http://developer.android.com/design/patterns/navigation.html#up-vs-back
                 //
                 NavUtils.navigateUpFromSameTask(this);
-                return true;
+                itemProcessedHere = true;
+                break;
             case R.id.action_about_updates:
                 ShowUpdatesActivity.showUpdatesDialog(this);
-                return true;
+                itemProcessedHere = true;
+                break;
         }
-        return super.onOptionsItemSelected(item);
+
+        return itemProcessedHere;
     }
 
 }

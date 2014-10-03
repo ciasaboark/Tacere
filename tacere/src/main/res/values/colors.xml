@@ -28,6 +28,9 @@
     <item name="icon_tint" type="color">@color/accent</item>
     <item name="section_background" type="color">#e0e0e0</item>
     <item name="section_text_color" type="color">#607d8b</item>
+    <item name="warning_background" type="color">#e51c23</item>
+    <item name="icon_enabled" type="color">@color/primary</item>
+    <item name="icon_disabled" type="color">#546e7a</item>
 
     <!-- Select calendars activity -->
     <item name="calendar_list_selected" type="color">#ffd4f1da</item>
@@ -60,4 +63,5 @@
     <item name="tutorial_frame_welcome" type="color">#a8ff5bfc</item>
     <item name="tutorial_frame_ringer" type="color">#a8ff3a1a</item>
     <item name="tutorial_frame_events" type="color">#a83dffc5</item>
+    <item name="tutorial_icon_tint" type="color">#ffeb3b</item>
 </resources>

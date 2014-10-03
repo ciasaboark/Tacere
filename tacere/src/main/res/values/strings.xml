@@ -7,67 +7,78 @@
     <string name="app_name">Tacere</string>
 
     <!-- Main Activity -->
-    <string name="action_settings">Settings</string>
-    <string name="action_about">About</string>
-    <string name="upcoming_events">Events in the next %1$d days</string>
-    <string name="list_error_no_events">No calendar events found for the next %1$s.</string>
+    <string name="main_action_settings">Settings</string>
+    <string name="main_action_about">About</string>
+    <string name="main_upcoming_events">Events in the next %1$d days</string>
+    <string name="main_error_service_disabled">Automatic silencing disabled in settings</string>
+    <string name="main_error_no_events">No calendar events found for the next %1$s.</string>
 
     <!-- About Activity -->
-    <string name="title_activity_about">About</string>
-    <string name="action_about_license">License</string>
+    <string name="about_title">About</string>
+    <string name="about_action_tutorial">Tutorial</string>
+    <string name="about_action_license">License</string>
     <string name="about_version">Version %1$s</string>
 
     <!-- About License Activity -->
-    <string name="title_activity_about_activity_license">License/Credits</string>
+    <string name="about_license_title">License/Credits</string>
 
     <!-- Settings Activity -->
-    <string name="title_activity_settings">Settings</string>
-    <string name="action_settings_restore">Restore Defaults</string>
-    <string name="action_about_updates">Updates</string>
-    <string name="pref_general_header">General</string>
-    <string name="pref_volumes_header">Volumes</string>
-    <string name="pref_quick_silence_header">Intervals</string>
-    <string name="pref_advance_header">Advanced</string>
-    <string name="pref_service">Service</string>
-    <string name="pref_ringer_type_title">Default Ringer Type</string>
-    <string name="pref_do_not_disturb">Enable Do Not Disturb</string>
-    <string name="pref_media_volume">Silence Media Volume</string>
-    <string name="pref_alarm_volume">Silence Alarm Volume</string>
-    <string name="pref_quick_silence">Adjust Quick Silence Duration</string>
-    <string name="pref_advanced_title">Additional Settings</string>
-    <string name="pref_service_enabled">Automatic Silencing</string>
-    <string name="pref_service_disabled">Automatic Silencing</string>
-    <string name="pref_ringer_type_normal">Device will ring as normal during events</string>
-    <string name="pref_ringer_type_vibrate">Device will vibrate during events</string>
-    <string name="pref_ringer_type_silent">Device will silence during events</string>
-    <string name="pref_quicksilent_duration">Quick silencing will last for %1$s%2$d minutes</string>
+    <string name="settings_section_service_toggle">Automatic Silencing</string>
+
+    <!-- Main settings fragment -->
+    <!-- titles -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_action_restore">Restore Defaults</string>
+    <string name="settings_action_updates">Updates</string>
+    <string name="settings_section_general_title">General</string>
+    <string name="settings_section_volumes_title">Volumes</string>
+    <string name="settings_section_advanced_title">Advanced</string>
+    <!-- section general -->
+    <string name="settings_section_general_select_calendars">Select Calendars</string>
+    <string name="settings_section_general_ringer">Default Ringer Type</string>
+    <string name="settings_section_general_ringer_normal">Device will ring as normal during events</string>
+    <string name="settings_section_general_ringer_vibrate">Device will vibrate during events</string>
+    <string name="settings_section_general_ringer_silent">Device will silence during events</string>
+    <string name="settings_section_general_ringer_ignore">All events will be ignored</string>
+    <string name="settings_section_general_do_not_disturb">Enable Do Not Disturb</string>
+    <!-- section volumes -->
+    <string name="settings_section_volumes_media">Silence Media Volume</string>
+    <string name="settings_section_volumes_alarm">Silence Alarm Volume</string>
+    <!-- section advanced -->
+    <string name="settings_section_advanced_additional">Additional Settings</string>
     <string name="pref_advanced_sub">Intervals and event types</string>
 
     <!-- Select Calendars Activity -->
     <string name="title_activity_select_calendars">Select Calendars</string>
 
     <!-- Advanced Settings Activity -->
-    <string name="title_activity_advanced_settings">Advanced Settings</string>
-    <string name="pref_events_header">Events</string>
-    <string name="pref_silence_free_time_title">Available Events</string>
-    <string name="pref_silence_all_day_title">All Day Events</string>
-    <string name="pref_refresh_interval">Refresh Interval</string>
-    <string name="pref_buffer_minutes_title">Event Buffer</string>
-    <string name="pref_list_days_title">Lookahead</string>
-    <string name="pref_wake_device_title">Wake Device</string>
-    <string name="pref_silence_free_enabled">Events marked as available will be silenced</string>
-    <string name="pref_silence_free_disabled">Events marked as available will be ignored</string>
-    <string name="pref_all_day_enabled">All day events will be silenced</string>
-    <string name="pref_all_day_disabled">All day events will be ignored</string>
-    <string name="pref_buffer_minutes">Events will trigger %1$d minutes early and last %1$d minutes after the event ends</string>
-    <string name="pref_list_days">Events for the next %1$d days will be fetched</string>
+    <string name="advanced_settings_title">Advanced Settings</string>
+
+    <!-- Advanced Settings Fragment -->
+    <!-- titles -->
+    <string name="advanced_settings_section_events_title">Events</string>
+    <string name="advanced_settings_section_intervals_title">Intervals</string>
+    <!-- section events -->
+    <string name="advanced_settings_section_events_available">Available Events</string>
+    <string name="advanced_settings_section_events_available_enabled">Events marked as available will be silenced</string>
+    <string name="advanced_settings_section_events_available_disabled">Events marked as available will be ignored</string>
+    <string name="advanced_settings_section_events_all_day">All Day Events</string>
+    <string name="advanced_settings_section_events_all_day_enabled">All day events will be silenced</string>
+    <string name="advanced_settings_section_events_all_day_disabled">All day events will be ignored</string>
+    <!-- section intervals -->
+    <string name="advanced_settings_section_intervals_buffer">Event Buffer</string>
+    <string name="advanced_settings_section_intervals_buffer_duration">Events will trigger %1$d minutes early and last %1$d minutes after the event ends</string>
+    <string name="advanced_settings_section_intervals_lookahead">Lookahead</string>
+    <string name="advanced_settings_section_intervals_lookahead_duration">Events for the next %1$d days will be fetched</string>
+    <string name="advanced_settings_section_intervals_quicksilence">Adjust Quick Silence Duration</string>
+    <string name="advanced_settings_section_interval_quicksilence_duration">Quick silencing will last for %1$s%2$d minutes</string>
 
     <!-- Generics -->
     <string name="placeholder">Placeholder String</string>
-    <string name="hours">Hours</string>
-    <string name="hours_lower">hours</string>
     <string name="hour">Hour</string>
     <string name="hour_lower">hour</string>
+    <string name="hours">Hours</string>
+    <string name="hours_lower">hours</string>
     <string name="minute">Minute</string>
     <string name="minute_lower">minute</string>
     <string name="minutes">Minutes</string>
@@ -109,7 +120,7 @@
     <string name="notification_quicksilence_ticker">Quick Silence activating</string>
     <string name="notification_event_active_title">Tacere: Event active</string>
     <string name="notification_event_active_starting">Tacere event starting:</string>
-    <string name="notification_event_skip">Skip this event</string>
+    <string name="notification_event_skip">Ignore this event</string>
     <string name="notification_event_enable">Enable auto silencing</string>
     <string name="startQuicksilence">Quicksilence</string>
     <string name="cancelQuicksilence">Cancel quicksilence</string>
@@ -127,18 +138,47 @@
     <string name="event_details_checkbox">Use for all repetitions of this event</string>
     <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
     <string name="title_activity_tutorial">Tutorial</string>
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
     <!-- Tutorial Pages -->
-    <!-- Ringer priority tutorial -->
+    <!-- Ringer priority tutorial page -->
     <string name="tutorial_ringer_priority_title">Ringer Priorities</string>
-    <string name="tutorial_ringer_priority_intro">When an event starts Tacere will try to find the most appropriate way to adjust your device\'s ringer.  Settings can be applied on a per-calendar and per event basis.  Repeating events can share their settings, or have separate ringers applied to each instance.</string>
-    <string name="tutorial_ringer_priority_continued">If an event has more than one setting, I\'ll use the one that\'t closest to the event instance.</string>
-    <string name="tutorial_ringer_priority_end">In order of increasing precedence I\'ll look for:\n\n
-        * A calendar specific ringer\n
-        * An event series ringer\n
-        * An event instance ringer.\n\n
-        If none of these are set, I\'ll use the default setting.</string>
-    <string name="tutorial_welcome_skip">If you just want your device to silence during meetings, then you don\'t need to adjust anything.  By default I\'ll silence the device during all events that are not all day or are not marked as available.</string>
+    <string name="tutorial_ringer_priority_intro">When an event starts I\'ll try to find the most appropriate way to adjust your device\'s ringer.  By default I\'ll put the device in silent mode.  This can be changed in settings.  Preferences can also be set on a per-calendar and per-event basis.  Repeating events can share settings, or have different settings for each instance.</string>
+    <string name="tutorial_ringer_priority_continued">If an event has more than one setting, I\'ll use the one that\'s closest to the event instance.</string>
+    <string name="tutorial_ringer_priority_precedence">In order of increasing precedence I\'ll look for</string>
+    <string name="tutorial_ringer_priority_calendar">A calendar specific ringer</string>
+    <string name="tutorial_ringer_priority_series">An event series ringer</string>
+    <string name="tutorial_ringer_priority_instance">An event instance ringer.</string>
+    <string name="tutorial_ringer_priority_final">If none of these are set, I\'ll use the default setting.</string>
+
+    <!-- Welcome tutorial page -->
+    <string name="tutorial_welcome_title">Welcome!</string>
+    <string name="tutorial_welcome_intro">Tacere will automatically silence your device during calendar events.</string>
+    <string name="tutorial_welcome_details">By default I\'ll silence your device\'s ringer for all events that are not all day events or are not marked as available within the calendar.  Silencing will begin 5 minutes before an event begins, and last 5 after the event ends.  I\'ll post a notification whenever an event starts.</string>
+    <string name="tutorial_welcome_skip">If these defaults sound good, feel free to skip this tutorial, otherwise swipe over for more details on what can be configured.</string>
+
+    <!-- Event list tutorial page -->
+    <string name="tutorial_event_list_title">Event List</string>
+    <string name="tutorial_event_list_main_description">The main view shows a list of current and upcoming calendar events. By default I\'ll show events from all calendars for the next week.  Calendars can be selected, and the period shown can be adjusted within settings.</string>
+    <string name="tutorial_event_list_item_description">Each item in the list represents a single event instance, so if an event repeats over multiple days I\'ll show a separate entry for each repetition.</string>
+    <string name="tutorial_event_list_item_description_continued">Each entry in the list will display the event\'s title, the beginning  and end date and time, and the ringer that will be applied when the event becomes active.</string>
+    <string name="tutorial_event_list_active_description">If an event is active its background will change color.</string>
+    <string name="tutorial_event_list_future_description">Events that do not start today are dimmed slightly.</string>
+
+    <!-- Ringer sources tutorial page -->
+    <string name="tutorial_event_ringers_title">Event Ringers</string>
+    <string name="tutorial_event_ringers_default_description">The default ringer will be used if I can not find a more specific ringer for an event.  The default ringer can be changed in the settings.</string>
+    <string name="tutorial_event_ringers_calendar_description">Calendar specific ringers can be set within settings.  If an event belongs to a calendar that has a ringer set, then that ringer will be used instead of the default.</string>
+    <string name="tutorial_event_ringers_series_description">Repeating events can share a common ringer.  To set the ringer long press on any repeating event in the list and be sure to check \'Use for all repetitions of this event\'.</string>
+    <string name="tutorial_event_ringers_instance_description">The instance specific ringer can be toggled by tapping on an event, or by long pressing on an event and choosing a specific ringer.</string>
+    <string name="tutorial_event_ringers_ignore_description">By default I\'ll will ignore all day events and events that are marked as \'available\'.  These events will ignore the default and calendar specific ringers, but will silence if their event series or instance ringers have been set.</string>
+
+    <!-- End tutorial page -->
+    <string name="tutorial_end_title">Thats It!</string>
+    <string name="tutorial_end_intro">Tacere is set up and ready to roll.  If you need to view this tutorial again, its available from the \'About Tacere\' page.</string>
+    <string name="tutorial_end_button">Lets go!</string>
+
+    <!-- Misc testing strings -->
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+
 
 </resources>

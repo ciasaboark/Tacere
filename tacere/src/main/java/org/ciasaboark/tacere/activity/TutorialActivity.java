@@ -22,6 +22,7 @@ import android.widget.Button;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.activity.fragment.TutorialEndFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialEventListFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialRingerPriorityFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialRingerSourceFragment;
@@ -131,6 +132,9 @@ public class TutorialActivity extends FragmentActivity {
                     break;
                 case 3:
                     pageFragment = new TutorialRingerSourceFragment();
+                    break;
+                case 4:
+                    pageFragment = new TutorialEndFragment();
                     break;
                 default:
                     pageFragment = new Fragment();

@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:background="@color/section_background"
             android:padding="16dp"
-            android:text="@string/pref_general_header"
+            android:text="@string/settings_section_general_title"
             android:textColor="@color/section_text_color" />
 
         <RelativeLayout
@@ -46,7 +46,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/calendar_icon"
                 android:paddingLeft="16dp"
-                android:text="@string/select_calendars"
+                android:text="@string/settings_section_general_select_calendars"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </RelativeLayout>
 
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/settings_ringerIcon"
                 android:clickable="false"
-                android:text="@string/pref_ringer_type_title"
+                android:text="@string/settings_section_general_ringer"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
@@ -117,7 +117,7 @@
                 android:id="@+id/do_not_disturb_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_do_not_disturb"
+                android:text="@string/settings_section_general_do_not_disturb"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>
@@ -128,7 +128,7 @@
             android:layout_height="wrap_content"
             android:background="@color/section_background"
             android:padding="16dp"
-            android:text="@string/pref_volumes_header"
+            android:text="@string/settings_section_volumes_title"
             android:textColor="@color/section_text_color" />
 
         <RelativeLayout
@@ -151,7 +151,7 @@
                 android:id="@+id/settings_mediaText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_media_volume"
+                android:text="@string/settings_section_volumes_media"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>
@@ -180,41 +180,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/pref_alarm_volume"
+                android:text="@string/settings_section_volumes_alarm"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/section_background"
-            android:padding="16dp"
-            android:text="@string/pref_advance_header"
-            android:textColor="@color/section_text_color" />
-
         <LinearLayout
+            android:id="@+id/settings_advanced_settings_container"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
+                android:id="@+id/textView10"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_advanced_title"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:background="@color/section_background"
+                android:padding="16dp"
+                android:text="@string/settings_section_advanced_title"
+                android:textColor="@color/section_text_color" />
 
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/settings_advanced_settings_box"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_advanced_sub"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_section_advanced_additional"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_advanced_sub"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
         </LinearLayout>
 
         <View style="@style/Divider" />

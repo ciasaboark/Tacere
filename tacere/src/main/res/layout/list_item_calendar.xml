@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/eventListItem"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="?android:attr/selectableItemBackground"
@@ -20,6 +18,8 @@
         android:id="@+id/calendar_list_item_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
         android:orientation="horizontal">
 
         <ImageView
@@ -29,7 +29,7 @@
             android:layout_marginRight="10dp"
             android:background="@drawable/sidebar"
             android:clickable="false"
-            android:focusable="false"/>
+            android:focusable="false" />
 
         <CheckBox
             android:id="@+id/calendar_checkbox"
@@ -37,16 +37,51 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
-            android:checked="false"/>
+            android:checked="false"
+            android:clickable="false"
+            android:focusable="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/calendar_list_item_icons"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="right"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/configure_calendar_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/blank"
+            android:clickable="false"
+            android:focusable="false"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/configure_calendar_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:adjustViewBounds="false"
+            android:clickable="true"
+            android:padding="8dp"
+            android:src="@drawable/action_settings"
+            android:tint="@color/primary" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/calendar_list_item_text"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_gravity="left"
+        android:layout_toLeftOf="@+id/calendar_list_item_icons"
         android:layout_toRightOf="@+id/calendar_list_item_checkbox"
-        android:gravity="left"
         android:orientation="horizontal">
 
         <RelativeLayout
@@ -70,13 +105,14 @@
                 android:layout_centerVertical="false"
                 android:layout_gravity="fill_horizontal|center_horizontal"
                 android:clickable="false"
+                android:ellipsize="end"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:maxLines="1"
                 android:scrollbarStyle="outsideOverlay"
+                android:singleLine="true"
                 android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/calendar_account"
@@ -84,41 +120,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/calendar_name"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceSmall"/>
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/calendar_list_item_icons"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="right"
-        android:gravity="right"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/configure_calendar_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/blank"
-            android:clickable="false"
-            android:focusable="false"/>
-
-        <ImageButton
-            android:id="@+id/configure_calendar_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="16dp"
-            android:adjustViewBounds="false"
-            android:background="@drawable/action_settings"
-            android:clickable="true"
-            android:focusable="false"/>
     </LinearLayout>
 
 </RelativeLayout>

@@ -25,13 +25,14 @@ import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
+import org.ciasaboark.tacere.activity.fragment.AdvancedSettingsFragment;
 import org.ciasaboark.tacere.activity.fragment.MainSettingsFragment;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 
-public class SettingsActivity extends FragmentActivity implements MainSettingsFragment.OnFragmentInteractionListener {
+public class SettingsActivity extends FragmentActivity implements MainSettingsFragment.OnSelectCalendarsListener {
     @SuppressWarnings("unused")
     private static final String TAG = "Settings";
     private final Prefs prefs = new Prefs(this);
@@ -108,14 +109,34 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
     private void drawFragments() {
 
         if (findViewById(id.settings_fragment_main) != null) {
-            MainSettingsFragment mainSettingsFragment = new MainSettingsFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
+            MainSettingsFragment mainSettingsFragment = (MainSettingsFragment) getSupportFragmentManager().findFragmentByTag(MainSettingsFragment.TAG);
+            if (mainSettingsFragment == null) {
+                //the main settings fragment should only show a link to advanced settings if that
+                //fragment will not be attached to this activity
+                boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
+                mainSettingsFragment = new MainSettingsFragment(showAdvancedSettingsLink);
+                getSupportFragmentManager().beginTransaction()
+                        .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
+            } else {
+                //fragment has already been attached, ask it to update its view
+                mainSettingsFragment.drawAllWidgets();
+            }
         }
 
         if (findViewById(id.settings_fragment_advanced) != null) {
-            //TODO make advanced settings fragment and add it here
+            AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment) getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
+            if (advancedSettingsFragment == null) {
+                advancedSettingsFragment = new AdvancedSettingsFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(id.settings_fragment_advanced, advancedSettingsFragment,
+                                AdvancedSettingsFragment.TAG).commit();
+            } else {
+                //advanced settings fragment has already been attached, ask it to update its view
+                advancedSettingsFragment.drawAllWidgets();
+            }
         }
+
+
     }
 
     private void drawServiceWidget() {
@@ -153,6 +174,7 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         prefs.setIsServiceActivated(!prefs.isServiceActivated());
         restartEventSilencerService();
         drawServiceWidget();
+        drawFragments();
     }
 
 
@@ -162,8 +184,18 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         startService(i);
     }
 
-    public void onClickAdvancedSettings(View v) {
-        Intent i = new Intent(this, AdvancedSettingsActivity.class);
+
+    @Override
+    public void onSelectCalendarsSelectedListener() {
+//        //if the layout contains a frame for the fragment we can display it inline, else start
+//        //the select calendars activity
+//        if (findViewById(id.settings_front_frame) != null) {
+//            SelectCalendarsFragment selectCalendarsFragment = new SelectCalendarsFragment();
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(id.settings_front_frame, selectCalendarsFragment).commit();
+//        } else {
+        Intent i = new Intent(this, SelectCalendarsActivity.class);
         startActivity(i);
+//        }
     }
 }

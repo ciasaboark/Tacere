@@ -65,5 +65,7 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <style name="DialogOnLargeDisplay" parent="AppTheme" />
+
 
 </resources>

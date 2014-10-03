@@ -5,32 +5,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
@@ -50,8 +24,9 @@ android {
 
     defaultConfig {
         applicationId "org.ciasaboark.tacere"
-        minSdkVersion 14
-        targetSdkVersion 18
+        minSdkVersion 'L'
+        targetSdkVersion 'L'
+        compileSdkVersion 'android-L'
         versionCode VERSION_CODE
         versionName APP_VERSION_NAME
     }

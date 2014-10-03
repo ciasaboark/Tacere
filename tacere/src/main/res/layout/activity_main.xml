@@ -4,23 +4,55 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:fab="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbarStyle="outsideOverlay"
-                tools:context=".MainActivity">
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarStyle="outsideOverlay"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/main_service_warning"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/warning_background"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingBottom="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="16dp"
+            android:paddingTop="4dp"
+            android:src="@drawable/info_icon"
+            android:tint="@color/windowBackground" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:text="@string/main_error_service_disabled"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/windowBackground" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/eventListView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
+        android:layout_below="@+id/main_service_warning"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
+        android:drawSelectorOnTop="true"
         android:scrollbarStyle="outsideOverlay"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
     <LinearLayout
         android:id="@+id/error_box"
@@ -40,7 +72,7 @@
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp"
-            android:background="@drawable/calendar_icon"/>
+            android:background="@drawable/calendar_icon" />
 
         <TextView
             android:id="@+id/event_list_error"
@@ -48,8 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/placeholder"
-            android:visibility="visible"
-            />
+            android:visibility="visible" />
 
     </LinearLayout>
 
@@ -61,8 +92,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
-        android:animateFirstView="false">
-    </ViewFlipper>
+        android:animateFirstView="false"></ViewFlipper>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/quickSilenceButton"
@@ -75,5 +105,5 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_state_silent"
         fab:fab_colorNormal="@color/fab_quicksilence_normal"
-        fab:fab_colorPressed="@color/fab_quicksilence_pressed"/>
+        fab:fab_colorPressed="@color/fab_quicksilence_pressed" />
 </RelativeLayout>

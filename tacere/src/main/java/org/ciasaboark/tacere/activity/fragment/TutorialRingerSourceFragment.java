@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import org.ciasaboark.tacere.R;
 
 public class TutorialRingerSourceFragment extends Fragment {
-    private int layout = R.layout.fragment_tutorial_page_ringer_source;
+    private int layout = R.layout.fragment_tutorial_page_events;
     private ViewGroup rootView;
 
     @Override

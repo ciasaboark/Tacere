@@ -3,8 +3,7 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearlayout5"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -28,9 +27,9 @@
                 android:id="@+id/activateServiceDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_service_enabled"
+                android:text="@string/settings_section_service_toggle"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/header_text_color"/>
+                android:textColor="@color/header_text_color" />
         </LinearLayout>
 
         <Switch
@@ -40,11 +39,11 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:checked="true"
-            android:clickable="false"/>
+            android:clickable="false" />
 
     </RelativeLayout>
 
-    <View style="@style/Divider"/>
+    <View style="@style/Divider" />
 
 
     <ScrollView
@@ -63,12 +62,6 @@
                 android:id="@+id/settings_fragment_main"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"></FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/settings_fragment_advanced"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"></FrameLayout>
-
         </LinearLayout>
 
 

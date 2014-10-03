@@ -8,13 +8,11 @@ package org.ciasaboark.tacere.activity.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,13 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.AdvancedSettingsActivity;
-import org.ciasaboark.tacere.activity.SelectCalendarsActivity;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
@@ -36,22 +34,18 @@ import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MainSettingsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MainSettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MainSettingsFragment extends android.support.v4.app.Fragment {
     public static final String TAG = "MainSettingsFragment";
     private static final int layout = R.layout.fragment_main_settings;
     private Prefs prefs;
     private Context context;
     private View rootView;
+    private boolean showAdvancedSettingsLink = true;
+    private OnSelectCalendarsListener mListener;
 
-    private OnFragmentInteractionListener mListener;
+    public MainSettingsFragment(boolean showAdvancedSettingsLink) {
+        this.showAdvancedSettingsLink = showAdvancedSettingsLink;
+    }
 
     public MainSettingsFragment() {
         // Required empty public constructor
@@ -78,21 +72,14 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnSelectCalendarsListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement " + OnSelectCalendarsListener.class + " to embed this fragment");
         }
     }
 
@@ -107,13 +94,29 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         super.onPause();
     }
 
-    private void drawAllWidgets() {
+    public void drawAllWidgets() {
         drawCalendarWidgets();
         drawRingerWidgets();
         drawDoNotDisturbWidgets();
         drawMediaWidgets();
         drawAlarmWidgets();
+        drawAdvancedSettingsWidget();
+    }
 
+    private void drawAdvancedSettingsWidget() {
+        LinearLayout advancedSettingsContainer = (LinearLayout) rootView.findViewById(R.id.settings_advanced_settings_container);
+        if (showAdvancedSettingsLink) {
+            advancedSettingsContainer.setVisibility(View.VISIBLE);
+            LinearLayout advancedSettingsBox = (LinearLayout) rootView.findViewById(R.id.settings_advanced_settings_box);
+            advancedSettingsBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(context, AdvancedSettingsActivity.class));
+                }
+            });
+        } else {
+            advancedSettingsContainer.setVisibility(View.GONE);
+        }
     }
 
     private void drawCalendarWidgets() {
@@ -121,14 +124,14 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         TextView calendarTV = (TextView) rootView.findViewById(R.id.calendar_text);
         RelativeLayout calendarBox = (RelativeLayout) rootView.findViewById(R.id.select_calendar_box);
 
-        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
+        Drawable d = getResources().getDrawable(R.drawable.calendar_calendar);
         d.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
 
         calendarBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(context, SelectCalendarsActivity.class);
-                startActivity(i);
+                mListener.onSelectCalendarsSelectedListener();
+
             }
         });
 
@@ -166,7 +169,7 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
 
 
                 final AlertDialog alert = new AlertDialog.Builder(context)
-                        .setTitle(R.string.pref_ringer_type_title)
+                        .setTitle(R.string.settings_section_general_ringer)
                         .setSingleChoiceItems(filteredRingerTypes, previouslySelectedRinger,
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -193,19 +196,19 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         Drawable icon;
         switch (prefs.getRingerType()) {
             case NORMAL:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_normal);
+                ringerDescriptionTV.setText(R.string.settings_section_general_ringer_normal);
                 icon = getResources().getDrawable(R.drawable.ic_state_normal);
                 break;
             case VIBRATE:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_vibrate);
+                ringerDescriptionTV.setText(R.string.settings_section_general_ringer_vibrate);
                 icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
                 break;
             case SILENT:
-                ringerDescriptionTV.setText(R.string.pref_ringer_type_silent);
+                ringerDescriptionTV.setText(R.string.settings_section_general_ringer_silent);
                 icon = getResources().getDrawable(R.drawable.ic_state_silent);
                 break;
             case IGNORE:
-                ringerDescriptionTV.setText("All events will be ignored");
+                ringerDescriptionTV.setText(R.string.settings_section_general_ringer_ignore);
                 icon = getResources().getDrawable(R.drawable.ic_state_ignore);
                 break;
             default:
@@ -349,8 +352,8 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnSelectCalendarsListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onSelectCalendarsSelectedListener();
     }
 }

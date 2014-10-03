@@ -6,9 +6,9 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
 
     <LinearLayout
@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/sync_all_calendars"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/header_text_color"/>
+                    android:textColor="@color/header_text_color" />
             </LinearLayout>
 
             <Switch
@@ -46,17 +46,18 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:checked="true"
-                android:clickable="false"/>
+                android:clickable="false" />
 
         </RelativeLayout>
 
-        <View style="@style/Divider"/>
+        <View style="@style/Divider" />
 
 
         <ListView
             android:id="@+id/calendar_listview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:drawSelectorOnTop="true" />
 
     </LinearLayout>
 
@@ -81,15 +82,14 @@
                 android:layout_height="64dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:background="@drawable/calendar_icon"/>
+                android:background="@drawable/calendar_icon" />
 
             <TextView
                 android:id="@+id/calendar_list_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/calendar_list_error_text"
-                />
+                android:text="@string/calendar_list_error_text" />
         </LinearLayout>
 
         <RelativeLayout
@@ -104,7 +104,7 @@
                 android:layout_centerInParent="true"
                 android:clickable="true"
                 android:onClick="onClickAddAccount"
-                android:text="@string/calendar_error_add_account"/>
+                android:text="@string/calendar_error_add_account" />
         </RelativeLayout>
 
     </LinearLayout>

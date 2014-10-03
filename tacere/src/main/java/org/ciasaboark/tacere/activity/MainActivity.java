@@ -247,23 +247,26 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void showFirstRunWizardIfNeeded() {
-        final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (!showingTutorial) {
-                    showingTutorial = true;
-                    startActivity(new Intent(getApplicationContext(), TutorialActivity.class));
-                }
-                if (viewTreeObserver.isAlive()) {
-                    if (Build.VERSION.SDK_INT >= 16) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(this);
-                    } else {
-                        viewTreeObserver.removeGlobalOnLayoutListener(this);
+        if (prefs.isFirstRun()) {
+            prefs.disableFirstRun();
+            final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (!showingTutorial) {
+                        showingTutorial = true;
+                        startActivity(new Intent(getApplicationContext(), TutorialActivity.class));
+                    }
+                    if (viewTreeObserver.isAlive()) {
+                        if (Build.VERSION.SDK_INT >= 16) {
+                            viewTreeObserver.removeOnGlobalLayoutListener(this);
+                        } else {
+                            viewTreeObserver.removeGlobalOnLayoutListener(this);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void setupListView() {
@@ -285,7 +288,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendars().isEmpty()) {
             errorText = getString(R.string.list_error_no_calendars);
         } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendars().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
-            errorText = String.format(getString(R.string.list_error_no_events), dateConverter.toString());
+            errorText = String.format(getString(R.string.main_error_no_events), dateConverter.toString());
         }
         noEventsTv.setText(errorText);
     }
@@ -293,6 +296,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private void hideEventList() {
         ListView listview = (ListView) findViewById(R.id.eventListView);
         listview.setVisibility(View.GONE);
+
+        //also hide the warning box
+        LinearLayout warningBox = (LinearLayout) findViewById(R.id.main_service_warning);
+        warningBox.setVisibility(View.GONE);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -317,8 +324,18 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void drawEventList() {
+        drawServiceWarningBoxIfNeeded();
         ListView lv = (ListView) findViewById(R.id.eventListView);
         lv.setVisibility(View.VISIBLE);
+    }
+
+    private void drawServiceWarningBoxIfNeeded() {
+        LinearLayout warningBox = (LinearLayout) findViewById(R.id.main_service_warning);
+        if (!prefs.isServiceActivated()) {
+            warningBox.setVisibility(View.VISIBLE);
+        } else {
+            warningBox.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -410,7 +427,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup group) {
-            return layoutInflator.inflate(R.layout.event_list_item, group, false);
+            return layoutInflator.inflate(R.layout.list_item_event, group, false);
         }
 
         @Override

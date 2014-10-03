@@ -31,7 +31,7 @@
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings"
+            android:label="@string/settings_title"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.SettingsActivity" />
@@ -45,7 +45,7 @@
         </activity>
         <activity
             android:name=".activity.AboutActivity"
-            android:label="@string/title_activity_about"
+            android:label="@string/about_title"
             android:parentActivityName=".activity.MainActivity">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.AboutActivity" />
@@ -60,23 +60,22 @@
         <activity
             android:name=".activity.ShowUpdatesActivity"
             android:theme="@style/Dialog"></activity>
-        <activity
-            android:name=".activity.EventLongclickActivity"
-            android:theme="@style/Dialog"></activity>
+
         <activity
             android:name=".activity.DonationActivity"
             android:theme="@style/Dialog"></activity>
         <activity
             android:name=".activity.SelectCalendarsActivity"
             android:label="@string/title_activity_select_calendars"
-            android:parentActivityName=".activity.SettingsActivity">
+            android:parentActivityName=".activity.SettingsActivity"
+            android:theme="@style/DialogOnLargeDisplay">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
         </activity>
         <activity
             android:name=".activity.AboutLicenseActivity"
-            android:label="@string/title_activity_about_activity_license"
+            android:label="@string/about_license_title"
             android:parentActivityName=".activity.AboutActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -84,7 +83,7 @@
         </activity>
         <activity
             android:name=".activity.AdvancedSettingsActivity"
-            android:label="@string/title_activity_advanced_settings"
+            android:label="@string/advanced_settings_title"
             android:parentActivityName=".activity.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

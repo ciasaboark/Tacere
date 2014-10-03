@@ -58,11 +58,81 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                     <TextView
-                        android:id="@+id/textView8"
+                        android:id="@+id/tutorial_ringer_priority_precedence"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="16dp"
-                        android:text="@string/tutorial_ringer_priority_end"
+                        android:text="@string/tutorial_ringer_priority_precedence"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <ImageView
+                            android:id="@+id/tutorial_ringer_priority_calendar_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="16dp"
+                            android:src="@drawable/calendar_calendar" />
+
+                        <TextView
+                            android:id="@+id/tutorial_ringer_priority_calendar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/tutorial_ringer_priority_calendar_icon"
+                            android:text="@string/tutorial_ringer_priority_calendar"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <ImageView
+                            android:id="@+id/tutorial_ringer_priority_series_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="16dp"
+                            android:src="@drawable/calendar_series" />
+
+                        <TextView
+                            android:id="@+id/tutorial_ringer_priority_series"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/tutorial_ringer_priority_series_icon"
+                            android:text="@string/tutorial_ringer_priority_series"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <ImageView
+                            android:id="@+id/tutorial_ringer_priority_instance_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="16dp"
+                            android:src="@drawable/calendar_instance" />
+
+                        <TextView
+                            android:id="@+id/tutorial_ringer_priority_instance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/tutorial_ringer_priority_instance_icon"
+                            android:paddingBottom="16dp"
+                            android:singleLine="false"
+                            android:text="@string/tutorial_ringer_priority_instance"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/tutorial_ringer_priority_final"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:text="@string/tutorial_ringer_priority_final"
                         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 </LinearLayout>
