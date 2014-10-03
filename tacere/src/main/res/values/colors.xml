@@ -50,9 +50,10 @@
 
     <!-- ringer icon colors -->
     <item name="ringer_default" type="color">#ffc0c0c0</item>
-    <item name="ringer_calendar" type="color">@color/accent</item>
-    <item name="ringer_series" type="color">@color/accent</item>
-    <item name="ringer_instance" type="color">@color/accent</item>
+    <item name="ringer_calendar" type="color">@color/primary</item>
+    <item name="ringer_series" type="color">@color/primary</item>
+    <item name="ringer_instance" type="color">@color/primary</item>
+    <item name="ringer_source" type="color">#455a64</item>
 
     <!-- Tutorial Activity -->
     <item name="tutorial_background" type="color">#00bcd4</item>

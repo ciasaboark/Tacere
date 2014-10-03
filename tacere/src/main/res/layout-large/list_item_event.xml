@@ -7,19 +7,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
     <android.support.v7.widget.CardView
         android:id="@+id/eventListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
         android:clickable="false"
+        android:elevation="4dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:orientation="horizontal"
+        android:stateListAnimator="@anim/down_on_touch"
         card_view:cardCornerRadius="2dp">
 
         <RelativeLayout
@@ -27,12 +31,36 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/event_sidebar"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/sidebar"/>
+                android:layout_alignParentStart="true">
+
+                <ImageView
+                    android:id="@+id/event_sidebar_image"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentStart="false"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/sidebar"/>
+
+                <TextView
+                    android:id="@+id/embedded_letter"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="16dp"
+                    android:gravity="center_horizontal|fill_vertical"
+                    android:text="C"
+                    android:textColor="@android:color/white"
+                    android:textSize="36dp"
+                    android:textStyle="bold"
+                    android:typeface="serif"/>
+
+            </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/icons_holder"
@@ -74,8 +102,6 @@
                 android:layout_toLeftOf="@+id/icons_holder"
                 android:layout_toRightOf="@+id/event_sidebar"
                 android:paddingBottom="6dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
                 android:paddingTop="6dp">
 
                 <TextView
@@ -95,7 +121,8 @@
                     android:scrollbarStyle="outsideOverlay"
                     android:singleLine="true"
                     android:text="@string/placeholder"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/eventDate"

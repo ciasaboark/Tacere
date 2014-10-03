@@ -59,8 +59,10 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 //import android.graphics.Outline;
 
@@ -430,7 +432,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private class EventCursorAdapter extends CursorAdapter {
         private final LayoutInflater layoutInflator;
         private EventInstance thisEvent;
-        private int lastAnimatedView = -1;
+        private List<Integer> animatedViews = new ArrayList<Integer>();
 
         public EventCursorAdapter(Context ctx, Cursor c) {
             super(ctx, c);
@@ -480,11 +482,26 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     timeTV.setText(timeSB.toString());
                 }
 
-                ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar);
+                ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar_image);
                 Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar);
                 int displayColor = thisEvent.getDisplayColor();
                 coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
                 sidebar.setBackgroundDrawable(coloredSidebar);
+
+                TextView embeddedLetter = (TextView) view.findViewById(R.id.embedded_letter);
+                if (embeddedLetter != null) {
+                    long calendarId = thisEvent.getCalendarId();
+                    //TODO cache this info
+                    List<org.ciasaboark.tacere.event.Calendar> calendars = databaseInterface.getCalendarIdList();
+                    char firstChar = ' ';
+                    for (org.ciasaboark.tacere.event.Calendar cal : calendars) {
+                        if (cal.getId() == calendarId) {
+                            firstChar = cal.getDisplayName().charAt(0);
+                            break;
+                        }
+                    }
+                    embeddedLetter.setText(((Character) firstChar).toString().toUpperCase());
+                }
 
                 EventManager eventManager = new EventManager(context, thisEvent);
 
@@ -499,7 +516,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
                 ImageView ringerSourceView = (ImageView) view.findViewById(R.id.ringerSource);
                 if (ringerSourceView != null) {
-
                     Drawable ringerSource = getRingerSourceIcon();
                     ringerSourceView.setImageDrawable(ringerSource);
                 }
@@ -533,9 +549,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     v.setTextColor(textColor);
                 }
 
-                Animation animation = AnimationUtils.loadAnimation(context, (id > lastAnimatedView) ? R.anim.up_from_bottom : R.anim.down_from_top);
-                view.startAnimation(animation);
-                lastAnimatedView = id;
+                if (!animatedViews.contains(id)) {
+                    Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);
+                    view.startAnimation(animation);
+                    animatedViews.add(id);
+                }
 
             } catch (NoSuchEventException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
@@ -577,7 +595,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         private Drawable getRingerSourceIcon() {
             Drawable icon;
-            int iconColor = getResources().getColor(R.color.ringer_default);
+            int iconColor = getResources().getColor(R.color.ringer_source);
             EventManager eventManager = new EventManager(getApplicationContext(), thisEvent);
             RingerSource ringerSource = eventManager.getRingerSource();
 
