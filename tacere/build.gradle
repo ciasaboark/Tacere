@@ -5,6 +5,8 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
@@ -24,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId "org.ciasaboark.tacere"
-        minSdkVersion 'L'
+        minSdkVersion 14
         targetSdkVersion 'L'
         compileSdkVersion 'android-L'
         versionCode VERSION_CODE
@@ -43,7 +45,7 @@ android {
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
             buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + "\""
-            buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\"";
+            buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\""
         }
         debug {
             runProguard false
@@ -52,7 +54,9 @@ android {
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
             buildConfigField "String", "APP_VERSION_MINOR", "\"" + APP_VERSION_MINOR + "\""
             buildConfigField "String", "APP_VERSION_RELEASE", "\"" + APP_VERSION_RELEASE + "\""
-            buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\"";
+            buildConfigField "String", "APP_VERSION_NAME", "\"" + DEBUG_VERSION_NAME + "\""
+            versionNameSuffix " - debug build " + DATE_STRING
+
         }
     }
 }
