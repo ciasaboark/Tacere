@@ -82,7 +82,7 @@
             android:scrollbarStyle="outsideOverlay"
             android:singleLine="true"
             android:text="@string/placeholder"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <TextView
             android:id="@+id/eventDate"
@@ -95,7 +95,7 @@
             android:paddingLeft="6dp"
             android:singleLine="true"
             android:text="@string/placeholder"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         <TextView
             android:id="@+id/eventTime"
@@ -111,7 +111,7 @@
             android:paddingLeft="6dp"
             android:singleLine="true"
             android:text="@string/placeholder"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
 
     </RelativeLayout>
 
