@@ -38,7 +38,7 @@
 
     <!-- Main view event list -->
     <item name="event_list_item_background" type="color">@color/windowBackground</item>
-    <item name="event_list_item_future_background" type="color">#ffe6e9eb</item>
+    <item name="event_list_item_future_background" type="color">#ffd4d7d9</item>
     <item name="event_list_item_future_text" type="color">#ff4c4c4c</item>
     <item name="event_list_item_active_event" type="color">#ffd4f1da</item>
 
@@ -50,9 +50,9 @@
 
     <!-- ringer icon colors -->
     <item name="ringer_default" type="color">#ffc0c0c0</item>
-    <item name="ringer_calendar" type="color">#e51c23</item>
-    <item name="ringer_series" type="color">#259b24</item>
-    <item name="ringer_instance" type="color">#40c4ff</item>
+    <item name="ringer_calendar" type="color">@color/accent</item>
+    <item name="ringer_series" type="color">@color/accent</item>
+    <item name="ringer_instance" type="color">@color/accent</item>
 
     <!-- Tutorial Activity -->
     <item name="tutorial_background" type="color">#00bcd4</item>

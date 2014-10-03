@@ -37,6 +37,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -373,7 +374,16 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
             EventInstance thisEvent = databaseInterface.getEvent((int) id);
-            RingerType nextRingerType = thisEvent.getRingerType().getNext();
+            //we want the ringer to cycle to the next visible ringer, so if the event does
+            //not have a ringer set we jump to the next based on what the event manager provides
+            RingerType nextRingerType;
+            if (thisEvent.getRingerType() == RingerType.UNDEFINED) {
+                EventManager eventManager = new EventManager(this, thisEvent);
+                RingerType currentRinger = eventManager.getBestRinger();
+                nextRingerType = currentRinger.getNext();
+            } else {
+                nextRingerType = thisEvent.getRingerType().getNext();
+            }
 
             databaseInterface.setRingerForInstance((int) id, nextRingerType);
             eventListview.getAdapter().getView(position, view, eventListview);
@@ -419,6 +429,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     private class EventCursorAdapter extends CursorAdapter {
         private final LayoutInflater layoutInflator;
+        private EventInstance thisEvent;
+        private int lastAnimatedView = -1;
 
         public EventCursorAdapter(Context ctx, Cursor c) {
             super(ctx, c);
@@ -430,11 +442,12 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             return layoutInflator.inflate(R.layout.list_item_event, group, false);
         }
 
+
         @Override
         public void bindView(View view, final Context context, final Cursor cursor) {
             int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
             try {
-                EventInstance thisEvent = databaseInterface.getEvent(id);
+                thisEvent = databaseInterface.getEvent(id);
                 // a text view to show the event title
                 TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
                 if (descriptionTV != null) {
@@ -473,13 +486,22 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
                 sidebar.setBackgroundDrawable(coloredSidebar);
 
+                EventManager eventManager = new EventManager(context, thisEvent);
+
                 // an icon to show the ringer state for this event
                 ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
                 if (eventIV != null) {
-                    Drawable ringerIcon = getRingerIcon(thisEvent);
+                    Drawable ringerIcon = getRingerIcon();
                     eventIV.setImageDrawable(ringerIcon);
                     eventIV.setContentDescription(getBaseContext().getString(
                             R.string.icon_alt_text_normal));
+                }
+
+                ImageView ringerSourceView = (ImageView) view.findViewById(R.id.ringerSource);
+                if (ringerSourceView != null) {
+
+                    Drawable ringerSource = getRingerSourceIcon();
+                    ringerSourceView.setImageDrawable(ringerSource);
                 }
 
                 Calendar calendarDate = new GregorianCalendar();
@@ -504,16 +526,23 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     textColor = getResources().getColor(R.color.event_list_item_future_text);
                 }
 
-                view.setBackgroundColor(backgroundColor);
+                RelativeLayout listItemContainer = (RelativeLayout) view.findViewById(R.id.list_item_container);
+                listItemContainer.setBackgroundColor(backgroundColor);
+
                 for (TextView v : textElements) {
                     v.setTextColor(textColor);
                 }
+
+                Animation animation = AnimationUtils.loadAnimation(context, (id > lastAnimatedView) ? R.anim.up_from_bottom : R.anim.down_from_top);
+                view.startAnimation(animation);
+                lastAnimatedView = id;
+
             } catch (NoSuchEventException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
             }
         }
 
-        private Drawable getRingerIcon(EventInstance event) {
+        private Drawable getRingerIcon() {
             Drawable icon;
             int defaultColor = getResources().getColor(R.color.ringer_default);
             int calendarColor = getResources().getColor(R.color.ringer_calendar);
@@ -522,7 +551,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             int color = defaultColor;
 
 
-            EventManager eventManager = new EventManager(getApplicationContext(), event);
+            EventManager eventManager = new EventManager(getApplicationContext(), thisEvent);
             RingerType ringerType = eventManager.getBestRinger();
             icon = getIconForRinger(ringerType);
 
@@ -545,6 +574,34 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             }
             return icon;
         }
+
+        private Drawable getRingerSourceIcon() {
+            Drawable icon;
+            int iconColor = getResources().getColor(R.color.ringer_default);
+            EventManager eventManager = new EventManager(getApplicationContext(), thisEvent);
+            RingerSource ringerSource = eventManager.getRingerSource();
+
+            switch (ringerSource) {
+                case DEFAULT:
+                    icon = getResources().getDrawable(R.drawable.blank);
+                    break;
+                case CALENDAR:
+                    icon = getResources().getDrawable(R.drawable.calendar_calendar);
+                    break;
+                case EVENT_SERIES:
+                    icon = getResources().getDrawable(R.drawable.calendar_series);
+                    break;
+                case INSTANCE:
+                    icon = getResources().getDrawable(R.drawable.calendar_instance);
+                    break;
+                default:
+                    icon = getResources().getDrawable(R.drawable.blank);
+            }
+            icon.mutate().setColorFilter(iconColor, Mode.MULTIPLY);
+
+            return icon;
+        }
+
 
         private Drawable getIconForRinger(RingerType ringerType) {
             Drawable icon;

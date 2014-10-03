@@ -3,8 +3,9 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
     android:id="@+id/eventListItem"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="?android:attr/selectableItemBackground"
@@ -29,7 +30,7 @@
             android:layout_marginRight="10dp"
             android:background="@drawable/sidebar"
             android:clickable="false"
-            android:focusable="false" />
+            android:focusable="false"/>
 
         <CheckBox
             android:id="@+id/calendar_checkbox"
@@ -39,7 +40,7 @@
             android:layout_gravity="center_vertical"
             android:checked="false"
             android:clickable="false"
-            android:focusable="false" />
+            android:focusable="false"/>
     </LinearLayout>
 
     <LinearLayout
@@ -62,7 +63,7 @@
             android:background="@drawable/blank"
             android:clickable="false"
             android:focusable="false"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <ImageView
             android:id="@+id/configure_calendar_button"
@@ -73,7 +74,7 @@
             android:clickable="true"
             android:padding="8dp"
             android:src="@drawable/action_settings"
-            android:tint="@color/primary" />
+            android:tint="@color/primary"/>
     </LinearLayout>
 
     <LinearLayout
@@ -112,7 +113,7 @@
                 android:scrollbarStyle="outsideOverlay"
                 android:singleLine="true"
                 android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
                 android:id="@+id/calendar_account"
@@ -123,7 +124,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         </RelativeLayout>
     </LinearLayout>

@@ -4,12 +4,12 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbarStyle="outsideOverlay"
-    tools:context=".MainActivity">
+                xmlns:fab="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbarStyle="outsideOverlay"
+                tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/main_service_warning"
@@ -28,7 +28,7 @@
             android:paddingRight="16dp"
             android:paddingTop="4dp"
             android:src="@drawable/info_icon"
-            android:tint="@color/windowBackground" />
+            android:tint="@color/windowBackground"/>
 
         <TextView
             android:id="@+id/textView"
@@ -38,7 +38,7 @@
             android:padding="8dp"
             android:text="@string/main_error_service_disabled"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/windowBackground" />
+            android:textColor="@color/windowBackground"/>
     </LinearLayout>
 
     <ListView
@@ -49,7 +49,7 @@
         android:layout_below="@+id/main_service_warning"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="10dp"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:drawSelectorOnTop="true"
@@ -74,7 +74,7 @@
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp"
-            android:background="@drawable/calendar_icon" />
+            android:background="@drawable/calendar_icon"/>
 
         <TextView
             android:id="@+id/event_list_error"
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/placeholder"
-            android:visibility="visible" />
+            android:visibility="visible"/>
 
     </LinearLayout>
 
@@ -107,5 +107,5 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_state_silent"
         fab:fab_colorNormal="@color/fab_quicksilence_normal"
-        fab:fab_colorPressed="@color/fab_quicksilence_pressed" />
+        fab:fab_colorPressed="@color/fab_quicksilence_pressed"/>
 </RelativeLayout>

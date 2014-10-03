@@ -7,6 +7,8 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
@@ -68,5 +70,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:18.0.+'
     compile project(':viewPagerIndicator')
     compile 'com.melnykov:floatingactionbutton:1.0.3'
+    compile 'com.android.support:cardview-v7:21.+'
 }
 
