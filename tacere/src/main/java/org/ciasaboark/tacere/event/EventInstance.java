@@ -19,8 +19,8 @@ public class EventInstance {
     @SuppressWarnings("unused")
     private static final String TAG = "CalEvent";
     private long calendarId;
-    private int instanceId;     //instance ids are unique in repeating events
-    private int eventId;        //event ids are shared among repeating events
+    private long instanceId;     //instance ids are unique in repeating events
+    private long eventId;        //event ids are shared among repeating events
     private String title;
     private long begin;
     private long end; // in milliseconds from epoch
@@ -33,7 +33,7 @@ public class EventInstance {
     private HashMap<String, String> extraInfo = new HashMap<String, String>();
 
 
-    public EventInstance(long calendarId, int instanceId, int eventId, String title, long begin, long end,
+    public EventInstance(long calendarId, long instanceId, long eventId, String title, long begin, long end,
                          String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
@@ -89,7 +89,7 @@ public class EventInstance {
         return calendarId;
     }
 
-    public int getEventId() {
+    public long getEventId() {
         return eventId;
     }
 
@@ -173,7 +173,7 @@ public class EventInstance {
             return false;
         }
 
-        return getId().equals(((EventInstance) o).getId());
+        return getId() == ((EventInstance) o).getId();
     }
 
     public String toString() {
@@ -185,7 +185,7 @@ public class EventInstance {
         return title + ", ends " + fdate;
     }
 
-    public Integer getId() {
+    public long getId() {
         return instanceId;
     }
 }
