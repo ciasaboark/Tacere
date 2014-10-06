@@ -5,14 +5,14 @@
 
 package org.ciasaboark.tacere.database;
 
-public class NoSuchEventException extends Exception {
+public class NoSuchEventInstanceException extends Exception {
     //auto-generated
     private static final long serialVersionUID = -1608125323748877959L;
 
-    public NoSuchEventException() {
+    public NoSuchEventInstanceException() {
     }
 
-    public NoSuchEventException(String message) {
+    public NoSuchEventInstanceException(String message) {
         super(message);
     }
 }

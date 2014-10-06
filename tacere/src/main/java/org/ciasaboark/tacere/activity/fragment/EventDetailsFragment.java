@@ -26,7 +26,7 @@ import android.widget.TextView;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerSource;
@@ -62,7 +62,7 @@ public class EventDetailsFragment extends DialogFragment {
 
         try {
             event = databaseInterface.getEvent(instanceId);
-        } catch (NoSuchEventException e) {
+        } catch (NoSuchEventInstanceException e) {
             Log.e(TAG, "unable to find event with id " + instanceId);
             return null;
         }

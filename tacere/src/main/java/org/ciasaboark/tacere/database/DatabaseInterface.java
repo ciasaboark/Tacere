@@ -6,10 +6,12 @@
 package org.ciasaboark.tacere.database;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
@@ -149,7 +151,7 @@ public class DatabaseInterface {
                     if (e.isActiveBetween(beginTime, endTime)) {
                         events.addLast(e);
                     }
-                } catch (NoSuchEventException e) {
+                } catch (NoSuchEventInstanceException e) {
                     // this should only be reachable if the database has become corrupted
                     Log.e(TAG, "unable to get event with id " + id
                             + "while getting a list of all events. This should not have "
@@ -208,12 +210,13 @@ public class DatabaseInterface {
                 }
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return events;
     }
 
 
     // returns the event that matches the given Instance id, throws NoSuchEventException if no match
-    public EventInstance getEvent(int instanceId) throws NoSuchEventException {
+    public EventInstance getEvent(int instanceId) throws NoSuchEventInstanceException {
         //TODO use better SQL SELECT
         Cursor cursor = getEventCursor();
         EventInstance thisEvent = null;
@@ -221,29 +224,72 @@ public class DatabaseInterface {
             do {
                 int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
                 if (id == instanceId) {
-                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
-                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
-                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
-                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
-                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
-                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+//                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+//                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
+//                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+//                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
+//                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
+//                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
                     int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
-                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
-                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
-                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+//                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
+//                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
+//                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
 
-                    thisEvent = new EventInstance(cal_id, id, event_id, title, begin, end, description,
-                            displayColor, isFreeTime, isAllDay);
-                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
-                    thisEvent.setRingerType(ringerType);
+
+                    //pull in extra info from the system calendar database
+                    final String[] EVENT_PROJECTION = new String[]{
+                            Instances.EVENT_LOCATION
+                    };
+
+                    ContentResolver cr = context.getContentResolver();
+                    Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
+                    ContentUris.appendId(builder, Long.MIN_VALUE);
+                    ContentUris.appendId(builder, Long.MAX_VALUE);
+
+                    String selection = "Instances._id = ?";
+                    String[] selectionArgs = {String.valueOf(instanceId)};
+
+                    Cursor sysCursor = null;
+                    try {
+                        sysCursor = cr.query(
+                                builder.build(),
+                                EVENT_PROJECTION,
+                                selection,
+                                selectionArgs,
+                                null);
+                        String sLocation = sysCursor.getString(sysCursor.getColumnIndex(Instances.EVENT_LOCATION));
+                        long sCalId = sysCursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+                        int sEventId = sysCursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
+                        String sTitle = sysCursor.getString(cursor.getColumnIndex(Columns.TITLE));
+                        long sBegin = sysCursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
+                        long sEnd = sysCursor.getLong(cursor.getColumnIndex(Columns.END));
+                        String sDescription = sysCursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+                        int sDisplayColor = sysCursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
+                        boolean sIsFreetime = sysCursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
+                        boolean sIsAllday = sysCursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+
+                        thisEvent = new EventInstance(sCalId, instanceId, sEventId, sTitle, sBegin, sEnd, sDescription,
+                                sDisplayColor, sIsFreetime, sIsAllday);
+                        RingerType ringerType = RingerType.getTypeForInt(ringerInt);
+                        thisEvent.setRingerType(ringerType);
+
+                        thisEvent.putExtraInfo("location", sLocation);
+                    } catch (Exception e) {
+                        Log.d(TAG, "error reading extra info for event with instance id " + instanceId);
+                    } finally {
+                        if (sysCursor != null) {
+                            sysCursor.close();
+                        }
+                    }
                     break;
+
                 }
             } while (cursor.moveToNext());
 
         }
         cursor.close();
         if (thisEvent == null) {
-            throw new NoSuchEventException(TAG + " can not find event with given id " + instanceId);
+            throw new NoSuchEventInstanceException(TAG + " can not find event with given id " + instanceId);
         }
         return thisEvent;
     }
@@ -271,8 +317,10 @@ public class DatabaseInterface {
             int col_cal_id = calendarCursor.getColumnIndex(projection[8]);
             int col_event_id = calendarCursor.getColumnIndex(projection[9]);
 
+            final List calendarsToSync = prefs.getSelectedCalendars();
+            final boolean shouldAllCalendarsBeSynced = prefs.shouldAllCalendarsBeSynced();
+
             do {
-                // the cursor
                 String event_title = calendarCursor.getString(col_title);
                 long event_begin = calendarCursor.getLong(col_begin);
                 long event_end = calendarCursor.getLong(col_end);
@@ -295,16 +343,15 @@ public class DatabaseInterface {
                     EventInstance oldEvent = getEvent(id);
                     RingerType oldRinger = oldEvent.getRingerType();
                     newEvent.setRingerType(oldRinger);
-                } catch (NoSuchEventException e) {
+                } catch (NoSuchEventInstanceException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
                 }
 
                 // inserting an event with the same id will clobber all previous data, completing
                 // the synchronization of this event
-                List calendarsToSync = prefs.getSelectedCalendars();
                 long calendarId = newEvent.getCalendarId();
-                if (prefs.shouldAllCalendarsBeSynced() || calendarsToSync.contains(calendarId)) {
+                if (shouldAllCalendarsBeSynced || calendarsToSync.contains(calendarId)) {
                     insertEvent(newEvent);
                 } else {
                     removeEventIfExists(newEvent);
@@ -327,17 +374,17 @@ public class DatabaseInterface {
     // remove all events from the database with an ending date
     // + before the given time
     public void pruneEventsBefore(long cutoff) {
-        Cursor c = getEventCursor(0, cutoff);
-        if (c.moveToFirst()) {
+        Cursor cursor = getEventCursor(0, cutoff);
+        if (cursor.moveToFirst()) {
             do {
-                int id = c.getInt(c.getColumnIndex(Columns._ID));
-                long end = c.getLong(c.getColumnIndex(Columns.END));
+                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
                 if (end <= cutoff) {
                     deleteEventWithId(id);
                 }
-            } while (c.moveToNext());
+            } while (cursor.moveToNext());
         }
-        c.close();
+        cursor.close();
     }
 
     private Cursor getCalendarCursor(long begin, long end) {
@@ -353,9 +400,8 @@ public class DatabaseInterface {
         };
         final int projection_id = 0;
         final int projection_name = 1;
-        Cursor cursor;
         ContentResolver cr = context.getContentResolver();
-        cursor = cr.query(Calendars.CONTENT_URI, projection, null, null, null);
+        Cursor cursor = cr.query(Calendars.CONTENT_URI, projection, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 long calendarId = cursor.getLong(projection_id);
@@ -365,6 +411,7 @@ public class DatabaseInterface {
                 }
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return calendarName;
     }
 
@@ -384,27 +431,39 @@ public class DatabaseInterface {
         final int projection_color = 4;
         Cursor cursor;
         ContentResolver cr = context.getContentResolver();
+
         cursor = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                long id = cursor.getLong(projection_id);
-                String accountName = cursor.getString(projection_accountName);
-                String displayName = cursor.getString(projection_displayname);
-                String owner = cursor.getString(projection_owner);
-                int color = cursor.getInt(projection_color);
-                try {
-                    Calendar c = new Calendar(id, accountName, displayName, owner, color);
-                    calendarIds.add(c);
-                } catch (IllegalArgumentException e) {
-                    Log.w(TAG, "android database supplied bad values calendar info for id " + id +
-                            ", accountName:" + accountName + "displayName:" + displayName +
-                            " owner:" + owner);
-                    Log.w(TAG, e.getMessage());
-                }
-            } while (cursor.moveToNext());
+        if (cursor == null) {
+            Log.e(TAG, "getCalendarIdList(), unable to get calendar cursor, returning empty list");
         } else {
-            Log.d(TAG, "no calendars installed");
+            try {
+                if (cursor.moveToFirst()) {
+                    do {
+                        long id = cursor.getLong(projection_id);
+                        String accountName = cursor.getString(projection_accountName);
+                        String displayName = cursor.getString(projection_displayname);
+                        String owner = cursor.getString(projection_owner);
+                        int color = cursor.getInt(projection_color);
+                        try {
+                            Calendar c = new Calendar(id, accountName, displayName, owner, color);
+                            calendarIds.add(c);
+                        } catch (IllegalArgumentException e) {
+                            Log.w(TAG, "android database supplied bad values calendar info for id " + id +
+                                    ", accountName:" + accountName + "displayName:" + displayName +
+                                    " owner:" + owner);
+                            Log.w(TAG, e.getMessage());
+                        }
+                    } while (cursor.moveToNext());
+                } else {
+                    Log.d(TAG, "no calendars installed");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "getCalendarIdList(), exception raised reading from cursor " + e.getMessage());
+            } finally {
+                cursor.close();
+            }
         }
+
 
         return calendarIds;
     }
@@ -416,6 +475,85 @@ public class DatabaseInterface {
             eventIsValid = true;
         }
         return eventIsValid;
+    }
+
+    public long getRemainingEventRepetitionCount(long eventId) {
+        return getEventRepetitionCountFromTime(eventId, System.currentTimeMillis());
+    }
+
+    public long getEventRepetitionCountFromTime(long eventId, long begin) {
+        long eventRepetitions = 0;
+        boolean querySucceeded = false;
+        int tryCount = 0;
+        while (!querySucceeded && tryCount < 20) {
+            try {
+                eventRepetitions = tryGetEventRepetitionCountFromTime(eventId, begin);
+                querySucceeded = true;
+            } catch (Exception e) {
+                Log.w(TAG, "Error getting repetition count for event with id " + eventId + " on attempt number " + tryCount);
+            }
+        }
+
+        return eventRepetitions;
+    }
+
+    private long tryGetEventRepetitionCountFromTime(long eventId, long begin) throws Exception {
+        //the local database can not be trusted to return an accurate count of the event repetions
+        //since its window is limited.  Instead we have to query the system database
+        long eventRepetitions = 0;
+
+        final String[] EVENT_PROJECTION = new String[]{
+                Instances.EVENT_ID,
+                Instances._ID,
+                Instances.TITLE
+        };
+
+        ContentResolver cr = context.getContentResolver();
+        Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, Long.MAX_VALUE);
+
+        String selection = Instances.EVENT_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(eventId)};
+
+        Cursor cursor = null;
+        try {
+            cursor = cr.query(
+                    builder.build(),
+                    EVENT_PROJECTION,
+                    selection,
+                    selectionArgs,
+                    null);
+//            while (cursor.moveToNext()) {
+//                String _title = cursor.getString(2);
+//                long _eventId = cursor.getLong(0);
+//                long _instanceId = cursor.getLong(1);
+//                Log.d(TAG, "found repetition of event with id " + eventId + " eventId:" + _title);
+//            }
+
+            eventRepetitions = cursor.getCount();
+        } catch (Exception e) {
+            Log.e(TAG, "error getting repetition count for event with id " + eventId);
+            throw new Exception("Error performing query");
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return eventRepetitions;
+    }
+
+    public boolean doesEventRepeat(long eventId) {
+        boolean eventRepeats = false;
+        if (getEventRepetitionCount(eventId) > 1) {
+            eventRepeats = true;
+        }
+        return eventRepeats;
+    }
+
+    public long getEventRepetitionCount(long eventId) {
+        return getEventRepetitionCountFromTime(eventId, 0);
     }
 
     public void insertEvent(EventInstance e) {
@@ -453,28 +591,29 @@ public class DatabaseInterface {
         long end = begin + 1000 * 60 * 60 * 24 * cutoff; // pull all events n days from now
 
 
-        Cursor cal_cursor = getCalendarCursor(begin, end);
+        Cursor calendarCursor = getCalendarCursor(begin, end);
 
         ArrayList<Integer> cal_ids = new ArrayList<Integer>();
 
-        if (cal_cursor.moveToFirst()) {
-            int col_id = cal_cursor.getColumnIndex(projection[7]);
+        if (calendarCursor.moveToFirst()) {
+            int col_id = calendarCursor.getColumnIndex(projection[7]);
             do {
-                int event_id = Integer.valueOf(cal_cursor.getString(col_id));
+                int event_id = Integer.valueOf(calendarCursor.getString(col_id));
                 cal_ids.add(event_id);
-            } while (cal_cursor.moveToNext());
+            } while (calendarCursor.moveToNext());
         }
-        cal_cursor.close();
+        calendarCursor.close();
 
-        Cursor loc_cursor = getEventCursor();
-        if (loc_cursor.moveToFirst()) {
+        Cursor localCursor = getEventCursor();
+        if (localCursor.moveToFirst()) {
             do {
-                int loc_id = loc_cursor.getInt(loc_cursor.getColumnIndex(Columns._ID));
+                int loc_id = localCursor.getInt(localCursor.getColumnIndex(Columns._ID));
                 if (!cal_ids.contains(loc_id)) {
                     deleteEventWithId(loc_id);
                 }
-            } while (loc_cursor.moveToNext());
+            } while (localCursor.moveToNext());
         }
+        localCursor.close();
     }
 
     /**
@@ -493,7 +632,7 @@ public class DatabaseInterface {
             int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
             try {
                 nextEvent = getEvent(id);
-            } catch (NoSuchEventException e) {
+            } catch (NoSuchEventInstanceException e) {
                 Log.e(TAG, "unable to retrieve event with id of " + id
                         + " even though a record with this id exists in the database");
             }

@@ -37,7 +37,7 @@
     <item name="calendar_list_unselected" type="color">#ffcccccc</item>
 
     <!-- Main view event list -->
-    <item name="event_list_item_background" type="color">@color/windowBackground</item>
+    <item name="event_list_item_background" type="color">#ffffff</item>
     <item name="event_list_item_future_background" type="color">#ffd4d7d9</item>
     <item name="event_list_item_future_text" type="color">#ff4c4c4c</item>
     <item name="event_list_item_active_event" type="color">#ffd4f1da</item>

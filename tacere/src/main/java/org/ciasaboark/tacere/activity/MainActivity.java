@@ -48,7 +48,7 @@ import org.ciasaboark.tacere.converter.DateConverter;
 import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.NoSuchEventException;
+import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerSource;
@@ -288,7 +288,12 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         int lookaheadDays = prefs.getLookaheadDays();
         DateConverter dateConverter = new DateConverter(lookaheadDays);
         String errorText = "";
-        if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendars().isEmpty()) {
+
+        //TODO move to members?
+        boolean shouldAllCalendarsBeSynced = prefs.shouldAllCalendarsBeSynced();
+        boolean selectedCalendarsIsEmpty = prefs.getSelectedCalendars().isEmpty();
+
+        if (!shouldAllCalendarsBeSynced && selectedCalendarsIsEmpty) {
             errorText = getString(R.string.list_error_no_calendars);
         } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendars().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
             errorText = String.format(getString(R.string.main_error_no_events), dateConverter.toString());
@@ -396,7 +401,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             // if the selected event is no longer in the DB, then we need to remove it from the list
             // view
             removeListViewEvent(view);
-        } catch (NoSuchEventException e) {
+        } catch (NoSuchEventInstanceException e) {
             removeListViewEvent(view);
         }
     }
@@ -423,7 +428,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
             EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event.getId());
             dialogFragment.show(fm, EventDetailsFragment.TAG);
-        } catch (NoSuchEventException e) {
+        } catch (NoSuchEventInstanceException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
         return true;
@@ -549,13 +554,53 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                     v.setTextColor(textColor);
                 }
 
+                /**
+                 * Tablet specific views
+                 */
+
+                ImageView eventRepetitionIcon = (ImageView) view.findViewById(R.id.event_time_icon);
+                if (eventRepetitionIcon != null) {
+                    boolean eventRepeats = databaseInterface.doesEventRepeat(thisEvent.getEventId());
+                    Drawable icon;
+                    if (eventRepeats) {
+                        icon = getResources().getDrawable(R.drawable.history_icon);
+                    } else {
+                        icon = getResources().getDrawable(R.drawable.clock);
+                    }
+                    int color = getResources().getColor(R.color.ringer_source);
+                    icon.mutate().setColorFilter(color, Mode.MULTIPLY);
+                    eventRepetitionIcon.setImageDrawable(icon);
+                }
+
+                TextView eventCalendarTitle = (TextView) view.findViewById(R.id.event_calendar_text);
+                if (eventCalendarTitle != null) {
+                    long calendarId = thisEvent.getCalendarId();
+                    String calendarTitle = databaseInterface.getCalendarNameForId(calendarId);
+                    eventCalendarTitle.setText(calendarTitle);
+                    eventCalendarTitle.setTextColor(textColor);
+                }
+
+                LinearLayout locationBox = (LinearLayout) findViewById(R.id.event_location_holder);
+                if (locationBox != null) {
+                    String eventLocation = thisEvent.getExtraInfo("location");
+                    if (!eventLocation.equals("")) {
+                        locationBox.setVisibility(View.VISIBLE);
+                        TextView location = (TextView) findViewById(R.id.event_location);
+                        location.setText(eventLocation);
+                    }
+                }
+
+
+
+
+
                 if (!animatedViews.contains(id)) {
                     Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);
                     view.startAnimation(animation);
                     animatedViews.add(id);
                 }
 
-            } catch (NoSuchEventException e) {
+            } catch (NoSuchEventInstanceException e) {
                 Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
             }
         }
