@@ -291,11 +291,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
         //TODO move to members?
         boolean shouldAllCalendarsBeSynced = prefs.shouldAllCalendarsBeSynced();
-        boolean selectedCalendarsIsEmpty = prefs.getSelectedCalendars().isEmpty();
+        boolean selectedCalendarsIsEmpty = prefs.getSelectedCalendarsIds().isEmpty();
 
         if (!shouldAllCalendarsBeSynced && selectedCalendarsIsEmpty) {
             errorText = getString(R.string.list_error_no_calendars);
-        } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendars().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
+        } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendarsIds().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
             errorText = String.format(getString(R.string.main_error_no_events), dateConverter.toString());
         }
         noEventsTv.setText(errorText);

@@ -44,10 +44,10 @@ public class EventDetailsFragment extends DialogFragment {
     private Context context;
     private View view;
 
-    public static EventDetailsFragment newInstance(int instanceId) {
+    public static EventDetailsFragment newInstance(long instanceId) {
         EventDetailsFragment fragment = new EventDetailsFragment();
         Bundle args = new Bundle();
-        args.putInt("instanceId", instanceId);
+        args.putLong("instanceId", instanceId);
         fragment.setArguments(args);
         return fragment;
     }

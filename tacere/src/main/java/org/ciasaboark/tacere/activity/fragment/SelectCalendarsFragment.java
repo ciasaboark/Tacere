@@ -75,7 +75,7 @@ public class SelectCalendarsFragment extends Fragment {
     private void buildSimpleCalendarList() {
         DatabaseInterface databaseInterface = DatabaseInterface.getInstance(getActivity());
         calendars = databaseInterface.getCalendarIdList();
-        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        List<Long> calendarsToSync = prefs.getSelectedCalendarsIds();
         for (Calendar c : calendars) {
             if (calendarsToSync.contains(c.getId())) {
                 c.setSelected(true);
@@ -148,14 +148,14 @@ public class SelectCalendarsFragment extends Fragment {
     }
 
     private void removeCalendarFromSyncList(Calendar calendar) {
-        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        List<Long> calendarsToSync = prefs.getSelectedCalendarsIds();
         long calendarId = calendar.getId();
         calendarsToSync.remove(calendarId);
         prefs.setSelectedCalendars(calendarsToSync);
     }
 
     private void addCalendarToSyncList(Calendar calendar) {
-        List<Long> calendarsToSync = prefs.getSelectedCalendars();
+        List<Long> calendarsToSync = prefs.getSelectedCalendarsIds();
         long calendarId = calendar.getId();
         if (!calendarsToSync.contains(calendarId)) {
             calendarsToSync.add(calendarId);
@@ -192,7 +192,7 @@ public class SelectCalendarsFragment extends Fragment {
 
             try {
                 calendar = calendarList.get(position);
-                List<Long> selectedCalendarIds = prefs.getSelectedCalendars();
+                List<Long> selectedCalendarIds = prefs.getSelectedCalendarsIds();
 
                 if (selectedCalendarIds.contains(calendar.getId())) {
                     calendar.setSelected(true);

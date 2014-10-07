@@ -39,7 +39,7 @@ public class Prefs {
 
     }
 
-    public List<Long> getSelectedCalendars() {
+    public List<Long> getSelectedCalendarsIds() {
         String calendars = sharedPreferences.getString(Keys.SELECTED_CALENDARS, "");
         String[] calendarIdArray = calendars.split(",");
         List<Long> calendarList = new ArrayList<Long>();
