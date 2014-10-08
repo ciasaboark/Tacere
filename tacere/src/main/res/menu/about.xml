@@ -6,20 +6,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_about_tutorial"
-        android:icon="@drawable/history_icon"
+        android:icon="@drawable/question"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/about_action_tutorial" />
+        android:title="@string/about_action_tutorial"/>
     <item
         android:id="@+id/action_about_license"
         android:icon="@drawable/copyright_icon"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/about_action_license" />
+        android:title="@string/about_action_license"/>
     <item
         android:id="@+id/action_about_updates"
-        android:icon="@drawable/history_icon"
+        android:icon="@drawable/code"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/settings_action_updates" />
+        android:title="@string/settings_action_updates"/>
 </menu>
