@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,22 +21,18 @@ import android.provider.CalendarContract;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -45,24 +40,17 @@ import com.melnykov.fab.FloatingActionButton;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.fragment.EventDetailsFragment;
 import org.ciasaboark.tacere.converter.DateConverter;
-import org.ciasaboark.tacere.database.Columns;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
+import org.ciasaboark.tacere.database.EventCursorAdapter;
 import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
-import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
-import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 //import android.graphics.Outline;
 
@@ -274,13 +262,13 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     private void setupListView() {
         eventListview = (ListView) findViewById(R.id.eventListView);
-        eventListview.setOnItemClickListener(this);
-        eventListview.setOnItemLongClickListener(this);
         eventListview.setFadingEdgeLength(32);
         eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_item_future_background));
         cursor = databaseInterface.getEventCursor();
         cursorAdapter = new EventCursorAdapter(this, cursor);
         eventListview.setAdapter(cursorAdapter);
+        eventListview.setOnItemClickListener(this);
+        eventListview.setOnItemLongClickListener(this);
     }
 
     private void setupErrorMessage() {
@@ -380,7 +368,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try {
-            EventInstance thisEvent = databaseInterface.getEvent((int) id);
+            EventInstance thisEvent = databaseInterface.getEvent(id);
             //we want the ringer to cycle to the next visible ringer, so if the event does
             //not have a ringer set we jump to the next based on what the event manager provides
             RingerType nextRingerType;
@@ -426,270 +414,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             EventInstance event = databaseInterface.getEvent((int) id);
 
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-            EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event.getId());
+            EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event);
             dialogFragment.show(fm, EventDetailsFragment.TAG);
         } catch (NoSuchEventInstanceException e) {
             Log.d(TAG, "unable to find event with id " + id);
         }
         return true;
-    }
-
-    private class EventCursorAdapter extends CursorAdapter {
-        private final LayoutInflater layoutInflator;
-        private EventInstance thisEvent;
-        private List<Integer> animatedViews = new ArrayList<Integer>();
-
-        public EventCursorAdapter(Context ctx, Cursor c) {
-            super(ctx, c);
-            layoutInflator = LayoutInflater.from(ctx);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup group) {
-            return layoutInflator.inflate(R.layout.list_item_event, group, false);
-        }
-
-
-        @Override
-        public void bindView(View view, final Context context, final Cursor cursor) {
-            int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-            try {
-                thisEvent = databaseInterface.getEvent(id);
-                // a text view to show the event title
-                TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
-                if (descriptionTV != null) {
-                    descriptionTV.setText(thisEvent.getTitle());
-                }
-
-                // a text view to show the event date span
-                String begin = thisEvent.getLocalBeginDate();
-                String end = thisEvent.getLocalEndDate();
-                String date;
-                if (begin.equals(end)) {
-                    date = begin;
-                } else {
-                    date = begin + " - " + end;
-                }
-                TextView dateTV = (TextView) view.findViewById(R.id.eventDate);
-                if (dateTV != null) {
-                    dateTV.setText(date);
-                }
-
-                // a text view to show the beginning and ending times for the event
-                TextView timeTV = (TextView) view.findViewById(R.id.eventTime);
-                if (timeTV != null) {
-                    StringBuilder timeSB = new StringBuilder(thisEvent.getLocalBeginTime() + " - "
-                            + thisEvent.getLocalEndTime());
-
-                    if (thisEvent.isAllDay()) {
-                        timeSB = new StringBuilder(getBaseContext().getString(R.string.all_day));
-                    }
-                    timeTV.setText(timeSB.toString());
-                }
-
-                ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar_image);
-                Drawable coloredSidebar = (Drawable) getResources().getDrawable(R.drawable.sidebar);
-                int displayColor = thisEvent.getDisplayColor();
-                coloredSidebar.mutate().setColorFilter(displayColor, Mode.MULTIPLY);
-                sidebar.setBackgroundDrawable(coloredSidebar);
-
-                TextView embeddedLetter = (TextView) view.findViewById(R.id.embedded_letter);
-                if (embeddedLetter != null) {
-                    long calendarId = thisEvent.getCalendarId();
-                    //TODO cache this info
-                    List<org.ciasaboark.tacere.event.Calendar> calendars = databaseInterface.getCalendarIdList();
-                    char firstChar = ' ';
-                    for (org.ciasaboark.tacere.event.Calendar cal : calendars) {
-                        if (cal.getId() == calendarId) {
-                            firstChar = cal.getDisplayName().charAt(0);
-                            break;
-                        }
-                    }
-                    embeddedLetter.setText(((Character) firstChar).toString().toUpperCase());
-                }
-
-                EventManager eventManager = new EventManager(context, thisEvent);
-
-                // an icon to show the ringer state for this event
-                ImageView eventIV = (ImageView) view.findViewById(R.id.ringerState);
-                if (eventIV != null) {
-                    Drawable ringerIcon = getRingerIcon();
-                    eventIV.setImageDrawable(ringerIcon);
-                    eventIV.setContentDescription(getBaseContext().getString(
-                            R.string.icon_alt_text_normal));
-                }
-
-                ImageView ringerSourceView = (ImageView) view.findViewById(R.id.ringerSource);
-                if (ringerSourceView != null) {
-                    Drawable ringerSource = getRingerSourceIcon();
-                    ringerSourceView.setImageDrawable(ringerSource);
-                }
-
-                Calendar calendarDate = new GregorianCalendar();
-                calendarDate.set(Calendar.HOUR_OF_DAY, 0);
-                calendarDate.set(Calendar.MINUTE, 0);
-                calendarDate.set(Calendar.SECOND, 0);
-                calendarDate.set(Calendar.MILLISECOND, 0);
-                calendarDate.add(Calendar.DAY_OF_MONTH, 1);
-                TextView[] textElements = {descriptionTV, dateTV, timeTV};
-                int backgroundColor = getResources().getColor(R.color.windowBackground);
-                int textColor = getResources().getColor(R.color.textcolor);
-
-                long tomorrowMidnight = calendarDate.getTimeInMillis();
-                long eventBegin = thisEvent.getBegin();
-
-                if (ActiveEventManager.isActiveEvent(thisEvent)) {
-                    backgroundColor = getResources()
-                            .getColor(R.color.event_list_item_active_event);
-                } else if (eventBegin >= tomorrowMidnight) {
-                    backgroundColor = getResources()
-                            .getColor(R.color.event_list_item_future_background);
-                    textColor = getResources().getColor(R.color.event_list_item_future_text);
-                }
-
-                RelativeLayout listItemContainer = (RelativeLayout) view.findViewById(R.id.list_item_container);
-                listItemContainer.setBackgroundColor(backgroundColor);
-
-                for (TextView v : textElements) {
-                    v.setTextColor(textColor);
-                }
-
-                /**
-                 * Tablet specific views
-                 */
-
-                ImageView eventRepetitionIcon = (ImageView) view.findViewById(R.id.event_time_icon);
-                if (eventRepetitionIcon != null) {
-                    boolean eventRepeats = databaseInterface.doesEventRepeat(thisEvent.getEventId());
-                    Drawable icon;
-                    if (eventRepeats) {
-                        icon = getResources().getDrawable(R.drawable.history_icon);
-                    } else {
-                        icon = getResources().getDrawable(R.drawable.clock);
-                    }
-                    int color = getResources().getColor(R.color.ringer_source);
-                    icon.mutate().setColorFilter(color, Mode.MULTIPLY);
-                    eventRepetitionIcon.setImageDrawable(icon);
-                }
-
-                TextView eventCalendarTitle = (TextView) view.findViewById(R.id.event_calendar_text);
-                if (eventCalendarTitle != null) {
-                    long calendarId = thisEvent.getCalendarId();
-                    String calendarTitle = databaseInterface.getCalendarNameForId(calendarId);
-                    eventCalendarTitle.setText(calendarTitle);
-                    eventCalendarTitle.setTextColor(textColor);
-                }
-
-                LinearLayout locationBox = (LinearLayout) findViewById(R.id.event_location_holder);
-                if (locationBox != null) {
-                    String eventLocation = thisEvent.getExtraInfo("location");
-                    if (!eventLocation.equals("")) {
-                        locationBox.setVisibility(View.VISIBLE);
-                        TextView location = (TextView) findViewById(R.id.event_location);
-                        location.setText(eventLocation);
-                    }
-                }
-
-
-
-
-
-                if (!animatedViews.contains(id)) {
-                    Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);
-                    view.startAnimation(animation);
-                    animatedViews.add(id);
-                }
-
-            } catch (NoSuchEventInstanceException e) {
-                Log.w(TAG, "unable to get calendar event to build listview: " + e.getMessage());
-            }
-        }
-
-        private Drawable getRingerIcon() {
-            Drawable icon;
-            int defaultColor = getResources().getColor(R.color.ringer_default);
-            int calendarColor = getResources().getColor(R.color.ringer_calendar);
-            int eventColor = getResources().getColor(R.color.ringer_series);
-            int instanceColor = getResources().getColor(R.color.ringer_instance);
-            int color = defaultColor;
-
-
-            EventManager eventManager = new EventManager(getApplicationContext(), thisEvent);
-            RingerType ringerType = eventManager.getBestRinger();
-            icon = getIconForRinger(ringerType);
-
-            RingerSource ringerSource = eventManager.getRingerSource();
-            switch (ringerSource) {
-                case CALENDAR:
-                    color = calendarColor;
-                    break;
-                case EVENT_SERIES:
-                    color = eventColor;
-                    break;
-                case INSTANCE:
-                    color = instanceColor;
-            }
-
-            icon.mutate().setColorFilter(color, Mode.MULTIPLY);
-
-            if (icon == null) {
-                throw new AssertionError(this.getClass().getName() + "Ringer icon should not be null");
-            }
-            return icon;
-        }
-
-        private Drawable getRingerSourceIcon() {
-            Drawable icon;
-            int iconColor = getResources().getColor(R.color.ringer_source);
-            EventManager eventManager = new EventManager(getApplicationContext(), thisEvent);
-            RingerSource ringerSource = eventManager.getRingerSource();
-
-            switch (ringerSource) {
-                case DEFAULT:
-                    icon = getResources().getDrawable(R.drawable.blank);
-                    break;
-                case CALENDAR:
-                    icon = getResources().getDrawable(R.drawable.calendar_calendar);
-                    break;
-                case EVENT_SERIES:
-                    icon = getResources().getDrawable(R.drawable.calendar_series);
-                    break;
-                case INSTANCE:
-                    icon = getResources().getDrawable(R.drawable.calendar_instance);
-                    break;
-                default:
-                    icon = getResources().getDrawable(R.drawable.blank);
-            }
-            icon.mutate().setColorFilter(iconColor, Mode.MULTIPLY);
-
-            return icon;
-        }
-
-
-        private Drawable getIconForRinger(RingerType ringerType) {
-            Drawable icon;
-            if (ringerType == null) {
-                icon = getResources().getDrawable(R.drawable.blank);
-            } else {
-                switch (ringerType) {
-                    case NORMAL:
-                        icon = getResources().getDrawable(R.drawable.ic_state_normal);
-                        break;
-                    case VIBRATE:
-                        icon = getResources().getDrawable(R.drawable.ic_state_vibrate);
-                        break;
-                    case SILENT:
-                        icon = getResources().getDrawable(R.drawable.ic_state_silent);
-                        break;
-                    case IGNORE:
-                        icon = getResources().getDrawable(R.drawable.ic_state_ignore);
-                        break;
-                    default:
-                        icon = getResources().getDrawable(R.drawable.blank);
-                }
-            }
-
-            return icon;
-        }
     }
 }
