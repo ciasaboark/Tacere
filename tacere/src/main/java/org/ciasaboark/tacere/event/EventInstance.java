@@ -9,7 +9,6 @@ import org.ciasaboark.tacere.event.ringer.RingerType;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 public class EventInstance {
@@ -30,10 +29,10 @@ public class EventInstance {
     private int dispColor;
     private boolean isFreeTime;
     private boolean isAllDay;
-    private HashMap<String, String> extraInfo = new HashMap<String, String>();
+    private String location;
 
 
-    public EventInstance(long calendarId, long instanceId, long eventId, String title, long begin, long end,
+    public EventInstance(long calendarId, int instanceId, int eventId, String title, long begin, long end,
                          String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         this.calendarId = calendarId;
         this.instanceId = instanceId;
@@ -46,18 +45,7 @@ public class EventInstance {
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
         this.ringer = RingerType.UNDEFINED;
-    }
-
-    public void putExtraInfo(String key, String value) {
-        if (key == null || value == null) {
-            throw new IllegalArgumentException("key and value must not be null");
-        }
-        extraInfo.put(key, value);
-    }
-
-    public String getExtraInfo(String key) {
-        String value = extraInfo.get(key);
-        return value == null ? "" : value;
+        this.location = "";
     }
 
     public RingerType getRingerType() {
@@ -71,6 +59,14 @@ public class EventInstance {
             throw new IllegalArgumentException("New ringer can not be null");
         }
         this.ringer = newRinger;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getLocalBeginTime() {
