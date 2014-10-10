@@ -9,8 +9,11 @@
         <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:actionMenuTextColor">@color/textColorMenu</item>
-        <item name="android:actionMenuTextAppearance">@color/menu_text</item>
+        <!--<item name="android:actionMenuTextAppearance">@color/menu_text</item>-->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
     </style>
 
-    <style name="Dialog" parent="android:Theme.Material.Light.Dialog" />
+    <style name="Dialog" parent="android:Theme.Material.Light.Dialog"/>
 </resources>

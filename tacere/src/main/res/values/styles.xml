@@ -6,13 +6,13 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-    <item name="android:textColor">@color/textcolor</item>
+        <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:actionMenuTextColor">@color/textColorMenu</item>
         <item name="android:actionMenuTextAppearance">@color/menu_text</item>
     </style>
 
-    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog" />
+    <style name="Dialog" parent="android:Theme.Holo.Light.Dialog"/>
 
     <style name="Header" parent="AppTheme">
         <item name="android:colorBackground">@color/windowBackground</item>
@@ -65,7 +65,7 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
-    <style name="DialogOnLargeDisplay" parent="AppTheme" />
+    <style name="DialogOnLargeDisplay" parent="AppTheme"/>
 
 
 </resources>
