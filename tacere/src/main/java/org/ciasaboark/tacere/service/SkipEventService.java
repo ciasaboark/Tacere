@@ -28,7 +28,7 @@ public class SkipEventService extends IntentService {
 
         if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            int eventId = b.getInt("org.ciasaboark.tacere.eventId", -1);
+            long eventId = b.getLong("org.ciasaboark.tacere.eventId", -1);
             if (eventId != -1) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
                 dbIface.setRingerForInstance(eventId, RingerType.IGNORE);

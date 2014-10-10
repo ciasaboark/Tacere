@@ -48,8 +48,10 @@ public class Prefs {
                 long id = Long.parseLong(calendarId);
                 calendarList.add(id);
             } catch (NumberFormatException e) {
-                Log.e(TAG, "unable to read calendar id '" + calendarId + "' as integer" +
-                        " value, ignoring");
+                if (!calendarId.equals("")) {   //ignore the trailing ","
+                    Log.e(TAG, "unable to read calendar id '" + calendarId + "' as integer" +
+                            " value, ignoring");
+                }
             }
         }
         return calendarList;

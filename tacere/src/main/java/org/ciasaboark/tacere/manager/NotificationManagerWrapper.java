@@ -17,10 +17,8 @@ import android.support.v4.app.NotificationCompat;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.MainActivity;
 import org.ciasaboark.tacere.event.EventInstance;
-import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
-import org.ciasaboark.tacere.service.ResetEventService;
 import org.ciasaboark.tacere.service.SkipEventService;
 
 public class NotificationManagerWrapper {
@@ -129,25 +127,15 @@ public class NotificationManagerWrapper {
                 .setSmallIcon(R.drawable.small_mono).setAutoCancel(false).setOnlyAlertOnce(true)
                 .setOngoing(true).setContentIntent(pendIntent);
 
-        if (event.getRingerType() != RingerType.IGNORE) {
-            // this intent will be attached to the button on the notification
-            Intent skipEventIntent = new Intent(context, SkipEventService.class);
-            skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", event.getId());
-            PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
 
-            notBuilder
-                    .addAction(R.drawable.ic_state_normal, context.getString(R.string.notification_event_skip), skipEventPendIntent);
-        } else {
-            // this intent will be attached to the button on the notification
-            Intent skipEventIntent = new Intent(context, ResetEventService.class);
-            skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", event.getId());
-            PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
+        // this intent will be attached to the button on the notification
+        Intent skipEventIntent = new Intent(context, SkipEventService.class);
+        skipEventIntent.putExtra("org.ciasaboark.tacere.eventId", event.getId());
+        PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
-            notBuilder.addAction(R.drawable.ic_state_normal, context.getString(R.string.notification_event_enable),
-                    skipEventPendIntent);
-        }
+        notBuilder
+                .addAction(R.drawable.ic_state_ignore, context.getString(R.string.notification_event_skip), skipEventPendIntent);
 
         // the ticker text should only be shown the first time the notification is
         // created, not on each update

@@ -82,19 +82,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/placeholder"
+            android:textColor="@color/textcolor"
             android:visibility="visible"/>
 
     </LinearLayout>
-
-    <ViewFlipper
-        android:id="@+id/quicksilenceFlipper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:animateFirstView="false"></ViewFlipper>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/quickSilenceButton"

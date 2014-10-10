@@ -107,7 +107,7 @@ public class TutorialEventListFragment extends Fragment {
 
         TextView eventDate = (TextView) rootView.findViewById(R.id.future_event_date);
         TextView eventTime = (TextView) rootView.findViewById(R.id.future_event_time);
-        int textColor = getResources().getColor(R.color.event_list_item_future_text);
+        int textColor = getResources().getColor(R.color.textColorDisabled);
         eventTitle.setTextColor(textColor);
         eventDate.setTextColor(textColor);
         eventTime.setTextColor(textColor);
