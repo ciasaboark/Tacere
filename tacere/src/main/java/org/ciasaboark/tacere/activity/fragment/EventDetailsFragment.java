@@ -33,7 +33,7 @@ import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class EventDetailsFragment extends DialogFragment {
     public static final String TAG = "EventLongClickFragment";
@@ -44,10 +44,10 @@ public class EventDetailsFragment extends DialogFragment {
     private Context context;
     private View view;
 
-    public static EventDetailsFragment newInstance(long instanceId) {
+    public static EventDetailsFragment newInstance(EventInstance eventInstance) {
         EventDetailsFragment fragment = new EventDetailsFragment();
         Bundle args = new Bundle();
-        args.putLong("instanceId", instanceId);
+        args.putLong("instanceId", eventInstance.getId());
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,10 +55,10 @@ public class EventDetailsFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
-        int instanceId = getArguments().getInt("instanceId");
-        databaseInterface = DatabaseInterface.getInstance(getActivity());
-        prefs = new Prefs(getActivity());
+        long instanceId = getArguments().getLong("instanceId");
         context = getActivity().getApplicationContext();
+        databaseInterface = DatabaseInterface.getInstance(context);
+        prefs = new Prefs(context);
 
         try {
             event = databaseInterface.getEvent(instanceId);
@@ -166,11 +166,11 @@ public class EventDetailsFragment extends DialogFragment {
 
         //only display the checkbox if there are multiple instances of this event
         CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        List<Long> instanceIds = databaseInterface.getInstanceIdsForEvent(event.getEventId());
-        if (instanceIds.size() <= 1) {
-            cb.setVisibility(View.GONE);
-        } else {
+        boolean eventRepeats = databaseInterface.doesEventRepeat(event.getEventId());
+        if (eventRepeats) {
             cb.setText(R.string.event_details_checkbox);
+        } else {
+            cb.setVisibility(View.GONE);
         }
     }
 
@@ -198,16 +198,17 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void colorizeIcons() {
-        ImageButton[] imageButtons = {
-                (ImageButton) view.findViewById(R.id.imageButtonNormal),
-                (ImageButton) view.findViewById(R.id.imageButtonVibrate),
-                (ImageButton) view.findViewById(R.id.imageButtonSilent),
-                (ImageButton) view.findViewById(R.id.imageButtonIgnore)
-        };
-        for (ImageButton ib : imageButtons) {
-            Drawable backgroundDrawable = getColorizedIcon(ib.getBackground());
-            ib.setBackgroundDrawable(backgroundDrawable);
+        HashMap<ImageButton, RingerType> buttons = new HashMap<ImageButton, RingerType>();
+        buttons.put((ImageButton) view.findViewById(R.id.imageButtonNormal), RingerType.NORMAL);
+        buttons.put((ImageButton) view.findViewById(R.id.imageButtonVibrate), RingerType.VIBRATE);
+        buttons.put((ImageButton) view.findViewById(R.id.imageButtonSilent), RingerType.SILENT);
+        buttons.put((ImageButton) view.findViewById(R.id.imageButtonIgnore), RingerType.IGNORE);
+
+        for (ImageButton thisButton : buttons.keySet()) {
+            thisButton.setImageDrawable(getColorizedIcon(buttons.get(thisButton)));
         }
+
+
     }
 
     private void drawIndicators() {
@@ -248,6 +249,7 @@ public class EventDetailsFragment extends DialogFragment {
     private void setRingerType(RingerType type) {
         event.setRingerType(type);
         drawIndicators();
+        colorizeIcons();
     }
 
     private void resetAllEvents() {
@@ -265,9 +267,28 @@ public class EventDetailsFragment extends DialogFragment {
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
     }
 
-    private Drawable getColorizedIcon(Drawable d) {
-        Drawable colorizedIcon = d;
+    private Drawable getColorizedIcon(RingerType ringerType) {
+        Drawable colorizedIcon;
+        switch (ringerType) {
+            case NORMAL:
+                colorizedIcon = getResources().getDrawable(R.drawable.ic_state_normal);
+                break;
+            case VIBRATE:
+                colorizedIcon = getResources().getDrawable(R.drawable.ic_state_vibrate);
+                break;
+            case SILENT:
+                colorizedIcon = getResources().getDrawable(R.drawable.ic_state_silent);
+                break;
+            default:
+                colorizedIcon = getResources().getDrawable(R.drawable.ic_state_ignore);
+        }
+
         int color = getResources().getColor(R.color.primary);
+
+        if (event.getRingerType() == ringerType) {
+            color = getResources().getColor(R.color.accent);
+        }
+
         colorizedIcon.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         return colorizedIcon;
     }
