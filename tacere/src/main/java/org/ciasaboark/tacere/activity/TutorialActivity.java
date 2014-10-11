@@ -56,43 +56,11 @@ public class TutorialActivity extends FragmentActivity {
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
-        final Button nextButton = (Button) findViewById(R.id.tutorial_button_next);
-//        nextButton.setBackgroundColor(getResources().getColor(R.color.tutorial_next_button_background));
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-            }
-        });
-
         final Button skipButton = (Button) findViewById(R.id.tutorial_button_skip);
         skipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
-            }
-        });
-
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position == TOTAL_PAGES) {
-                    nextButton.setText(R.string.close);
-                    nextButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            finish();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
             }
         });
 

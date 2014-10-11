@@ -141,6 +141,7 @@
     <string name="title_activity_tutorial">Tutorial</string>
 
     <!-- Tutorial Pages -->
+    <string name="tutorial_button_skip">Skip</string>
     <!-- Ringer priority tutorial page -->
     <string name="tutorial_ringer_priority_title">Ringer Priorities</string>
     <string name="tutorial_ringer_priority_intro">When an event starts I\'ll try to find the most appropriate way to adjust your device\'s ringer.  By default I\'ll put the device in silent mode.  This can be changed in settings.  Preferences can also be set on a per-calendar and per-event basis.  Repeating events can share settings, or have different settings for each instance.</string>

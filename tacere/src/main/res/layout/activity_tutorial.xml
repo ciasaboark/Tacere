@@ -16,23 +16,12 @@
         android:layout_marginBottom="84dp"
         android:layout_weight="1"/>
 
-    <com.viewpagerindicator.CirclePageIndicator
-        android:id="@+id/indicator"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tutorial_button_bar"
-        android:layout_alignParentBottom="false"
-        android:padding="4dp"
-        app:radius="6dp"
-        app:snap="true"/>
-
     <RelativeLayout
         android:id="@+id/tutorial_button_bar"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        android:background="@color/tutorial_buttons_background"
         android:orientation="horizontal"
         android:paddingBottom="4dp"
         android:paddingLeft="16dp"
@@ -40,6 +29,17 @@
         android:paddingTop="4dp"
         android:theme="@style/AppTheme"
         android:visibility="visible">
+
+        <com.viewpagerindicator.CirclePageIndicator
+            android:id="@+id/indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_centerInParent="true"
+            android:clickable="false"
+            android:padding="4dp"
+            app:radius="6dp"
+            app:snap="true"/>
 
         <Button
             android:id="@+id/tutorial_button_skip"
@@ -50,17 +50,10 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center|left"
-            android:text="Skip Tutorial"
+            android:clickable="true"
+            android:enabled="true"
+            android:text="@string/tutorial_button_skip"
             android:textColor="@color/tutorial_button_skip_color"/>
 
-        <Button
-            android:id="@+id/tutorial_button_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center|right"
-            android:text="Next"/>
     </RelativeLayout>
 </RelativeLayout>

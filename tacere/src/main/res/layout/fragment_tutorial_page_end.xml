@@ -6,9 +6,9 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
@@ -30,7 +30,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="16dp"
                 android:text="@string/tutorial_end_title"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -45,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="8dp"
                     android:text="@string/tutorial_end_intro"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
 
                 <FrameLayout
@@ -60,7 +60,9 @@
                         android:background="?android:attr/selectableItemBackground"
                         android:padding="16dp"
                         android:text="@string/tutorial_end_button"
-                        android:textColor="@color/tutorial_icon_tint" />
+                        android:textColor="@color/accent"
+                        android:textSize="28dp"
+                        android:textStyle="bold|italic"/>
                 </FrameLayout>
 
 
