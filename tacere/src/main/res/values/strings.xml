@@ -13,6 +13,7 @@
     <string name="main_upcoming_events">Events in the next %1$d days</string>
     <string name="main_error_service_disabled">Automatic silencing disabled in settings</string>
     <string name="main_error_no_events">No calendar events found for the next %1$s.</string>
+    <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
 
     <!-- About Activity -->
     <string name="about_title">About</string>
@@ -90,6 +91,8 @@
     <string name="days">days</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- Event List Item -->
     <string name="icon_alt_text_normal">normal ringer icon</string>
@@ -101,6 +104,11 @@
     <string name="ring">Ring</string>
     <string name="vibrate">Vibrate</string>
     <string name="silent">Silent</string>
+    <string name="event_dialog_save_all_instances_message">%1$s repeats %2$d times.\nSave this setting for all events in this series?</string>
+    <string name="event_dialog_reset_all_instances_message">%1$s repeats %2$d times.\nWould you like to reset all events in this series?</string>
+    <string name="event_dialog_save_instance">Just this one</string>
+    <string name="event_dialog_save_all_instances">All events</string>
+    <string name="event_dialog_repeating_event_conformation_title">Apply to event series?</string>
 
     <!-- Updates Dialog -->
     <string name="updates_title">Recent Updates</string>
@@ -136,11 +144,11 @@
     <string name="clear">Reset</string>
 
     <!-- event details dialog -->
-    <string name="event_details_checkbox">Use for all repetitions of this event</string>
-    <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
-    <string name="title_activity_tutorial">Tutorial</string>
+    <string name="event_details_checkbox">Use for all events in this series</string>
+
 
     <!-- Tutorial Pages -->
+    <string name="title_activity_tutorial">Tutorial</string>
     <string name="tutorial_button_skip">Skip</string>
     <!-- Ringer priority tutorial page -->
     <string name="tutorial_ringer_priority_title">Ringer Priorities</string>

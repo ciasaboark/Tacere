@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,6 +41,7 @@ public class EventDetailsFragment extends DialogFragment {
     private int instanceId;
     private Context context;
     private View view;
+    private Button positiveButton;
 
     public static EventDetailsFragment newInstance(EventInstance eventInstance) {
         EventDetailsFragment fragment = new EventDetailsFragment();
@@ -55,7 +55,7 @@ public class EventDetailsFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         long instanceId = getArguments().getLong("instanceId");
-        context = getActivity().getApplicationContext();
+        context = getActivity();
         databaseInterface = DatabaseInterface.getInstance(context);
         prefs = new Prefs(context);
 
@@ -66,10 +66,10 @@ public class EventDetailsFragment extends DialogFragment {
             return null;
         }
 
-        AlertDialog.Builder thisDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         view = getActivity().getLayoutInflater().inflate(R.layout.dialog_event_longclick, null);
         setupWidgetsForView();
-        thisDialog.setView(view);
+        dialogBuilder.setView(view);
 
         //the clear button should only be visible if the event has a custom ringer or if the events
         //series has a custom ringer set
@@ -77,7 +77,7 @@ public class EventDetailsFragment extends DialogFragment {
 
         if (eventManager.getRingerSource() == RingerSource.EVENT_SERIES ||
                 eventManager.getRingerSource() == RingerSource.INSTANCE) {
-            thisDialog.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
+            dialogBuilder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     resetEvent();
@@ -86,28 +86,33 @@ public class EventDetailsFragment extends DialogFragment {
         }
 
 
-        thisDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //nothing to do here
             }
         });
 
-        //the positive button should only be enabled if the selected ringer is not UNDEFINED
-        AlertDialog dialog = thisDialog.create();
-        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
-        thisDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 saveSettings();
             }
         });
 
-        Dialog d = thisDialog.create();
-        d.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        //the positive button should only be enabled if the selected ringer is not UNDEFINED
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        return d;
+        return dialog;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AlertDialog thisDialog = (AlertDialog) getDialog();
+        positiveButton = thisDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setEnabled(event.getRingerType() == RingerType.UNDEFINED ? false : true);
     }
 
     private void setupWidgetsForView() {
@@ -161,37 +166,74 @@ public class EventDetailsFragment extends DialogFragment {
                 setRingerType(RingerType.IGNORE);
             }
         });
-
-        //only display the checkbox if there are multiple instances of this event
-        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        boolean eventRepeats = databaseInterface.doesEventRepeat(event.getEventId());
-        if (eventRepeats) {
-            cb.setText(R.string.event_details_checkbox);
-        } else {
-            cb.setVisibility(View.GONE);
-        }
     }
 
     private void resetEvent() {
-        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        if (cb.isChecked()) {
-            resetAllEvents();
+        if (databaseInterface.doesEventRepeat(event.getEventId())) {
+            long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
+            String positiveButtonText = getResources().getString(R.string.event_dialog_reset_all_instances_message);
+            Drawable icon = getResources().getDrawable(R.drawable.history);
+            icon.mutate().setColorFilter(
+                    getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.event_dialog_repeating_event_conformation_title)
+                    .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
+                    .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            resetAllEvents();
+                        }
+                    })
+                    .setNegativeButton(R.string.event_dialog_save_instance, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            resetEventInstance();
+                        }
+                    })
+                    .setIcon(icon)
+                    .show();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
+            resetEventInstance();
         }
+    }
+
+    private void resetEventInstance() {
+        databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
         notifyDatasetChanged();
     }
 
     private void saveSettings() {
-        CheckBox cb = (CheckBox) view.findViewById(R.id.all_events_checkbox);
-        if (cb.isChecked()) {
-            //if the checkbox is checked then we need to make sure to erase any previously chosen
-            //ringers for all instances before saving the current settings
-            resetAllEvents();
-            saveSettingsForAllEvents();
+        if (databaseInterface.doesEventRepeat(event.getEventId())) {
+            long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
+            String positiveButtonText = getResources().getString(R.string.event_dialog_save_all_instances_message);
+            Drawable icon = getResources().getDrawable(R.drawable.history);
+            icon.mutate().setColorFilter(
+                    getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.event_dialog_repeating_event_conformation_title)
+                    .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
+                    .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            resetAllEvents();
+                            saveSettingsForAllEvents();
+                        }
+                    })
+                    .setNegativeButton(R.string.event_dialog_save_instance, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            saveSettingsForEventInstance();
+                        }
+                    })
+                    .setIcon(icon)
+                    .show();
         } else {
-            databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
+            saveSettingsForEventInstance();
         }
+    }
+
+    private void saveSettingsForEventInstance() {
+        databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
         notifyDatasetChanged();
     }
 
@@ -245,6 +287,7 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void setRingerType(RingerType type) {
+        positiveButton.setEnabled(true);
         event.setRingerType(type);
         drawIndicators();
         colorizeIcons();
@@ -254,6 +297,12 @@ public class EventDetailsFragment extends DialogFragment {
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
         databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
                 RingerType.UNDEFINED);
+        notifyDatasetChanged();
+    }
+
+    private void resetThisEvent() {
+        databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
+        notifyDatasetChanged();
     }
 
     private void notifyDatasetChanged() {
@@ -263,6 +312,7 @@ public class EventDetailsFragment extends DialogFragment {
 
     private void saveSettingsForAllEvents() {
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
+        notifyDatasetChanged();
     }
 
     private Drawable getColorizedIcon(RingerType ringerType) {

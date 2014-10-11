@@ -29,6 +29,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
+                android:src="@drawable/calendar_calendar"
                 android:tint="@color/primary"/>
 
             <TextView
@@ -37,7 +38,8 @@
                 android:layout_height="wrap_content"
                 android:text="Event Name"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="24dp"/>
+                android:textSize="24dp"
+                android:textStyle="bold"/>
         </LinearLayout>
 
         <LinearLayout
@@ -80,7 +82,7 @@
                 android:id="@+id/calendar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Calendar Name"
+                android:text="@string/placeholder"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
         </LinearLayout>
 
@@ -101,7 +103,7 @@
 
                 <ImageButton
                     android:id="@+id/imageButtonNormal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="48dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ic_state_normal"/>
 
@@ -174,14 +176,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
-        <CheckBox
-            android:id="@+id/all_events_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:checked="false"
-            android:text="@string/event_details_checkbox"/>
 
     </LinearLayout>
 
