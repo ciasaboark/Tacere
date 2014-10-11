@@ -6,8 +6,8 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/windowBackground"
                 android:orientation="vertical">
 
@@ -28,7 +28,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginRight="16dp"/>
+                android:layout_marginRight="16dp"
+                android:tint="@color/primary"/>
 
             <TextView
                 android:id="@+id/event_title"
@@ -37,6 +38,29 @@
                 android:text="Event Name"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="24dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/event_details_repetitions_box"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/history"
+                android:tint="@color/primary"/>
+
+            <TextView
+                android:id="@+id/event_details_repetition_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -49,7 +73,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
-                android:background="@drawable/calendar_icon"/>
+                android:src="@drawable/calendar_icon"
+                android:tint="@color/primary"/>
 
             <TextView
                 android:id="@+id/calendar_title"

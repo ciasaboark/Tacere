@@ -19,7 +19,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -112,22 +111,21 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void setupWidgetsForView() {
-        int primaryColor = getResources().getColor(R.color.primary);
-        ImageView eventIconView = (ImageView) view.findViewById(R.id.event_icon);
-        Drawable eventIcon = getResources().getDrawable(R.drawable.info_icon).mutate();
-        eventIcon.setColorFilter(primaryColor, PorterDuff.Mode.MULTIPLY);
-        eventIconView.setBackgroundDrawable(eventIcon);
-
         TextView eventTitle = (TextView) view.findViewById(R.id.event_title);
         eventTitle.setText(event.getTitle());
 
-        ImageView calendarIconView = (ImageView) view.findViewById(R.id.event_calendar_icon);
-        Drawable calendarIcon = getResources().getDrawable(R.drawable.calendar_icon).mutate();
-        calendarIcon.setColorFilter(primaryColor, PorterDuff.Mode.MULTIPLY);
-        calendarIconView.setBackgroundDrawable(calendarIcon);
-
         TextView calendarTitle = (TextView) view.findViewById(R.id.calendar_title);
         calendarTitle.setText(databaseInterface.getCalendarNameForId(event.getCalendarId()));
+
+        LinearLayout eventRepetitonBox = (LinearLayout) view.findViewById(R.id.event_details_repetitions_box);
+        if (databaseInterface.doesEventRepeat(event.getEventId())) {
+            eventRepetitonBox.setVisibility(View.VISIBLE);
+            TextView eventRepetitionText = (TextView) view.findViewById(R.id.event_details_repetition_text);
+            long eventRepetitions = databaseInterface.getEventRepetitionCount(event.getEventId());
+            eventRepetitionText.setText("Repeats " + eventRepetitions + " times");
+        } else {
+            eventRepetitonBox.setVisibility(View.GONE);
+        }
 
         colorizeIcons();
         drawIndicators();
@@ -284,19 +282,11 @@ public class EventDetailsFragment extends DialogFragment {
         }
 
         int color = getResources().getColor(R.color.primary);
-
         if (event.getRingerType() == ringerType) {
             color = getResources().getColor(R.color.accent);
         }
 
         colorizedIcon.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         return colorizedIcon;
-    }
-
-    private Drawable getColorizedTitleIcon() {
-        Drawable d = getResources().getDrawable(R.drawable.calendar_icon);
-        int color = getResources().getColor(R.color.primary);
-        d.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-        return d;
     }
 }
