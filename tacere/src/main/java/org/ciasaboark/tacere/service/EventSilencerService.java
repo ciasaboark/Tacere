@@ -28,6 +28,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import java.util.Deque;
 
 public class EventSilencerService extends IntentService {
+    public static final String QUICKSILENCE_DURATION = "duration";
     private static final String TAG = "EventSilencerService";
     private static final long TEN_SECONDS = 10000;
     private static Prefs prefs;
@@ -88,7 +89,7 @@ public class EventSilencerService extends IntentService {
                 break;
             case QUICKSILENCE:
                 // we should never get a quicksilence request with a zero or negative duration
-                int duration = intent.getIntExtra("duration", -1);
+                int duration = intent.getIntExtra(QUICKSILENCE_DURATION, -1);
                 if (duration <= 0) {
                     Log.e(TAG, "got a quicksilence duration <= 0: " + duration + " this should not " +
                             "have happened");

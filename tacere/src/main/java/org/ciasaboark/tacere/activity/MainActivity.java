@@ -243,9 +243,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 
     private void stopOngoingQuicksilence() {
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-        startService(i);
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
+        alarmManagerWrapper.scheduleCancelQuickSilenceAlarmAt(System.currentTimeMillis());
     }
 
     private void drawStartQuicksilenceActionButton() {
@@ -257,12 +256,9 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     private void startQuicksilence() {
         // an intent to send to either start or stop a quick silence duration
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.QUICKSILENCE);
-        // the length of time for the pollService to sleep in minutes
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
         int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-        i.putExtra("duration", duration);
-        startService(i);
+        alarmManagerWrapper.scheduleImmediateQuicksilenceForDuration(duration);
     }
 
     private void drawStopQuicksilenceActionButton() {
