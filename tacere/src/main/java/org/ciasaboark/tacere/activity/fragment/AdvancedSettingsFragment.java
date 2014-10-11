@@ -9,7 +9,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +21,6 @@ import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.EventSilencerService;
-import org.ciasaboark.tacere.service.RequestTypes;
 
 public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
     public static final String TAG = "AdvancedSettingsFragment";
@@ -32,6 +29,11 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
     private Prefs prefs;
 
     public AdvancedSettingsFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
     }
 
     @Override
@@ -55,12 +57,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         return rootView;
     }
 
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -81,7 +77,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             public void onClick(View v) {
                 prefs.setSilenceFreeTimeEvents(!prefs.shouldAvailableEventsSilence());
                 drawFreeTimeWidgets();
-                restartEventSilencerService();
             }
         });
 
@@ -104,7 +99,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             public void onClick(View v) {
                 prefs.setSilenceAllDayEvents(!prefs.shouldAllDayEventsSilence());
                 drawSilenceAllDayWidgets();
-                restartEventSilencerService();
             }
         });
 
@@ -144,7 +138,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         prefs.setBufferMinutes(number.getValue() - 1);
                         drawEventBufferWidgets();
-                        restartEventSilencerService();
                     }
                 });
 
@@ -275,11 +268,5 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             hrs = String.valueOf(prefs.getQuickSilenceHours()) + " " + getString(R.string.hours_lower) + " ";
         }
         quickTV.setText(String.format(quicksilenceText, hrs, prefs.getQuicksilenceMinutes()));
-    }
-
-    private void restartEventSilencerService() {
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        context.startService(i);
     }
 }

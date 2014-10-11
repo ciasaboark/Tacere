@@ -9,7 +9,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
 
@@ -17,9 +18,8 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", "firstWake");
-        context.startService(i);
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.FIRST_WAKE);
     }
 
 }

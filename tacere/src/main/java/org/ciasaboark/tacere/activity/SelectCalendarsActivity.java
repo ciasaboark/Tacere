@@ -5,7 +5,6 @@
 
 package org.ciasaboark.tacere.activity;
 
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,8 +13,6 @@ import android.view.Menu;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.fragment.SelectCalendarsFragment;
-import org.ciasaboark.tacere.service.EventSilencerService;
-import org.ciasaboark.tacere.service.RequestTypes;
 
 public class SelectCalendarsActivity extends FragmentActivity {
     @SuppressWarnings("unused")
@@ -45,20 +42,13 @@ public class SelectCalendarsActivity extends FragmentActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        restartService();
-    }
-
-    private void restartService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
+    public void onStart() {
+        super.onStart();
     }
 
     @Override

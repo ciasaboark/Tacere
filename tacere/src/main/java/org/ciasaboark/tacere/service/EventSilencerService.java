@@ -38,6 +38,7 @@ public class EventSilencerService extends IntentService {
     private static ServiceStateManager stateManager;
     private static DatabaseInterface databaseInterface;
 
+
     public EventSilencerService() {
         super(TAG);
     }
@@ -52,9 +53,6 @@ public class EventSilencerService extends IntentService {
      */
     @Override
     public void onHandleIntent(Intent intent) {
-        Log.d(TAG, "waking");
-
-
         prefs = new Prefs(this);
         alarmManager = new AlarmManagerWrapper(this);
         notificationManager = new NotificationManagerWrapper(this);
@@ -64,39 +62,57 @@ public class EventSilencerService extends IntentService {
         databaseInterface = DatabaseInterface.getInstance(this);
 
         // pull extra info (if any) from the incoming intent
-        String requestType = "";
+        RequestTypes requestType = RequestTypes.NORMAL;
         if (intent.getExtras() != null) {
-            // for some reason intents that have no extras are still getting through this check
-            String t = intent.getStringExtra("type");
-            if (t != null) {
-                requestType = t;
-            } else {
-                Log.w(TAG,
-                        "incoming request type is undefined, using default value RequestTypes.NORMAL");
-                requestType = RequestTypes.NORMAL;
-            }
+            requestType = (RequestTypes) intent.getSerializableExtra(AlarmManagerWrapper.WAKE_REASON);
         }
+        Log.d(TAG, "waking for request type: " + requestType.toString());
 
-        if (requestType.equals(RequestTypes.FIRST_WAKE)) {
-            firstWake();
-        } else if (requestType.equals(RequestTypes.QUICKSILENCE)) {
-            // we should never get a quicksilence request with a zero or negative duration
-            int duration = intent.getIntExtra("duration", -1);
-            if (duration >= 1) {
-                quickSilence(duration);
-            }
-        } else if (requestType.equals(RequestTypes.CANCEL_QUICKSILENCE)) {
-            cancelQuickSilence();
-        } else if (requestType.equals(RequestTypes.ACTIVITY_RESTART)
-                || requestType.equals(RequestTypes.PROVIDER_CHANGED)) {
-            scheduleServiceRestart();
-        } else if (requestType.equals(RequestTypes.NORMAL)) {
-            if (prefs.isServiceActivated() && !stateManager.isQuickSilenceActive()) {
-                checkForActiveEventsAndSilence();
+        switch (requestType) {
+            case FIRST_WAKE:
+                //reset some settings and schedule an immediate restart
+                firstWake();
+                break;
+            case PROVIDER_CHANGED:
+                //sync the calendar database and schedule an immediate restart
+                databaseInterface.syncCalendarDb();
                 notifyCursorAdapterDataChanged();
-            } else { // normal wake requests (but service is marked to be inactive)
-                shutdownService();
-            }
+                scheduleServiceRestart();
+                break;
+            case SETTINGS_CHANGED:
+                //the user might have selected different calendars or changed some other settings
+                //update the database and restart
+                databaseInterface.syncCalendarDb();
+                notifyCursorAdapterDataChanged();
+                scheduleServiceRestart();
+                break;
+            case QUICKSILENCE:
+                // we should never get a quicksilence request with a zero or negative duration
+                int duration = intent.getIntExtra("duration", -1);
+                if (duration <= 0) {
+                    Log.e(TAG, "got a quicksilence duration <= 0: " + duration + " this should not " +
+                            "have happened");
+                } else {
+                    quickSilence(duration);
+                }
+                break;
+            case CANCEL_QUICKSILENCE:
+                cancelQuickSilence();
+                break;
+            case ACTIVITY_RESTART:
+                scheduleServiceRestart();
+                break;
+            case NORMAL:
+                syncDatabaseIfEmpty();
+                if (prefs.isServiceActivated() && !stateManager.isQuickSilenceActive()) {
+                    checkForActiveEventsAndSilence();
+                } else { // normal wake requests (but service is marked to be inactive)
+                    shutdownService();
+                }
+                break;
+            default:
+                Log.e(TAG, "got unknown request type, restarting normally");
+                scheduleServiceRestart();
         }
     }
 
@@ -106,11 +122,24 @@ public class EventSilencerService extends IntentService {
      */
     private void firstWake() {
         databaseInterface.syncCalendarDb();
+        notifyCursorAdapterDataChanged();
         // since the state is saved in a SharedPreferences file it can become out of sync
         // if the device restarts. To solve this set the service as not active, then schedule an
         // immediate restart to look for active events
         stateManager.setServiceState(ServiceStates.NOT_ACTIVE);
-        alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
+        alarmManager.scheduleImmediateAlarm(RequestTypes.NORMAL);
+    }
+
+    private void notifyCursorAdapterDataChanged() {
+        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
+        dsm.broadcastDataSetChangedMessage();
+    }
+
+    private void scheduleServiceRestart() {
+        // schedule an immediate wakeup only if we aren't in a quick silence period
+        if (!stateManager.getServiceState().equals(ServiceStates.QUICKSILENCE)) {
+            alarmManager.scheduleImmediateAlarm(RequestTypes.NORMAL);
+        }
     }
 
     private void quickSilence(int durationMinutes) {
@@ -144,15 +173,15 @@ public class EventSilencerService extends IntentService {
         alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
     }
 
-    private void scheduleServiceRestart() {
-        // schedule an immediate wakeup only if we aren't in a quick silence period
-        if (!stateManager.getServiceState().equals(ServiceStates.QUICKSILENCE)) {
-            alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
+    private void syncDatabaseIfEmpty() {
+        if (databaseInterface.isDatabaseEmpty()) {
+            databaseInterface.syncCalendarDb();
+            notifyCursorAdapterDataChanged();
         }
     }
 
     private void checkForActiveEventsAndSilence() {
-        Deque<EventInstance> events = databaseInterface.syncAndGetAllActiveEvents();
+        Deque<EventInstance> events = databaseInterface.getAllActiveEvents();
         boolean foundEvent = false;
         for (EventInstance event : events) {
             if (shouldEventSilence(event)) {
@@ -172,6 +201,7 @@ public class EventSilencerService extends IntentService {
                 notificationManager.cancelAllNotifications();
                 volumesManager.restoreVolumes();
                 ringerState.restorePhoneRinger();
+                notifyCursorAdapterDataChanged();
             }
 
             //if no events are active, then we should sleep until the start of the next inactive
@@ -193,11 +223,6 @@ public class EventSilencerService extends IntentService {
 
             alarmManager.scheduleNormalWakeAt(wakeAt);
         }
-    }
-
-    private void notifyCursorAdapterDataChanged() {
-        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
-        dsm.broadcastDataSetChangedMessage();
     }
 
     /**
@@ -252,6 +277,7 @@ public class EventSilencerService extends IntentService {
         long wakeAt = event.getEnd()
                 + (EventInstance.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
         alarmManager.scheduleNormalWakeAt(wakeAt);
+        notifyCursorAdapterDataChanged();
     }
 
     private void shutdown() {

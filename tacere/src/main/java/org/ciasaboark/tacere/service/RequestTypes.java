@@ -6,11 +6,12 @@
 
 package org.ciasaboark.tacere.service;
 
-public class RequestTypes {
-    public static final String NORMAL = "normal";
-    public static final String QUICKSILENCE = "quickSilence";
-    public static final String CANCEL_QUICKSILENCE = "cancelQuickSilence";
-    public static final String FIRST_WAKE = "firstWake";
-    public static final String ACTIVITY_RESTART = "activityRestart";
-    public static final String PROVIDER_CHANGED = "providerChanged";
+public enum RequestTypes {
+    NORMAL,
+    QUICKSILENCE,
+    CANCEL_QUICKSILENCE,
+    FIRST_WAKE,
+    ACTIVITY_RESTART,
+    PROVIDER_CHANGED,
+    SETTINGS_CHANGED,
 }

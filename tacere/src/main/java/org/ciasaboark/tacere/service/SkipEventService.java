@@ -13,6 +13,7 @@ import android.util.Log;
 
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.event.ringer.RingerType;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 
 public class SkipEventService extends IntentService {
     private static final String TAG = "SkipEventService";
@@ -33,9 +34,8 @@ public class SkipEventService extends IntentService {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
                 dbIface.setRingerForInstance(eventId, RingerType.IGNORE);
 
-                Intent i = new Intent(this, EventSilencerService.class);
-                i.putExtra("type", "activityRestart");
-                startService(i);
+                AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(ctx);
+                alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
             }
         }
 

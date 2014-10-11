@@ -20,6 +20,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.versioning.Versioning;
 
 public class ShowUpdatesActivity extends Activity {
+    public static final String VERSION_PREFIX = "version-";
     private Prefs prefs;
     private boolean showingUpdatesFromMainScreen = false;
 
@@ -46,7 +47,7 @@ public class ShowUpdatesActivity extends Activity {
         boolean shouldChangelogBeShown = false;
         //the updates dialog should be shown if no value has been stored for the current app version
         try {
-            staticPrefs.getBoolean(Versioning.getVersionCode());
+            staticPrefs.getBoolean(VERSION_PREFIX + Versioning.getVersionCode());
         } catch (IllegalArgumentException e) {
             shouldChangelogBeShown = true;
         }
@@ -56,7 +57,7 @@ public class ShowUpdatesActivity extends Activity {
 
     private static void hideChangelogForCurrentAppVersion(Context ctx) {
         Prefs staticPrefs = new Prefs(ctx);
-        staticPrefs.storePreference(Versioning.getVersionCode(), false);
+        staticPrefs.storePreference(VERSION_PREFIX + Versioning.getVersionCode(), false);
 
     }
 

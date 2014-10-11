@@ -29,8 +29,6 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.AdvancedSettingsActivity;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.EventSilencerService;
-import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.ArrayList;
 
@@ -59,6 +57,17 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnSelectCalendarsListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement " + OnSelectCalendarsListener.class + " to embed this fragment");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getActivity();
@@ -73,25 +82,14 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnSelectCalendarsListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + OnSelectCalendarsListener.class + " to embed this fragment");
-        }
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     public void drawAllWidgets() {
@@ -179,7 +177,6 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
                                         RingerType selectedRinger = RingerType.getTypeForInt(selectedRingerValue);
                                         prefs.setRingerType(selectedRinger);
                                         drawRingerWidgets();
-                                        restartEventSilencerService();
                                         dialog.dismiss();
                                     }
                                 })
@@ -329,12 +326,6 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         } else {
             button.setBackgroundDrawable(icon);
         }
-    }
-
-    private void restartEventSilencerService() {
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        context.startService(i);
     }
 
     public void onClickAdvancedSettings(View v) {

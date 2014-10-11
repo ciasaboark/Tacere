@@ -14,6 +14,7 @@ import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 public class AlarmManagerWrapper {
+    public static final String WAKE_REASON = "wake_reason";
     // requestCodes for the different pending intents
     private static final int RC_EVENT = 1;
     private static final int RC_QUICKSILENT = 2;
@@ -29,7 +30,7 @@ public class AlarmManagerWrapper {
         scheduleAlarmAt(time, RequestTypes.NORMAL);
     }
 
-    private void scheduleAlarmAt(long time, String type) {
+    private void scheduleAlarmAt(long time, RequestTypes type) {
         if (null == type) {
             throw new IllegalArgumentException("unknown type: " + type);
         }
@@ -39,7 +40,7 @@ public class AlarmManagerWrapper {
         }
 
         Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", type);
+        i.putExtra(WAKE_REASON, type);
 
         // note that the android alarm manager allows multiple pending intents to be scheduled per
         // app but only if each intent has a unique request code. Since we want to schedule wakeups
@@ -57,6 +58,13 @@ public class AlarmManagerWrapper {
                 PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
+    }
+
+    public void scheduleImmediateAlarm(RequestTypes type) {
+        if (type == null) {
+            throw new IllegalArgumentException("request type can not be null");
+        }
+        scheduleAlarmAt(System.currentTimeMillis(), type);
     }
 
     public void scheduleCancelQuickSilenceAlarmAt(long time) {

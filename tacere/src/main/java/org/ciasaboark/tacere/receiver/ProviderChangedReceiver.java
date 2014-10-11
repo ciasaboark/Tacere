@@ -10,7 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 public class ProviderChangedReceiver extends BroadcastReceiver {
     private static final String TAG = "ProviderChangedReceiver";
@@ -18,8 +19,7 @@ public class ProviderChangedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "received broadcast intent, waking service");
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", "providerChanged");
-        context.startService(i);
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.PROVIDER_CHANGED);
     }
 }

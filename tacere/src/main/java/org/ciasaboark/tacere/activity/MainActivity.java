@@ -47,12 +47,11 @@ import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerType;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
-
-//import android.graphics.Outline;
 
 public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
     @SuppressWarnings("unused")
@@ -70,7 +69,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        databaseInterface = DatabaseInterface.getInstance(getApplicationContext());
+        databaseInterface = DatabaseInterface.getInstance(this);
         prefs = new Prefs(this);
 
 
@@ -93,11 +92,15 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 //redraw the widgets
                 setupAndDrawActionButtons();
 
+                //we might be comming from an empty database to one that has entries, or vice versa
+                drawEventListOrError();
+
                 //if this broadcast message came from the anywhere besided the event silencer service
                 //then the service needs to be restarted
                 String messageSource = intent.getStringExtra(DataSetManager.SOURCE_KEY);
                 if (!EventSilencerService.class.getName().equals(messageSource)) {
-                    restartEventSilencerService();
+                    AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+                    alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
                 }
             }
         };
@@ -106,6 +109,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         LocalBroadcastManager.getInstance(this).registerReceiver(datasetChangedReceiver,
                 new IntentFilter(DataSetManager.BROADCAST_MESSAGE_KEY));
 
+
+        // start the background service
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
+        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
 
         // display the updates dialog if it hasn't been shown yet
         ShowUpdatesActivity.showUpdatesDialogIfNeeded(this);
@@ -119,13 +126,17 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         drawActionButton();
     }
 
-    /**
-     * Restarts the event silencer service
-     */
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
+    private void drawEventListOrError() {
+        setupListView();
+        setupErrorMessage();
+
+        if (databaseInterface.isDatabaseEmpty()) {
+            hideEventList();
+            drawError();
+        } else {
+            hideError();
+            drawEventList();
+        }
     }
 
     private void setupActionButtons() {
@@ -163,100 +174,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             drawStopQuicksilenceActionButton();
         } else {
             drawStartQuicksilenceActionButton();
-        }
-    }
-
-    private void stopOngoingQuicksilence() {
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
-        startService(i);
-    }
-
-    private void drawStartQuicksilenceActionButton() {
-        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
-        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_quicksilence_normal));
-        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_quicksilence_pressed));
-        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_silent));
-    }
-
-    private void startQuicksilence() {
-        // an intent to send to either start or stop a quick silence duration
-        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
-        i.putExtra("type", RequestTypes.QUICKSILENCE);
-        // the length of time for the pollService to sleep in minutes
-        int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-        i.putExtra("duration", duration);
-        startService(i);
-    }
-
-    private void drawStopQuicksilenceActionButton() {
-        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
-        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_stop_normal));
-        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_stop_pressed));
-        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_normal));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        listViewIndex = eventListview.getFirstVisiblePosition();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        eventListview.setSelectionFromTop(listViewIndex, 0);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        setContentView(R.layout.activity_main);
-        // start the background service
-        restartEventSilencerService();
-        drawEventListOrError();
-        setupAndDrawActionButtons();
-        showFirstRunWizardIfNeeded();
-    }
-
-    private void drawEventListOrError() {
-        setupListView();
-        setupErrorMessage();
-
-        databaseInterface.update(prefs.getLookaheadDays());
-
-        // prune the database of old events
-        databaseInterface.pruneEventsBefore(System.currentTimeMillis() - 1000 * 60 * (long) prefs.getBufferMinutes());
-
-        if (databaseInterface.isDatabaseEmpty()) {
-            hideEventList();
-            drawError();
-        } else {
-            hideError();
-            drawEventList();
-        }
-    }
-
-    private void showFirstRunWizardIfNeeded() {
-        if (prefs.isFirstRun()) {
-            prefs.disableFirstRun();
-            final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (!showingTutorial) {
-                        showingTutorial = true;
-                        startActivity(new Intent(getApplicationContext(), TutorialActivity.class));
-                    }
-                    if (viewTreeObserver.isAlive()) {
-                        if (Build.VERSION.SDK_INT >= 16) {
-                            viewTreeObserver.removeOnGlobalLayoutListener(this);
-                        } else {
-                            viewTreeObserver.removeGlobalOnLayoutListener(this);
-                        }
-                    }
-                }
-            });
         }
     }
 
@@ -325,12 +242,86 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         lv.setVisibility(View.VISIBLE);
     }
 
+    private void stopOngoingQuicksilence() {
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.CANCEL_QUICKSILENCE);
+        startService(i);
+    }
+
+    private void drawStartQuicksilenceActionButton() {
+        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_quicksilence_normal));
+        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_quicksilence_pressed));
+        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_silent));
+    }
+
+    private void startQuicksilence() {
+        // an intent to send to either start or stop a quick silence duration
+        Intent i = new Intent(getApplicationContext(), EventSilencerService.class);
+        i.putExtra("type", RequestTypes.QUICKSILENCE);
+        // the length of time for the pollService to sleep in minutes
+        int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+        i.putExtra("duration", duration);
+        startService(i);
+    }
+
+    private void drawStopQuicksilenceActionButton() {
+        FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_stop_normal));
+        quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_stop_pressed));
+        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_normal));
+    }
+
     private void drawServiceWarningBoxIfNeeded() {
         LinearLayout warningBox = (LinearLayout) findViewById(R.id.main_service_warning);
         if (!prefs.isServiceActivated()) {
             warningBox.setVisibility(View.VISIBLE);
         } else {
             warningBox.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listViewIndex = eventListview.getFirstVisiblePosition();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        eventListview.setSelectionFromTop(listViewIndex, 0);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setContentView(R.layout.activity_main);
+        drawEventListOrError();
+        setupAndDrawActionButtons();
+        showFirstRunWizardIfNeeded();
+    }
+
+    private void showFirstRunWizardIfNeeded() {
+        if (prefs.isFirstRun()) {
+            prefs.disableFirstRun();
+            final ViewTreeObserver viewTreeObserver = getWindow().getDecorView().getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (!showingTutorial) {
+                        showingTutorial = true;
+                        startActivity(new Intent(getApplicationContext(), TutorialActivity.class));
+                    }
+                    if (viewTreeObserver.isAlive()) {
+                        if (Build.VERSION.SDK_INT >= 16) {
+                            viewTreeObserver.removeOnGlobalLayoutListener(this);
+                        } else {
+                            viewTreeObserver.removeGlobalOnLayoutListener(this);
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -384,7 +375,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
             eventListview.getAdapter().getView(position, view, eventListview);
 
             // since the database has changed we need to wake the service
-            restartEventSilencerService();
+            AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
+            alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
         } catch (NullPointerException e) {
             // if the selected event is no longer in the DB, then we need to remove it from the list
             // view

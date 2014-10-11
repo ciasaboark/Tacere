@@ -28,8 +28,6 @@ import org.ciasaboark.tacere.R.id;
 import org.ciasaboark.tacere.activity.fragment.AdvancedSettingsFragment;
 import org.ciasaboark.tacere.activity.fragment.MainSettingsFragment;
 import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.service.EventSilencerService;
-import org.ciasaboark.tacere.service.RequestTypes;
 
 
 public class SettingsActivity extends FragmentActivity implements MainSettingsFragment.OnSelectCalendarsListener {
@@ -58,12 +56,77 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         }
     }
 
-    public void onFragmentInteraction(Uri uri) {
-        //nothing to do here
-    }
-
     public void onPause() {
         super.onPause();
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}.
+     */
+    private void setupActionBar() {
+        try {
+            getActionBar().setIcon(R.drawable.action_settings);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
+    }
+
+    public void onClickToggleService(View v) {
+        prefs.setIsServiceActivated(!prefs.isServiceActivated());
+        drawServiceWidget();
+        drawFragments();
+    }
+
+    private void drawAllWidgets() {
+        drawServiceWidget();
+        drawFragments();
+    }
+
+    private void drawServiceWidget() {
+        //the service state toggle
+        Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
+        if (prefs.isServiceActivated()) {
+            serviceActivatedSwitch.setChecked(true);
+        } else {
+            serviceActivatedSwitch.setChecked(false);
+        }
+    }
+
+    private void drawFragments() {
+
+        if (findViewById(id.settings_fragment_main) != null) {
+            MainSettingsFragment mainSettingsFragment = (MainSettingsFragment) getSupportFragmentManager().findFragmentByTag(MainSettingsFragment.TAG);
+            if (mainSettingsFragment == null) {
+                //the main settings fragment should only show a link to advanced settings if that
+                //fragment will not be attached to this activity
+                boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
+                mainSettingsFragment = new MainSettingsFragment(showAdvancedSettingsLink);
+                getSupportFragmentManager().beginTransaction()
+                        .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
+            } else {
+                //fragment has already been attached, ask it to update its view
+                mainSettingsFragment.drawAllWidgets();
+            }
+        }
+
+        if (findViewById(id.settings_fragment_advanced) != null) {
+            AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment) getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
+            if (advancedSettingsFragment == null) {
+                advancedSettingsFragment = new AdvancedSettingsFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(id.settings_fragment_advanced, advancedSettingsFragment,
+                                AdvancedSettingsFragment.TAG).commit();
+            } else {
+                //advanced settings fragment has already been attached, ask it to update its view
+                advancedSettingsFragment.drawAllWidgets();
+            }
+        }
+
+
+    }
+
+    public void onFragmentInteraction(Uri uri) {
+        //nothing to do here
     }
 
     @Override
@@ -101,54 +164,6 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         drawAllWidgets();
     }
 
-    private void drawAllWidgets() {
-        drawServiceWidget();
-        drawFragments();
-    }
-
-    private void drawFragments() {
-
-        if (findViewById(id.settings_fragment_main) != null) {
-            MainSettingsFragment mainSettingsFragment = (MainSettingsFragment) getSupportFragmentManager().findFragmentByTag(MainSettingsFragment.TAG);
-            if (mainSettingsFragment == null) {
-                //the main settings fragment should only show a link to advanced settings if that
-                //fragment will not be attached to this activity
-                boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
-                mainSettingsFragment = new MainSettingsFragment(showAdvancedSettingsLink);
-                getSupportFragmentManager().beginTransaction()
-                        .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
-            } else {
-                //fragment has already been attached, ask it to update its view
-                mainSettingsFragment.drawAllWidgets();
-            }
-        }
-
-        if (findViewById(id.settings_fragment_advanced) != null) {
-            AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment) getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
-            if (advancedSettingsFragment == null) {
-                advancedSettingsFragment = new AdvancedSettingsFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(id.settings_fragment_advanced, advancedSettingsFragment,
-                                AdvancedSettingsFragment.TAG).commit();
-            } else {
-                //advanced settings fragment has already been attached, ask it to update its view
-                advancedSettingsFragment.drawAllWidgets();
-            }
-        }
-
-
-    }
-
-    private void drawServiceWidget() {
-        //the service state toggle
-        Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
-        if (prefs.isServiceActivated()) {
-            serviceActivatedSwitch.setChecked(true);
-        } else {
-            serviceActivatedSwitch.setChecked(false);
-        }
-    }
-
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("deprecation")
     private void setImageButtonIcon(ImageButton button, Drawable icon) {
@@ -159,43 +174,9 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         }
     }
 
-    /**
-     * Set up the {@link android.app.ActionBar}.
-     */
-    private void setupActionBar() {
-        try {
-            getActionBar().setIcon(R.drawable.action_settings);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
-        }
-    }
-
-    public void onClickToggleService(View v) {
-        prefs.setIsServiceActivated(!prefs.isServiceActivated());
-        restartEventSilencerService();
-        drawServiceWidget();
-        drawFragments();
-    }
-
-
-    private void restartEventSilencerService() {
-        Intent i = new Intent(this, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        startService(i);
-    }
-
-
     @Override
     public void onSelectCalendarsSelectedListener() {
-//        //if the layout contains a frame for the fragment we can display it inline, else start
-//        //the select calendars activity
-//        if (findViewById(id.settings_front_frame) != null) {
-//            SelectCalendarsFragment selectCalendarsFragment = new SelectCalendarsFragment();
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(id.settings_front_frame, selectCalendarsFragment).commit();
-//        } else {
         Intent i = new Intent(this, SelectCalendarsActivity.class);
         startActivity(i);
-//        }
     }
 }

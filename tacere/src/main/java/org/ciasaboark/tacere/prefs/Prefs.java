@@ -9,7 +9,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.ciasaboark.tacere.activity.ShowUpdatesActivity;
 import org.ciasaboark.tacere.event.ringer.RingerType;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,20 +24,42 @@ import java.util.Map;
  *
  * @author Jonathan Nelson <ciasaboark@gmail.com>
  */
-public class Prefs {
+public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "Prefs";
     private static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
+    private static Context context;
+//    private static SharedPreferences.OnSharedPreferenceChangeListener listener;
 
-    public Prefs(Context ctx) {
+    public Prefs(final Context ctx) {
+        if (this.context == null) {
+            this.context = ctx;
+        }
         if (Prefs.sharedPreferences == null) {
             Prefs.sharedPreferences = ctx.getSharedPreferences(PREFERENCES_NAME,
                     Context.MODE_PRIVATE);
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         }
 
         if (Prefs.editor == null) {
             editor = sharedPreferences.edit();
+        }
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //TODO it might be better to filter this down to only the preferences that
+        //require a service restart
+        if (Keys.IS_FIRSTRUN.equals(key)) {
+            //there is no need to relaunch the service because the firstrun is completed
+        } else if (key != null && key.startsWith(ShowUpdatesActivity.VERSION_PREFIX)) {
+            //the changelog manager uses keys that start with the version prefix,
+            //these can be ignored
+        } else {
+            AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+            alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.SETTINGS_CHANGED);
         }
 
     }

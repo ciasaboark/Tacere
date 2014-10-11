@@ -141,10 +141,7 @@ public class DatabaseInterface {
         }
     }
 
-    public Deque<EventInstance> syncAndGetAllActiveEvents() {
-        // sync the db and prune old events
-        syncCalendarDb();
-
+    public Deque<EventInstance> getAllActiveEvents() {
         Deque<EventInstance> events = new ArrayDeque<EventInstance>();
         Cursor cursor = getEventCursor();
         long beginTime = System.currentTimeMillis()
@@ -173,6 +170,45 @@ public class DatabaseInterface {
         cursor.close();
 
         return events;
+    }
+
+    // returns the event that matches the given Instance id, throws NoSuchEventException if no match
+    public EventInstance getEvent(long instanceId) throws NoSuchEventInstanceException {
+        //TODO use better SQL SELECT
+        Cursor cursor = getEventCursor();
+        EventInstance thisEvent = null;
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                if (id == instanceId) {
+                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
+                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
+                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
+                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+                    int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
+                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
+                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
+                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+                    String location = cursor.getString(cursor.getColumnIndex(Columns.LOCATION));
+
+                    thisEvent = new EventInstance(cal_id, id, event_id, title, begin, end, description,
+                            displayColor, isFreeTime, isAllDay);
+                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
+                    thisEvent.setRingerType(ringerType);
+                    thisEvent.setLocation(location);
+
+                    break;
+                }
+            } while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (thisEvent == null) {
+            throw new NoSuchEventInstanceException(TAG + " can not find event with given id " + instanceId);
+        }
+        return thisEvent;
     }
 
     public void setRingerForAllInstancesOfEvent(long eventId, RingerType ringerType) {
@@ -226,46 +262,6 @@ public class DatabaseInterface {
         }
         cursor.close();
         return events;
-    }
-
-
-    // returns the event that matches the given Instance id, throws NoSuchEventException if no match
-    public EventInstance getEvent(long instanceId) throws NoSuchEventInstanceException {
-        //TODO use better SQL SELECT
-        Cursor cursor = getEventCursor();
-        EventInstance thisEvent = null;
-        if (cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-                if (id == instanceId) {
-                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
-                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
-                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
-                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
-                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
-                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
-                    int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
-                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
-                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
-                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
-                    String location = cursor.getString(cursor.getColumnIndex(Columns.LOCATION));
-
-                    thisEvent = new EventInstance(cal_id, id, event_id, title, begin, end, description,
-                            displayColor, isFreeTime, isAllDay);
-                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
-                    thisEvent.setRingerType(ringerType);
-                    thisEvent.setLocation(location);
-
-                    break;
-                }
-            } while (cursor.moveToNext());
-
-        }
-        cursor.close();
-        if (thisEvent == null) {
-            throw new NoSuchEventInstanceException(TAG + " can not find event with given id " + instanceId);
-        }
-        return thisEvent;
     }
 
     // sync the calendar and the local database for the given number of days
