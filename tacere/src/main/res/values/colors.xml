@@ -7,17 +7,17 @@
 
 <resources>
     <!-- Basic theme colors -->
-    <item name="primary_dark" type="color">#0288d1</item>
-    <item name="primary" type="color">#03a9f4</item>
+    <item name="primary_dark" type="color">#455a64</item>
+    <item name="primary" type="color">#546e7a</item>
     <!--<item name="primary" type="color">#37474f</item>-->
-    <item name="header_background" type="color">#039be5</item>
-    <item name="header_text_color" type="color">#cfd8dc</item>
+    <item name="header_background" type="color">#b0bec5</item>
+    <item name="header_text_color" type="color">@color/primary_dark</item>
     <item name="header_accent" type="color">#84ffff</item>
 
     <!--<item name="button_ongoing" type="color">#00bfa5</item>-->
 
     <item name="cancel_quicksilence" type="color">@color/primary</item>
-    <item name="accent" type="color">#ffc400</item>
+    <item name="accent" type="color">#ff9100</item>
 
     <!--<item name="icon_accent" type="color">#b0bec5</item>-->
     <!--<item name="icon_accent_custom" type="color">#00bfa5</item>-->
@@ -60,13 +60,9 @@
     <item name="ringer_source" type="color">@color/primary</item>
 
     <!-- Tutorial Activity -->
-    <item name="tutorial_background" type="color">#00bcd4</item>
+    <item name="tutorial_background" type="color">@color/primary</item>
     <item name="tutorial_frame_background" type="color">#a8919191</item>
     <item name="tutorial_next_button_background" type="color">#ff3650fc</item>
     <item name="tutorial_buttons_background" type="color">#92929292</item>
     <item name="tutorial_button_skip_color" type="color">#b2ebf2</item>
-    <item name="tutorial_frame_welcome" type="color">#a8ff5bfc</item>
-    <item name="tutorial_frame_ringer" type="color">#a8ff3a1a</item>
-    <item name="tutorial_frame_events" type="color">#a83dffc5</item>
-    <item name="tutorial_icon_tint" type="color">#ffeb3b</item>
 </resources>

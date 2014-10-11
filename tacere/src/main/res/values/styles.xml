@@ -53,8 +53,8 @@
     <!-- Transparent style used for tutorial activity -->
     <style name="Tutorial" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/tutorial_background</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:textColor">@color/textcolor</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
