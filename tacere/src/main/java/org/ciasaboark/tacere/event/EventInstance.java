@@ -66,7 +66,11 @@ public class EventInstance {
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        if (location == null) {
+            this.location = "";
+        } else {
+            this.location = location;
+        }
     }
 
     public String getLocalBeginTime() {
