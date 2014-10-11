@@ -6,7 +6,6 @@
 package org.ciasaboark.tacere.database;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -22,8 +21,6 @@ import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.ActiveEventManager;
-import org.ciasaboark.tacere.service.EventSilencerService;
-import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -74,8 +71,8 @@ public class EventListItemInflator {
         long eventBegin = event.getBegin();
 
         if (ActiveEventManager.isActiveEvent(event)) {
-            backgroundColor = context.getResources()
-                    .getColor(R.color.event_list_item_active_event);
+            backgroundColor = desaturateColor(context.getResources()
+                    .getColor(R.color.accent), 0.1f);
         } else if (eventBegin >= tomorrowMidnight) {
             backgroundColor = context.getResources()
                     .getColor(R.color.event_list_item_future_background);
@@ -328,14 +325,5 @@ public class EventListItemInflator {
 
     public View getView() {
         return view;
-    }
-
-    /**
-     * Restarts the event silencer service
-     */
-    private void restartEventSilencerService() {
-        Intent i = new Intent(context, EventSilencerService.class);
-        i.putExtra("type", RequestTypes.ACTIVITY_RESTART);
-        context.startService(i);
     }
 }
