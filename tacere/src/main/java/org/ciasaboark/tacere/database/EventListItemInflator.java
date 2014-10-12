@@ -85,39 +85,8 @@ public class EventListItemInflator {
     }
 
     private void drawTextWidgets() {
-        TextView descriptionTV = (TextView) view.findViewById(R.id.eventText);
-        if (descriptionTV != null) {
-            descriptionTV.setText(event.getTitle());
-            descriptionTV.setTextColor(textColor);
-        }
-
-        // a text view to show the event date span
-        String begin = event.getLocalBeginDate();
-        String end = event.getLocalEndDate();
-        String date;
-        if (begin.equals(end)) {
-            date = begin;
-        } else {
-            date = begin + " - " + end;
-        }
-        TextView dateTV = (TextView) view.findViewById(R.id.eventDate);
-        if (dateTV != null) {
-            dateTV.setText(date);
-            dateTV.setTextColor(textColor);
-        }
-
-        // a text view to show the beginning and ending times for the event
-        TextView timeTV = (TextView) view.findViewById(R.id.eventTime);
-        if (timeTV != null) {
-            StringBuilder timeSB = new StringBuilder(event.getLocalBeginTime() + " - "
-                    + event.getLocalEndTime());
-
-            if (event.isAllDay()) {
-                timeSB = new StringBuilder(context.getString(R.string.all_day));
-            }
-            timeTV.setText(timeSB.toString());
-            timeTV.setTextColor(textColor);
-        }
+        drawTitleText();
+        drawDateTimeText();
     }
 
     private void drawSidebar() {
@@ -186,6 +155,50 @@ public class EventListItemInflator {
         hsv[1] = (hsv[1] / 1 * ratio) + (DESATURATE_RATIO * (1.0f - ratio));
 
         return Color.HSVToColor(hsv);
+    }
+
+    private void drawTitleText() {
+        TextView titleText = (TextView) view.findViewById(R.id.event_title);
+        if (titleText != null) {
+            titleText.setText(event.getTitle());
+            titleText.setTextColor(textColor);
+        }
+    }
+
+    private void drawDateTimeText() {
+        String beginDate = event.getLocalBeginDate();
+        String endDate = event.getLocalEndDate();
+        String beginTime = event.getLocalBeginTime();
+        String endTime = event.getLocalEndTime();
+
+        TextView dateTimeField1 = (TextView) view.findViewById(R.id.event_date_time_field1);
+        TextView dateTimeField2 = (TextView) view.findViewById(R.id.event_date_time_field2);
+        //there are a number of different ways to display the date and time
+        if (beginDate.equals(endDate)) {
+            if (event.isAllDay()) {
+                //field1: <begin date>
+                //field2: 'All Day'
+                dateTimeField1.setText(beginDate);
+                dateTimeField2.setText(R.string.all_day);
+            } else {
+                //field1: <begin date>
+                //field2: <begin time> - <end time>
+                dateTimeField1.setText(beginDate);
+                dateTimeField2.setText(beginTime + " - " + endTime);
+            }
+        } else {
+            if (event.isAllDay()) {
+                //field1: <begin date> - <end date>
+                //field2: 'All Day'
+                dateTimeField1.setText(beginDate + " - " + endDate);
+                dateTimeField2.setText(R.string.all_day);
+            } else {
+                //field1: <begin date> <begin time>
+                //field2: <end date> <end time>
+                dateTimeField1.setText(beginDate + " " + beginTime);
+                dateTimeField2.setText(endDate + " " + endTime);
+            }
+        }
     }
 
     private Drawable getRingerIcon() {
