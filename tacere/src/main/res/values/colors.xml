@@ -7,22 +7,25 @@
 
 <resources>
     <!-- Basic theme colors -->
-    <item name="primary_dark" type="color">#455a64</item>
-    <item name="primary" type="color">#546e7a</item>
+    <item name="primary_dark" type="color">#263238</item>
+    <item name="primary" type="color">#37474f</item>
+    <item name="primary_alt_light" type="color">#78909c</item>
+    <item name="primary_alt_dark" type="color">#263238</item>
     <!--<item name="primary" type="color">#37474f</item>-->
-    <item name="header_background" type="color">#b0bec5</item>
-    <item name="header_text_color" type="color">@color/primary_dark</item>
-    <item name="header_accent" type="color">#84ffff</item>
+    <item name="header_background" type="color">#616161</item>
+    <item name="header_text_color" type="color">@color/windowBackground</item>
 
     <!--<item name="button_ongoing" type="color">#00bfa5</item>-->
 
-    <item name="cancel_quicksilence" type="color">@color/primary</item>
-    <item name="accent" type="color">#ff9100</item>
+    <item name="accent" type="color">#ff3d00</item>
+    <item name="accent_alt_light" type="color">#ff6e40</item>
+    <item name="accent_alt_dark" type="color">#dd2c00</item>
 
     <!--<item name="icon_accent" type="color">#b0bec5</item>-->
     <!--<item name="icon_accent_custom" type="color">#00bfa5</item>-->
 
-    <item name="textcolor" type="color">#ff000000</item>
+    <item name="textcolor" type="color">#de000000</item>
+    <item name="textcolor_alt" type="color">#deffffff</item>
     <item name="textColorPrimary" type="color">#d9000000</item>
     <item name="textColorDisabled" type="color">#7f000000</item>
     <item name="textColorHeading" type="color">#ff555555</item>
@@ -48,9 +51,9 @@
 
     <!-- Floating action button colors -->
     <item name="fab_quicksilence_normal" type="color">@color/accent</item>
-    <item name="fab_quicksilence_pressed" type="color">#80d8ff</item>
+    <item name="fab_quicksilence_pressed" type="color">@color/accent_alt_light</item>
     <item name="fab_stop_normal" type="color">@color/primary</item>
-    <item name="fab_stop_pressed" type="color">#455a64</item>
+    <item name="fab_stop_pressed" type="color">@color/primary_alt_light</item>
 
     <!-- ringer icon colors -->
     <item name="ringer_default" type="color">#ffc0c0c0</item>
