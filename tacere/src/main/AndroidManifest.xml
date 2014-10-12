@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.ciasaboark.tacere">
+<manifest
+    package="org.ciasaboark.tacere"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- android:versionCode="7" -->
     <!-- android:versionName="2.0.4 beta" -->
@@ -12,6 +13,7 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
     <application
         android:allowBackup="true"
@@ -23,18 +25,17 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/settings_title"
             android:parentActivityName=".activity.MainActivity">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.SettingsActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,12 +45,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.MainActivity" />
         </activity>
-
         <activity
             android:name=".activity.AboutActivity"
             android:label="@string/about_title"
             android:parentActivityName=".activity.MainActivity">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.AboutActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -59,61 +59,69 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.MainActivity" />
         </activity>
-
         <activity
             android:name=".activity.ShowUpdatesActivity"
-            android:theme="@style/Dialog"></activity>
-
+            android:theme="@style/Dialog"/>
         <activity
             android:name=".activity.DonationActivity"
-            android:theme="@style/Dialog"></activity>
-
+            android:theme="@style/Dialog"/>
         <activity
             android:name=".activity.SelectCalendarsActivity"
             android:label="@string/title_activity_select_calendars"
             android:parentActivityName=".activity.SettingsActivity"
             android:theme="@style/DialogOnLargeDisplay">
-            <meta-data
+        <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
         </activity>
-
         <activity
             android:name=".activity.AboutLicenseActivity"
             android:label="@string/about_license_title"
             android:parentActivityName=".activity.AboutActivity">
-            <meta-data
+        <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.AboutActivity" />
         </activity>
-
         <activity
             android:name=".activity.AdvancedSettingsActivity"
             android:label="@string/advanced_settings_title"
             android:parentActivityName=".activity.SettingsActivity">
-            <meta-data
+        <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.SettingsActivity" />
+        </activity>
+        <activity
+            android:name=".activity.TutorialActivity"
+            android:label="Wizard"
+            android:theme="@style/Tutorial"/>
+        <activity
+            android:name=".activity.InAppBillingActivity"
+            android:label="@string/title_activity_in_app_billing"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Upgrade">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.ciasaboark.tacere.activity.MainActivity"/>
         </activity>
 
         <service
             android:name=".service.EventSilencerService"
             android:exported="false">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="org.ciasaboark.tacere.EventSilencerService" />
             </intent-filter>
         </service>
         <service
             android:name=".service.SkipEventService"
             android:exported="false">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="org.ciasaboark.tacere.SkipEventService" />
             </intent-filter>
         </service>
         <service
             android:name=".service.ResetEventService"
             android:exported="false">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="org.ciasaboark.tacere.ResetEventService" />
             </intent-filter>
         </service>
@@ -122,14 +130,14 @@
             android:name=".receiver.BootCompletedReceiver"
             android:enabled="true"
             android:exported="false">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.ProviderChangedReceiver">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.PROVIDER_CHANGED" />
 
                 <data android:scheme="content" />
@@ -137,10 +145,7 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".activity.TutorialActivity"
-            android:label="Wizard"
-            android:theme="@style/Tutorial"></activity>
+
     </application>
 
 </manifest>

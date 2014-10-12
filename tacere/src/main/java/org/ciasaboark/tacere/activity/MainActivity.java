@@ -109,7 +109,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         LocalBroadcastManager.getInstance(this).registerReceiver(datasetChangedReceiver,
                 new IntentFilter(DataSetManager.BROADCAST_MESSAGE_KEY));
 
-
         // start the background service
         AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
         alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
@@ -330,6 +329,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_buy_upgrade:
+                Intent buyNowActivityIntent = new Intent(this, InAppBillingActivity.class);
+                buyNowActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(buyNowActivityIntent);
+                return true;
             case R.id.action_settings:
                 // app icon in action bar clicked; go home
                 Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);

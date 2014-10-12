@@ -6,24 +6,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_buy_upgrade"
+        android:icon="@drawable/clock"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="buy upgrade"/>
+
+    <item
         android:id="@+id/action_add_event"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/action_add_event" />
+        android:title="@string/action_add_event"/>
 
     <item
         android:id="@+id/action_about"
         android:icon="@drawable/info_icon"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/main_action_about" />
+        android:title="@string/main_action_about"/>
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/action_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/main_action_settings" />
+        android:title="@string/main_action_settings"/>
 
 
 </menu>

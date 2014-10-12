@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
-
 <resources>
 
     <string name="app_name">Tacere</string>
@@ -146,7 +146,6 @@
     <!-- event details dialog -->
     <string name="event_details_checkbox">Use for all events in this series</string>
 
-
     <!-- Tutorial Pages -->
     <string name="title_activity_tutorial">Tutorial</string>
     <string name="tutorial_button_skip">Skip</string>
@@ -189,6 +188,6 @@
 
     <!-- Misc testing strings -->
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
-
+    <string name="title_activity_in_app_billing">InAppBillingActivity</string>
 
 </resources>
