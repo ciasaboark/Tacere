@@ -100,7 +100,7 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
                 //the main settings fragment should only show a link to advanced settings if that
                 //fragment will not be attached to this activity
                 boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
-                mainSettingsFragment = new MainSettingsFragment(showAdvancedSettingsLink);
+                mainSettingsFragment = MainSettingsFragment.newInstance(showAdvancedSettingsLink);
                 getSupportFragmentManager().beginTransaction()
                         .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
             } else {
