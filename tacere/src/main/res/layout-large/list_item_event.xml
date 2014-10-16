@@ -69,7 +69,6 @@
                     android:text="C"
                     android:textColor="@android:color/white"
                     android:textSize="36dp"
-                    android:textStyle="bold"
                     android:typeface="sans"/>
 
             </RelativeLayout>
