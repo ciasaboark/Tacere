@@ -59,13 +59,15 @@ public class DatabaseInterface {
     private final int PROJECTION_CAL_ID = 8;
     private final int PROJECTION_EVENT_ID = 9;
     private final int PROJECTION_LOCATION = 10;
-    private SQLiteDatabase eventsDB;
+    private final SQLiteDatabase eventsDB;
+    private final DataSetManager dataSetManager;
 
 
     private DatabaseInterface(Context context) {
         DatabaseInterface.context = context;
         EventDatabaseOpenHelper dbHelper = new EventDatabaseOpenHelper(context);
         this.eventsDB = dbHelper.getWritableDatabase();
+        this.dataSetManager = new DataSetManager(this, context);
     }
 
     public static DatabaseInterface getInstance(Context ctx) {
@@ -133,6 +135,7 @@ public class DatabaseInterface {
                 throw new SQLException("setRingerForInstance() should have updated 1 row for instance id " + instanceId + ", updated " + rowsUpdated);
             }
             eventsDB.setTransactionSuccessful();
+            dataSetManager.broadcastDataSetChangedForId(instanceId);
         } catch (Exception e) {
             Log.e(TAG, "error setting ringer type: " + e.getMessage());
             e.printStackTrace();
@@ -142,6 +145,7 @@ public class DatabaseInterface {
     }
 
     public Deque<EventInstance> getAllActiveEvents() {
+        //TODO better SQL select
         Deque<EventInstance> events = new ArrayDeque<EventInstance>();
         Cursor cursor = getEventCursor();
         long beginTime = System.currentTimeMillis()
@@ -265,7 +269,7 @@ public class DatabaseInterface {
     }
 
     // sync the calendar and the local database for the given number of days
-    public void update(int days) {
+    private void update(int days) {
         if (days < 0) {
             throw new IllegalArgumentException("can not sync for a negative period of days: " + days);
         }
@@ -319,7 +323,6 @@ public class DatabaseInterface {
             } while (calendarCursor.moveToNext());
         }
         calendarCursor.close();
-
         pruneRemovedEvents(days);
     }
 
@@ -333,7 +336,8 @@ public class DatabaseInterface {
 
     // remove all events from the database with an ending date
     // + before the given time
-    public void pruneEventsBefore(long cutoff) {
+    private void pruneEventsBefore(long cutoff) {
+        long rowsDeleted = 0;
         Cursor c = getEventCursor(0, cutoff);
         if (c.moveToFirst()) {
             do {
@@ -524,6 +528,9 @@ public class DatabaseInterface {
         cv.put(Columns.LOCATION, e.getLocation());
 
         long rowID = eventsDB.insertWithOnConflict(EventDatabaseOpenHelper.TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        if (rowID != -1) {
+            //TODO notifiy dataset changed?, this may cause too many messages to be received
+        }
         Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
     }
 

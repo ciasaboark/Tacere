@@ -7,6 +7,7 @@ package org.ciasaboark.tacere.database;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import android.util.Log;
 public class DataSetManager {
     public static final String BROADCAST_MESSAGE_KEY = "data set changed";
     public static final String SOURCE_KEY = "source";
+    public static final String ROW_CHANGED = "rowChanged";
     private static final String TAG = "DataSetManager";
 
     private Context context;
@@ -32,13 +34,25 @@ public class DataSetManager {
         source = src;
     }
 
-    public void broadcastDataSetChangedMessage() {
+    public void broadcastDataSetChangedForId(long id) {
+        Bundle args = new Bundle();
+        args.putLong(ROW_CHANGED, id);
+        broadcastDataSetChangedMessage(args);
+    }
+
+    private void broadcastDataSetChangedMessage(Bundle args) {
+        assert args != null;
+
         Log.d(TAG, "Broadcasting data set changed message on behalf of " + source.getClass());
         Intent intent = new Intent(BROADCAST_MESSAGE_KEY);
-        // You can also include some extra data.
         String sourceClass = source.getClass().getName();
-        intent.putExtra(SOURCE_KEY, sourceClass);
+        args.putString(SOURCE_KEY, sourceClass);
+        intent.putExtras(args);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    public void broadcastDataSetChangedMessage() {
+        broadcastDataSetChangedMessage(new Bundle());
     }
 
 
