@@ -12,13 +12,13 @@
         android:title="@string/about_action_tutorial"/>
     <item
         android:id="@+id/action_about_license"
-        android:icon="@drawable/copyright_icon"
+        android:icon="@drawable/copyright"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/about_action_license"/>
     <item
         android:id="@+id/action_about_updates"
-        android:icon="@drawable/code"
+        android:icon="@drawable/code_history"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/settings_action_updates"/>
