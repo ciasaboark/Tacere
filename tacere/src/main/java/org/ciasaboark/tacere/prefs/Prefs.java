@@ -7,11 +7,12 @@ package org.ciasaboark.tacere.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
-import org.ciasaboark.tacere.activity.ShowUpdatesActivity;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
+import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 import java.util.ArrayList;
@@ -50,18 +51,35 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        //TODO it might be better to filter this down to only the preferences that
-        //require a service restart
-        if (Keys.IS_FIRSTRUN.equals(key)) {
-            //there is no need to relaunch the service because the firstrun is completed
-        } else if (key != null && key.startsWith(ShowUpdatesActivity.VERSION_PREFIX)) {
-            //the changelog manager uses keys that start with the version prefix,
-            //these can be ignored
-        } else {
-            AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
-            alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.SETTINGS_CHANGED);
+        //the only preferences that we care to monitor changes on
+        String[] preferences = {
+                Keys.SILENCE_MEDIA,
+                Keys.BUFFER_MINUTES,
+                Keys.CALENDAR_RINGERS,
+                Keys.DO_NOT_DISTURB,
+                Keys.EVENT_RINGERS,
+                Keys.IS_SERVICE_ACTIVATED,
+                Keys.LOOKAHEAD_DAYS,
+                Keys.RINGER_TYPE,
+                Keys.SELECTED_CALENDARS,
+                Keys.SILENCE_ALARM,
+                Keys.SILENCE_ALL_DAY_EVENTS,
+                Keys.SILENCE_FREE_TIME_EVENTS,
+                Keys.SYNC_ALL_CALENDARS
+        };
+        //a few preferences get updated fairly often, it might be worth checking for them by
+        // name to avoid the loop
+        if (TextUtils.equals(key, ServiceStateManager.SERVICE_STATE_KEY)) {
+            return;
         }
 
+        for (String pref : preferences) {
+            if (TextUtils.equals(pref, key)) {
+                AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+                alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.SETTINGS_CHANGED);
+                break;
+            }
+        }
     }
 
     public List<Long> getSelectedCalendarsIds() {
@@ -398,19 +416,19 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
     }
 
     public void storeMediaVolume(int curVolume) {
-        editor.putInt(Keys.MEDIA_VOLUME, curVolume).commit();
+        editor.putInt(Keys.VOLUME_MEDIA, curVolume).commit();
     }
 
     public void storeAlarmVolume(int curVolume) {
-        editor.putInt(Keys.ALARM_VOLUME, curVolume).commit();
+        editor.putInt(Keys.VOL, curVolume).commit();
     }
 
     public int getStoredMediaVolume() {
-        return sharedPreferences.getInt(Keys.MEDIA_VOLUME, DefaultPrefs.MEDIA_VOLUME);
+        return sharedPreferences.getInt(Keys.VOLUME_MEDIA, DefaultPrefs.MEDIA_VOLUME);
     }
 
     public int getStoredAlarmVolume() {
-        return sharedPreferences.getInt(Keys.ALARM_VOLUME, DefaultPrefs.ALARM_VOLUME);
+        return sharedPreferences.getInt(Keys.VOL, DefaultPrefs.ALARM_VOLUME);
     }
 
     public boolean isFirstRun() {
@@ -438,8 +456,8 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
         public static final String SILENCE_ALARM = "SILENCE_ALARM";
         public static final String EVENT_RINGERS = "EVENT_RINGERS";
         public static final String CALENDAR_RINGERS = "CALENDAR_RINGERS";
-        public static final String MEDIA_VOLUME = "MEDIA_VOLUME";
-        public static final String ALARM_VOLUME = "ALARM_VOLUME";
         public static final String IS_FIRSTRUN = "IS_FIRSTRUN";
+        public static final String VOLUME_MEDIA = "VOLUME_MEDIA";
+        public static final String VOL = "VOLUME_ALARM";
     }
 }
