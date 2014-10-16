@@ -66,7 +66,7 @@
         android:paddingTop="6dp">
 
         <TextView
-            android:id="@+id/eventText"
+            android:id="@+id/event_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -86,11 +86,11 @@
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/eventDate"
+            android:id="@+id/event_date_time_field1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/eventText"
+            android:layout_below="@+id/event_title"
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingLeft="6dp"
@@ -99,11 +99,11 @@
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         <TextView
-            android:id="@+id/eventTime"
+            android:id="@+id/event_date_time_field2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/eventDate"
+            android:layout_below="@+id/event_date_time_field1"
             android:clickable="false"
             android:ellipsize="end"
             android:focusable="false"
