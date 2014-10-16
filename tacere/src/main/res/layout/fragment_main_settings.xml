@@ -16,7 +16,7 @@
 
 
         <TextView
-            android:id="@+id/eventTime"
+            android:id="@+id/event_date_time_field2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/section_background"
@@ -37,7 +37,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
-                android:paddingLeft="16dp" />
+                android:src="@drawable/calendar_calendar"
+                android:tint="@color/primary"/>
 
             <TextView
                 android:id="@+id/calendar_text"
@@ -61,16 +62,16 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/settings_ringerIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
                 android:layout_marginRight="16dp"
-                android:background="@drawable/ic_state_silent"
                 android:clickable="false"
-                android:paddingLeft="16dp" />
+                android:src="@drawable/ic_state_silent"
+                android:tint="@color/primary"/>
 
             <TextView
                 android:id="@+id/settings_ringerTitle"
@@ -139,6 +140,15 @@
             android:clickable="true"
             android:padding="16dp">
 
+            <ImageView
+                android:id="@+id/volume_media_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/volume_media"
+                android:tint="@color/primary"/>
+
             <Switch
                 android:id="@+id/adjustMediaCheckBox"
                 android:layout_width="wrap_content"
@@ -151,8 +161,9 @@
                 android:id="@+id/settings_mediaText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/volume_media_icon"
                 android:text="@string/settings_section_volumes_media"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </RelativeLayout>
 
@@ -165,6 +176,14 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/volume_alarm_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/volume_alarm"
+                android:tint="@color/primary"/>
 
             <Switch
                 android:id="@+id/adjustAlarmCheckBox"
@@ -179,9 +198,10 @@
                 android:id="@+id/settings_alarmText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/volume_alarm_icon"
                 android:clickable="false"
                 android:text="@string/settings_section_volumes_alarm"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </RelativeLayout>
 
