@@ -33,7 +33,7 @@ public class RingerStateManager {
         // only store the current ringer state if we are not transitioning from one event to the
         // next and we are not in a quick silence period
         ServiceStateManager stateManager = new ServiceStateManager(context);
-        if (stateManager.getServiceState().equals(ServiceStateManager.ServiceStates.NOT_ACTIVE)) {
+        if (stateManager.isServiceNotActive()) {
             storeRingerState();
         }
     }
