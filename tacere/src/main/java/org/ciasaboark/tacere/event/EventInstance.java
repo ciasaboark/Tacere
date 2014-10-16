@@ -34,13 +34,23 @@ public class EventInstance {
 
     public EventInstance(long calendarId, int instanceId, int eventId, String title, long begin, long end,
                          String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+        if (begin < 0) {
+            throw new IllegalArgumentException("date can not be negative");
+        }
+        if (end < 0) {
+            throw new IllegalArgumentException("date can not be negative");
+        }
+        if (end < begin) {
+            throw new IllegalArgumentException("event can not end before it begins");
+        }
+
         this.calendarId = calendarId;
         this.instanceId = instanceId;
         this.eventId = eventId;
-        this.title = title;
+        this.title = title == null ? "" : title;
         this.begin = begin;
         this.end = end;
-        this.description = description;
+        this.description = description == null ? "" : description;
         this.dispColor = displayColor;
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
