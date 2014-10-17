@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.ciasaboark.tacere.event.ringer.Intervals;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
@@ -201,12 +202,26 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
         editor.putInt(Keys.BUFFER_MINUTES, bufferMinutes).commit();
     }
 
-    public int getLookaheadDays() {
-        return sharedPreferences.getInt(Keys.LOOKAHEAD_DAYS, DefaultPrefs.LOOKAHEAD_DAYS);
+    public Intervals getLookaheadDays() {
+        int intervalValue = sharedPreferences.getInt(Keys.LOOKAHEAD_DAYS, -1);
+
+        Intervals interval;
+        try {
+            interval = Intervals.getTypeForInt(intervalValue);
+        } catch (IllegalArgumentException e) {
+            //use the default value
+            interval = DefaultPrefs.LOOKAHEAD_DAYS;
+        }
+
+        return interval;
     }
 
-    public void setLookaheadDays(int lookaheadDays) {
-        editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays).commit();
+    public void setLookaheadDays(Intervals lookaheadDays) {
+        if (lookaheadDays == null) {
+            throw new IllegalArgumentException("Interval can not be null");
+        }
+
+        editor.putInt(Keys.LOOKAHEAD_DAYS, lookaheadDays.value).commit();
     }
 
     public boolean getDoNotDisturb() {

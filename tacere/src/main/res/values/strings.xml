@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
@@ -70,8 +71,8 @@
     <!-- section intervals -->
     <string name="advanced_settings_section_intervals_buffer">Event Buffer</string>
     <string name="advanced_settings_section_intervals_buffer_duration">Events will trigger %1$d minutes early and last %1$d minutes after the event ends</string>
-    <string name="advanced_settings_section_intervals_lookahead">Lookahead</string>
-    <string name="advanced_settings_section_intervals_lookahead_duration">Events for the next %1$d days will be fetched</string>
+    <string name="advanced_settings_section_intervals_lookahead">Date Range</string>
+    <string name="advanced_settings_section_intervals_lookahead_duration">Events for the next %1$s will be fetched</string>
     <string name="advanced_settings_section_intervals_quicksilence">Adjust Quick Silence Duration</string>
     <string name="advanced_settings_section_interval_quicksilence_duration">Quick silencing will last for %1$s%2$d minutes</string>
 

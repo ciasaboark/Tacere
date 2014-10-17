@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.event.ringer.Intervals;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
@@ -163,35 +164,28 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         lookaheadBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final String[] intervals = Intervals.names();
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle("Lookahead Interval");
-                final NumberPicker number = new NumberPicker(context);
-                String[] nums = new String[365];
+                alert.setTitle(R.string.advanced_settings_section_intervals_lookahead);
 
-                for (int i = 0; i < nums.length; i++) {
-                    nums[i] = Integer.toString(i + 1);
-                }
+                alert.setSingleChoiceItems(intervals, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String intervalString = intervals[i];
+                        int intervalValue = Intervals.getIntForStringValue(intervalString);
+                        Intervals interval = Intervals.getTypeForInt(intervalValue);
 
-                number.setMinValue(1);
-                number.setMaxValue(nums.length - 1);
-                number.setWrapSelectorWheel(false);
-                number.setDisplayedValues(nums);
-                number.setValue(prefs.getLookaheadDays());
-
-                alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        prefs.setLookaheadDays(number.getValue());
+                        prefs.setLookaheadDays(interval);
                         drawLookaheadWidgets();
                     }
                 });
 
-                alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                alert.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // Do nothing
+                        //do nothing
                     }
                 });
 
-                alert.setView(number);
                 alert.show();
             }
         });
@@ -199,7 +193,7 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         // the lookahead interval button
         TextView lookaheadTV = (TextView) rootView.findViewById(R.id.lookaheadDaysDescription);
         String lookaheadText = getResources().getString(R.string.advanced_settings_section_intervals_lookahead_duration);
-        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays()));
+        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays().string.toLowerCase()));
     }
 
     private void drawQuickSilenceWidget() {

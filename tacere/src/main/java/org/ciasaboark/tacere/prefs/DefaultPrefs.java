@@ -5,6 +5,7 @@
 
 package org.ciasaboark.tacere.prefs;
 
+import org.ciasaboark.tacere.event.ringer.Intervals;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 
 class DefaultPrefs {
@@ -27,7 +28,7 @@ class DefaultPrefs {
     // how far in advance to begin silencing and continue silencing after event is over
     static final int BUFFER_MINUTES = 5;
     // how many days to merge when a calendar change is detected
-    static final int LOOKAHEAD_DAYS = 7;
+    static final Intervals LOOKAHEAD_DAYS = Intervals.WEEK;
 
     //TODO work these in to replace adjusting media and alarm volume with complete silencing
     static final boolean SILENCE_MEDIA = false;
