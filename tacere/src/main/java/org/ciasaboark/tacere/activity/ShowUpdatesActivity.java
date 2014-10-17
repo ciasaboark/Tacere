@@ -25,12 +25,26 @@ public class ShowUpdatesActivity extends Activity {
     private boolean showingUpdatesFromMainScreen = false;
 
     public static void showUpdatesDialogIfNeeded(Context ctx) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("Context can not be null");
+        }
+
+        Prefs staticPrefs = new Prefs(ctx);
+        if (staticPrefs.isFirstRun()) {
+            hideChangelogForCurrentAppVersion(ctx);
+        }
+
         boolean showUpdates = shouldChangelogForCurrentAppVersionBeShown(ctx);
         if (showUpdates) {
             Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
             updatesIntent.putExtra("initiator", "main"); //TODO need a better way of keeping track of who started this activity
             ctx.startActivity(updatesIntent);
         }
+    }
+
+    private static void hideChangelogForCurrentAppVersion(Context ctx) {
+        Prefs staticPrefs = new Prefs(ctx);
+        staticPrefs.storePreference(VERSION_PREFIX + Versioning.getVersionCode(), false);
     }
 
     private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
@@ -53,12 +67,6 @@ public class ShowUpdatesActivity extends Activity {
         }
 
         return shouldChangelogBeShown;
-    }
-
-    private static void hideChangelogForCurrentAppVersion(Context ctx) {
-        Prefs staticPrefs = new Prefs(ctx);
-        staticPrefs.storePreference(VERSION_PREFIX + Versioning.getVersionCode(), false);
-
     }
 
     public static void showUpdatesDialog(Context ctx) {

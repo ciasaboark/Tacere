@@ -24,7 +24,10 @@ public class AlarmManagerWrapper {
     private final Context context;
 
     public AlarmManagerWrapper(Context ctx) {
-        this.context = ctx;
+        if (ctx == null) {
+            throw new IllegalArgumentException("context can not be null");
+        }
+        this.context = ctx.getApplicationContext();
     }
 
     public void scheduleNormalWakeAt(long time) {
@@ -38,10 +41,6 @@ public class AlarmManagerWrapper {
     private void scheduleAlarmAt(long time, RequestTypes type, Bundle additionalArgs) {
         if (null == type) {
             throw new IllegalArgumentException("unknown type: " + type);
-        }
-
-        if (time < 0) {
-            throw new IllegalArgumentException("PollService:scheduleAlarmAt not given valid time");
         }
 
         Intent i = new Intent(context, EventSilencerService.class);
@@ -94,7 +93,7 @@ public class AlarmManagerWrapper {
     }
 
     public void scheduleActivityRestartWakeAt(long time) {
-        scheduleAlarmAt(time, RequestTypes.ACTIVITY_RESTART);
+        scheduleAlarmAt(time, RequestTypes.NORMAL);
     }
 
     public void cancelAllAlarms() {

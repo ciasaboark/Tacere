@@ -246,7 +246,7 @@ public class DatabaseInterface {
     public void syncCalendarDb() {
         // update(n) will also remove all events not found in the next n days, so we
         // + need to keep this in sync with the users preferences.
-        update(prefs.getLookaheadDays());
+        update(prefs.getLookaheadDays().value);
         pruneEventsBefore(System.currentTimeMillis() - EventInstance.MILLISECONDS_IN_MINUTE
                 * (long) prefs.getBufferMinutes());
     }

@@ -35,6 +35,7 @@ import java.util.HashMap;
 
 public class EventDetailsFragment extends DialogFragment {
     public static final String TAG = "EventLongClickFragment";
+    DataSetManager dataSetManager;
     private DatabaseInterface databaseInterface;
     private Prefs prefs;
     private EventInstance event;
@@ -56,6 +57,7 @@ public class EventDetailsFragment extends DialogFragment {
         super.onCreateDialog(savedInstanceState);
         long instanceId = getArguments().getLong("instanceId");
         context = getActivity();
+        dataSetManager = new DataSetManager(this, context);
         databaseInterface = DatabaseInterface.getInstance(context);
         prefs = new Prefs(context);
 
@@ -105,14 +107,6 @@ public class EventDetailsFragment extends DialogFragment {
         dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         return dialog;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        AlertDialog thisDialog = (AlertDialog) getDialog();
-        positiveButton = thisDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        positiveButton.setEnabled(event.getRingerType() == RingerType.UNDEFINED ? false : true);
     }
 
     private void setupWidgetsForView() {
@@ -175,7 +169,7 @@ public class EventDetailsFragment extends DialogFragment {
             Drawable icon = getResources().getDrawable(R.drawable.history);
             icon.mutate().setColorFilter(
                     getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-            new AlertDialog.Builder(getActivity())
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                     .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
                     .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
@@ -190,16 +184,20 @@ public class EventDetailsFragment extends DialogFragment {
                             resetEventInstance();
                         }
                     })
-                    .setIcon(icon)
-                    .show();
+                    .setIcon(icon);
+            AlertDialog dialog = builder.show();
+            Button seriesButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            if (seriesButton != null) {
+                seriesButton.setTextColor(getResources().getColor(R.color.accent));
+            }
+
+            Button instanceButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+            if (instanceButton != null) {
+                instanceButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            }
         } else {
             resetEventInstance();
         }
-    }
-
-    private void resetEventInstance() {
-        databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
-        notifyDatasetChanged();
     }
 
     private void saveSettings() {
@@ -209,13 +207,12 @@ public class EventDetailsFragment extends DialogFragment {
             Drawable icon = getResources().getDrawable(R.drawable.history);
             icon.mutate().setColorFilter(
                     getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-            new AlertDialog.Builder(getActivity())
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                     .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
                     .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            resetAllEvents();
                             saveSettingsForAllEvents();
                         }
                     })
@@ -225,16 +222,20 @@ public class EventDetailsFragment extends DialogFragment {
                             saveSettingsForEventInstance();
                         }
                     })
-                    .setIcon(icon)
-                    .show();
+                    .setIcon(icon);
+            AlertDialog dialog = builder.show();
+            Button seriesButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            if (seriesButton != null) {
+                seriesButton.setTextColor(getResources().getColor(R.color.accent));
+            }
+
+            Button instanceButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+            if (instanceButton != null) {
+                instanceButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+            }
         } else {
             saveSettingsForEventInstance();
         }
-    }
-
-    private void saveSettingsForEventInstance() {
-        databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
-        notifyDatasetChanged();
     }
 
     private void colorizeIcons() {
@@ -288,6 +289,7 @@ public class EventDetailsFragment extends DialogFragment {
 
     private void setRingerType(RingerType type) {
         positiveButton.setEnabled(true);
+        positiveButton.setTextColor(getResources().getColor(R.color.accent));
         event.setRingerType(type);
         drawIndicators();
         colorizeIcons();
@@ -297,22 +299,24 @@ public class EventDetailsFragment extends DialogFragment {
         prefs.unsetRingerTypeForEventSeries(event.getEventId());
         databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
                 RingerType.UNDEFINED);
-        notifyDatasetChanged();
+        dataSetManager.broadcastDataSetChangedMessage();
     }
 
-    private void resetThisEvent() {
-        databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
-        notifyDatasetChanged();
-    }
-
-    private void notifyDatasetChanged() {
-        DataSetManager dsm = new DataSetManager(this, context);
-        dsm.broadcastDataSetChangedMessage();
+    private void resetEventInstance() {
+        databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
     }
 
     private void saveSettingsForAllEvents() {
+        prefs.unsetRingerTypeForEventSeries(event.getEventId());
+        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
+                RingerType.UNDEFINED);
+
         prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
-        notifyDatasetChanged();
+        dataSetManager.broadcastDataSetChangedMessage();
+    }
+
+    private void saveSettingsForEventInstance() {
+        databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
     }
 
     private Drawable getColorizedIcon(RingerType ringerType) {
@@ -338,5 +342,23 @@ public class EventDetailsFragment extends DialogFragment {
 
         colorizedIcon.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         return colorizedIcon;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AlertDialog thisDialog = (AlertDialog) getDialog();
+        positiveButton = thisDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setEnabled(event.getRingerType() == RingerType.UNDEFINED ? false : true);
+            positiveButton.setTextColor(positiveButton.isEnabled() ?
+                    getResources().getColor(R.color.accent) :
+                    getResources().getColor(R.color.textColorDisabled));
+        }
+
+        Button negativeButton = thisDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (negativeButton != null) {
+            negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+        }
     }
 }

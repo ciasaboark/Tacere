@@ -2,6 +2,7 @@
  * Copyright (c) 2014 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
+
 package org.ciasaboark.tacere.activity;
 
 import android.app.Activity;
@@ -23,6 +24,8 @@ public class DonationActivity extends Activity {
         //and only if it has not already been shown
         boolean isKeyInstalled = isDonationKeyInstalled(ctx);
         boolean hasDialogAlreadyBeenShown = hasDonationDialogAlreadyBeenShown(ctx);
+        Prefs prefs = new Prefs(ctx);
+
 
         if (isKeyInstalled && !hasDialogAlreadyBeenShown) {
             Intent donationIntent = new Intent(ctx.getApplicationContext(), DonationActivity.class);

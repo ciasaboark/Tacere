@@ -7,12 +7,14 @@ package org.ciasaboark.tacere.activity.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -120,8 +122,8 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         bufferBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle("Buffer Minutes");
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Buffer Minutes");
                 final NumberPicker number = new NumberPicker(context);
                 String[] nums = new String[32];
 
@@ -135,21 +137,32 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                 number.setDisplayedValues(nums);
                 number.setValue(prefs.getBufferMinutes() + 1);
 
-                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         prefs.setBufferMinutes(number.getValue() - 1);
                         drawEventBufferWidgets();
                     }
                 });
 
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Do nothing
                     }
                 });
 
-                alert.setView(number);
-                alert.show();
+                builder.setView(number);
+
+                AlertDialog dialog = builder.show();
+
+                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
+                }
+
+                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+                }
             }
         });
 
@@ -165,10 +178,10 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             @Override
             public void onClick(View v) {
                 final String[] intervals = Intervals.names();
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle(R.string.advanced_settings_section_intervals_lookahead);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(R.string.advanced_settings_section_intervals_lookahead);
 
-                alert.setSingleChoiceItems(intervals, -1, new DialogInterface.OnClickListener() {
+                builder.setSingleChoiceItems(intervals, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String intervalString = intervals[i];
@@ -180,13 +193,23 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                     }
                 });
 
-                alert.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
+                builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //do nothing
                     }
                 });
 
-                alert.show();
+                AlertDialog dialog = builder.show();
+
+                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
+                }
+
+                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+                }
             }
         });
 
@@ -250,7 +273,17 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                     }
                 });
 
-                builder.show();
+                AlertDialog dialog = builder.show();
+
+                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
+                }
+
+                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
+                }
             }
         });
 
