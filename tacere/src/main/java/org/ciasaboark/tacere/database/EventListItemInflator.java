@@ -91,13 +91,13 @@ public class EventListItemInflator {
 
     private void drawSidebar() {
         ImageView sidebar = (ImageView) view.findViewById(R.id.event_sidebar_image);
-        Drawable coloredSidebar = (Drawable) context.getResources().getDrawable(R.drawable.sidebar);
+        Drawable sidebarDrawable = sidebar.getDrawable();
         int displayColor = event.getDisplayColor();
         if (isEventFuture) {
             displayColor = desaturateColor(displayColor, DESATURATE_RATIO);
         }
-        coloredSidebar.mutate().setColorFilter(displayColor, PorterDuff.Mode.MULTIPLY);
-        sidebar.setBackgroundDrawable(coloredSidebar);
+        sidebarDrawable.mutate().setColorFilter(displayColor, PorterDuff.Mode.MULTIPLY);
+        sidebar.setImageDrawable(sidebarDrawable);
     }
 
     private void drawIcons() {

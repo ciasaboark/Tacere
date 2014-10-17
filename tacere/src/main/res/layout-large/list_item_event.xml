@@ -51,10 +51,10 @@
                     android:layout_alignParentStart="false"
                     android:layout_centerVertical="true"
                     android:layout_margin="16dp"
-                    android:background="@drawable/sidebar"
                     android:clickable="false"
                     android:focusable="false"
-                    android:focusableInTouchMode="false"/>
+                    android:focusableInTouchMode="false"
+                    android:src="@drawable/shape_circle"/>
 
                 <TextView
                     android:id="@+id/embedded_letter"
