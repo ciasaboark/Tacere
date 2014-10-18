@@ -87,17 +87,9 @@
     <orderEntry type="library" exported="" name="appcompat-v7-18.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
+    <orderEntry type="library" exported="" name="groovy-2.4.0-beta-3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12-beta-2" level="project" />
     <orderEntry type="module" module-name="viewPagerIndicator" exported="" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/plugins/testng/lib/testng.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
   </component>
 </module>
 
