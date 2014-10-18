@@ -60,14 +60,12 @@ public class DatabaseInterface {
     private final int PROJECTION_EVENT_ID = 9;
     private final int PROJECTION_LOCATION = 10;
     private final SQLiteDatabase eventsDB;
-    private final DataSetManager dataSetManager;
 
 
     private DatabaseInterface(Context context) {
         DatabaseInterface.context = context;
         EventDatabaseOpenHelper dbHelper = new EventDatabaseOpenHelper(context);
         this.eventsDB = dbHelper.getWritableDatabase();
-        this.dataSetManager = new DataSetManager(this, context);
     }
 
     public static DatabaseInterface getInstance(Context ctx) {
@@ -135,7 +133,6 @@ public class DatabaseInterface {
                 throw new SQLException("setRingerForInstance() should have updated 1 row for instance id " + instanceId + ", updated " + rowsUpdated);
             }
             eventsDB.setTransactionSuccessful();
-            dataSetManager.broadcastDataSetChangedForId(instanceId);
         } catch (Exception e) {
             Log.e(TAG, "error setting ringer type: " + e.getMessage());
             e.printStackTrace();
