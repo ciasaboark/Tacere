@@ -46,8 +46,9 @@
 
     <!-- Main view event list -->
     <item name="event_list_item_background" type="color">#ffffff</item>
-    <item name="event_list_item_future_background" type="color">#fff4f4f4</item>
+    <item name="event_list_item_future_background" type="color">#ffdbdbdb</item>
     <item name="event_list_item_active_event" type="color">#ffd4f1da</item>
+    <item name="event_list_background" type="color">@color/windowBackground</item>
 
     <!-- Floating action button colors -->
     <item name="fab_quicksilence_normal" type="color">@color/accent</item>
@@ -68,4 +69,7 @@
     <item name="tutorial_next_button_background" type="color">#ff3650fc</item>
     <item name="tutorial_buttons_background" type="color">#92929292</item>
     <item name="tutorial_button_skip_color" type="color">#b2ebf2</item>
+    <item name="tutorial_event_default" type="color">#ff101fff</item>
+    <item name="tutorial_event_active" type="color">#ff84ff1e</item>
+    <item name="tutorial_event_future" type="color">#ffff9c29</item>
 </resources>

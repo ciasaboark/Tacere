@@ -24,4 +24,8 @@
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>
     </style>
+
+    <style name="CustomAlertDialog" parent="@android:style/Theme.Dialog">
+
+    </style>
 </resources>

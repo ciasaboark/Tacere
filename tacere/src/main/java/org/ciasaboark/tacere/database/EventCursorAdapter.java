@@ -17,6 +17,7 @@ import android.widget.CursorAdapter;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.view.EventListItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,6 @@ public class EventCursorAdapter extends CursorAdapter {
     private final Context context;
     private EventInstance thisEvent;
     private List<Integer> animatedViews = new ArrayList<Integer>();
-    private View view;
 
 
     public EventCursorAdapter(Context ctx, Cursor c) {
@@ -46,13 +46,10 @@ public class EventCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
-        this.view = view;
         int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
         try {
             thisEvent = databaseInterface.getEvent(id);
-            EventListItemInflator eventListItemInflator = new EventListItemInflator(context, view, thisEvent);
-            eventListItemInflator.inflateView();
-
+            ((EventListItem) view).setEvent(thisEvent);
 
             if (!animatedViews.contains(id)) {
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);

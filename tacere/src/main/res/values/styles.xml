@@ -19,7 +19,6 @@
     </style>
 
     <style name="Header_Switch" parent="AppTheme">
-        <item name="android:colorBackground">@color/header_background</item>
         <item name="android:background">@color/header_background</item>
         <item name="android:textColor">@color/header_text_color</item>
     </style>
@@ -76,6 +75,8 @@
     </style>
 
     <style name="DialogOnLargeDisplay" parent="AppTheme"/>
+
+    <style name="CustomAlertDialog" parent="@android:style/Theme.Dialog"/>
 
 
 </resources>

@@ -5,28 +5,25 @@
 
 package org.ciasaboark.tacere.activity.fragment;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.view.EventListItem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class TutorialEventListFragment extends Fragment {
+    private final long NOW = System.currentTimeMillis();
     private int layout = R.layout.fragment_tutorial_page_event_list;
     private ViewGroup rootView;
     private List<String> eventTitles = new ArrayList<String>();
-    private long now = System.currentTimeMillis();
     private Random random = new Random();
 
     @Override
@@ -51,95 +48,59 @@ public class TutorialEventListFragment extends Fragment {
     }
 
     private void renderDefaultEvent() {
-        ImageView sidebar = (ImageView) rootView.findViewById(R.id.default_event_sidebar);
-        int sidebarColor = getResources().getColor(android.R.color.holo_red_light);
-        colorSidebar(sidebar, sidebarColor);
-
-        RelativeLayout frame = (RelativeLayout) rootView.findViewById(R.id.default_event_list_item);
-        frame.setBackgroundColor(getResources().getColor(R.color.event_list_item_background));
-
-        ImageView ringerIcon = (ImageView) rootView.findViewById(R.id.default_event_ringer);
-        setRingerIcon(ringerIcon);
-
-        TextView eventTitle = (TextView) rootView.findViewById(R.id.default_event_title);
-        TextView eventDate = (TextView) rootView.findViewById(R.id.default_event_date);
-        TextView eventTime = (TextView) rootView.findViewById(R.id.default_event_time);
-        setRandomTitle(eventTitle);
-    }
-
-    private void setRandomTitle(TextView textView) {
-        int titleIndex = random.nextInt(eventTitles.size());
-        String title = eventTitles.get(titleIndex);
-        eventTitles.remove(titleIndex);
-        textView.setText(title);
+        String eventTitle = getRandomTitle();
+        long begin = NOW + EventInstance.MILLISECONDS_IN_MINUTE * 15;
+        long end = begin + EventInstance.MILLISECONDS_IN_MINUTE * 60;
+        EventInstance defaultEvent = new EventInstance(1, -1, -1,
+                eventTitle,
+                begin,
+                end,
+                "A default item",
+                getResources().getColor(R.color.tutorial_event_default),
+                false, false);
+        defaultEvent.setLocation("Somewhere USA");
+        EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.default_event);
+        eventListItem.setEvent(defaultEvent);
+        eventListItem.setCalendarTitle("Primary calendar");
     }
 
     private void renderActiveEvent() {
-        ImageView sidebar = (ImageView) rootView.findViewById(R.id.active_event_sidebar);
-        int sidebarColor = getResources().getColor(android.R.color.holo_orange_light);
-        colorSidebar(sidebar, sidebarColor);
-
-        RelativeLayout frame = (RelativeLayout) rootView.findViewById(R.id.active_event_list_item);
-        frame.setBackgroundColor(getResources().getColor(R.color.event_list_item_active_event));
-
-        ImageView ringerIcon = (ImageView) rootView.findViewById(R.id.active_event_ringer);
-        setRingerIcon(ringerIcon);
-
-        TextView eventTitle = (TextView) rootView.findViewById(R.id.active_event_title);
-        TextView eventDate = (TextView) rootView.findViewById(R.id.future_event_title);
-        TextView eventTime = (TextView) rootView.findViewById(R.id.future_event_title);
-        setRandomTitle(eventTitle);
+        String eventTitle = getRandomTitle();
+        EventInstance defaultEvent = new EventInstance(1, -1, -1,
+                eventTitle,
+                NOW,
+                NOW + EventInstance.MILLISECONDS_IN_DAY,
+                "A default item",
+                getResources().getColor(R.color.tutorial_event_active),
+                false, false);
+        EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.active_event);
+        eventListItem.setCalendarTitle("Work calendar");
+        eventListItem.setIsActiveEvent(true);
+        eventListItem.setEvent(defaultEvent);
     }
 
     private void renderFutureEvent() {
-        ImageView sidebar = (ImageView) rootView.findViewById(R.id.future_event_sidebar);
-        int sidebarColor = getResources().getColor(android.R.color.holo_blue_light);
-        colorSidebar(sidebar, sidebarColor);
-
-        RelativeLayout frame = (RelativeLayout) rootView.findViewById(R.id.future_event_list_item);
-        frame.setBackgroundColor(getResources().getColor(R.color.event_list_item_future_background));
-
-        ImageView ringerIcon = (ImageView) rootView.findViewById(R.id.future_event_ringer);
-        setRingerIcon(ringerIcon);
-
-        TextView eventTitle = (TextView) rootView.findViewById(R.id.future_event_title);
-        setRandomTitle(eventTitle);
-
-        TextView eventDate = (TextView) rootView.findViewById(R.id.future_event_date);
-        TextView eventTime = (TextView) rootView.findViewById(R.id.future_event_time);
-        int textColor = getResources().getColor(R.color.textColorDisabled);
-        eventTitle.setTextColor(textColor);
-        eventDate.setTextColor(textColor);
-        eventTime.setTextColor(textColor);
+        String eventTitle = getRandomTitle();
+        long begin = NOW + EventInstance.MILLISECONDS_IN_DAY * 3;
+        long end = begin + EventInstance.MILLISECONDS_IN_DAY;
+        EventInstance defaultEvent = new EventInstance(1, -1, -1,
+                eventTitle,
+                begin,
+                end,
+                "A default item",
+                getResources().getColor(R.color.tutorial_event_future),
+                false, false);
+        defaultEvent.setLocation("CCT room 403");
+        EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.future_event);
+        eventListItem.setIsFutureEvent(true);
+        eventListItem.setCalendarTitle("Vacation time");
+        eventListItem.setEvent(defaultEvent);
     }
 
-    private void colorSidebar(ImageView view, int color) {
-        Drawable d = view.getBackground();
-        colorBackgroundDrawable(view, d, color);
-    }
-
-    private void setRingerIcon(ImageView view) {
-        Drawable[] ringerDrawables = {
-                getResources().getDrawable(R.drawable.ic_state_silent),
-                getResources().getDrawable(R.drawable.ic_state_vibrate),
-                getResources().getDrawable(R.drawable.ic_state_normal),
-                getResources().getDrawable(R.drawable.ic_state_ignore)
-        };
-        Drawable d = ringerDrawables[random.nextInt(ringerDrawables.length)];
-
-        int[] colors = {
-                getResources().getColor(R.color.ringer_default),
-                getResources().getColor(R.color.ringer_calendar),
-                getResources().getColor(R.color.ringer_series),
-                getResources().getColor(R.color.ringer_instance)
-        };
-        int color = colors[random.nextInt(colors.length)];
-
-        colorBackgroundDrawable(view, d, color);
-    }
-
-    private void colorBackgroundDrawable(ImageView view, Drawable drawable, int color) {
-        drawable.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-        view.setImageDrawable(drawable);
+    private String getRandomTitle() {
+        int titleIndex = random.nextInt(eventTitles.size());
+        String title = eventTitles.get(titleIndex);
+        eventTitles.remove(titleIndex);
+        return title;
     }
 }

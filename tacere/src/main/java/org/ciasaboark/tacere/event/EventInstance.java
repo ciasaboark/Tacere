@@ -58,6 +58,10 @@ public class EventInstance {
         this.location = "";
     }
 
+    public static EventInstance getBlankEvent() {
+        return new EventInstance(-1, -1, -1, "", 0, 0, "", 0, false, false);
+    }
+
     public RingerType getRingerType() {
         return ringer == null ?
                 RingerType.UNDEFINED :
