@@ -304,6 +304,7 @@ public class EventDetailsFragment extends DialogFragment {
 
     private void resetEventInstance() {
         databaseInterface.setRingerForInstance(event.getId(), RingerType.UNDEFINED);
+        dataSetManager.broadcastDataSetChangedForId(event.getId());
     }
 
     private void saveSettingsForAllEvents() {
@@ -317,6 +318,7 @@ public class EventDetailsFragment extends DialogFragment {
 
     private void saveSettingsForEventInstance() {
         databaseInterface.setRingerForInstance(event.getId(), event.getRingerType());
+        dataSetManager.broadcastDataSetChangedForId(event.getId());
     }
 
     private Drawable getColorizedIcon(RingerType ringerType) {
