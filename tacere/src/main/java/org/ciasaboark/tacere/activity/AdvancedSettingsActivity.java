@@ -5,11 +5,9 @@
 
 package org.ciasaboark.tacere.activity;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +18,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 
 // import android.util.Log;
 
-public class AdvancedSettingsActivity extends FragmentActivity {
+public class AdvancedSettingsActivity extends ActionBarActivity {
     @SuppressWarnings("unused")
     private static final String TAG = "AdvancedSettingsActivity";
     private Prefs prefs;
@@ -33,13 +31,19 @@ public class AdvancedSettingsActivity extends FragmentActivity {
         prefs = new Prefs(this);
         // Show the Up button in the action bar.
         setupActionBar();
-
-        Drawable upIcon = getResources().getDrawable(R.drawable.action_settings);
-        int c = getResources().getColor(R.color.header_text_color);
-        upIcon.mutate().setColorFilter(c, PorterDuff.Mode.MULTIPLY);
-        getActionBar().setIcon(upIcon);
-
         attachFragment();
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}.
+     */
+    private void setupActionBar() {
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "unable to setup action bar");
+        }
     }
 
     private void attachFragment() {
@@ -55,20 +59,6 @@ public class AdvancedSettingsActivity extends FragmentActivity {
             }
         }
     }
-
-    /**
-     * Set up the {@link android.app.ActionBar}.
-     */
-    private void setupActionBar() {
-        try {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(R.drawable.action_settings);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
-        }
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

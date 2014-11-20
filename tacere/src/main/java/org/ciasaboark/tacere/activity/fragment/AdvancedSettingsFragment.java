@@ -7,14 +7,12 @@ package org.ciasaboark.tacere.activity.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -23,7 +21,10 @@ import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.event.ringer.Intervals;
+import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
+import org.ciasaboark.tacere.prefs.BetaPrefs;
 import org.ciasaboark.tacere.prefs.Prefs;
+import org.ciasaboark.tacere.service.RequestTypes;
 
 public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
     public static final String TAG = "AdvancedSettingsFragment";
@@ -71,6 +72,44 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         drawEventBufferWidgets();
         drawLookaheadWidgets();
         drawQuickSilenceWidget();
+        drawBetaWidgets();
+    }
+
+    private void drawBetaWidgets() {
+        LinearLayout betaSettingsBox = (LinearLayout) rootView.findViewById(R.id.beta_settings_box);
+        final BetaPrefs betaPrefs = new BetaPrefs(getActivity());
+        if (betaPrefs.isBetaPrefsUnlocked()) {
+            betaSettingsBox.setVisibility(View.VISIBLE);
+            final CheckBox useLargeDisplayCheckbox = (CheckBox) rootView.findViewById(R.id.beta_largedisplay_checkbox);
+            final RelativeLayout useLargeDisplayBox = (RelativeLayout) rootView.findViewById(R.id.large_display_box);
+            if (betaPrefs.getUseLargeDisplay()) {
+                useLargeDisplayCheckbox.setChecked(true);
+            }
+            useLargeDisplayBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    useLargeDisplayCheckbox.performClick();
+                    betaPrefs.setUseLargeDisplay(useLargeDisplayCheckbox.isChecked());
+                }
+            });
+
+            final CheckBox disableNotificationsCheckbox = (CheckBox) rootView.findViewById(R.id.beta_notifications_checkbox);
+            final RelativeLayout disableNotificationsBox = (RelativeLayout) rootView.findViewById(R.id.disable_notifications_box);
+            if (betaPrefs.getDisableNotifications()) {
+                disableNotificationsCheckbox.setChecked(true);
+            }
+            disableNotificationsBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    disableNotificationsCheckbox.performClick();
+                    betaPrefs.setDisableNotifications(disableNotificationsCheckbox.isChecked());
+                    AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(getActivity());
+                    alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
+                }
+            });
+        } else {
+            betaSettingsBox.setVisibility(View.GONE);
+        }
     }
 
     private void drawFreeTimeWidgets() {
@@ -153,16 +192,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                 builder.setView(number);
 
                 AlertDialog dialog = builder.show();
-
-                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-                if (positiveButton != null) {
-                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
-                }
-
-                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
-                if (negativeButton != null) {
-                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
-                }
             }
         });
 
@@ -200,23 +229,13 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                 });
 
                 AlertDialog dialog = builder.show();
-
-                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-                if (positiveButton != null) {
-                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
-                }
-
-                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
-                if (negativeButton != null) {
-                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
-                }
             }
         });
 
         // the lookahead interval button
         TextView lookaheadTV = (TextView) rootView.findViewById(R.id.lookaheadDaysDescription);
         String lookaheadText = getResources().getString(R.string.advanced_settings_section_intervals_lookahead_duration);
-        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays().string.toLowerCase()));
+        lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays().injectString));
     }
 
     private void drawQuickSilenceWidget() {
@@ -274,16 +293,6 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                 });
 
                 AlertDialog dialog = builder.show();
-
-                Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-                if (positiveButton != null) {
-                    positiveButton.setTextColor(getResources().getColor(R.color.accent));
-                }
-
-                Button negativeButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
-                if (negativeButton != null) {
-                    negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
-                }
             }
         });
 
