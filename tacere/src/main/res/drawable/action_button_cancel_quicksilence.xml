@@ -7,7 +7,7 @@
        android:shape="oval">
     <solid
         android:background="@drawable/ic_state_normal"
-        android:color="@color/cancel_quicksilence"/>
+        android:color="@color/fab_quicksilence_normal"/>
     <size
         android:width="156dp"
         android:height="156dp"/>
