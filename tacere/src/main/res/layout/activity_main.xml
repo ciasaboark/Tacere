@@ -16,6 +16,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/warning_background"
+        android:elevation="@dimen/header_elevation"
         android:visibility="gone">
 
         <ImageView
@@ -82,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/placeholder"
-            android:textColor="@color/textcolor"
+            android:textColor="@color/text_color"
             android:visibility="visible"/>
 
     </LinearLayout>
@@ -96,7 +97,9 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
+        android:elevation="6dp"
         android:src="@drawable/ic_state_silent"
         fab:fab_colorNormal="@color/fab_quicksilence_normal"
-        fab:fab_colorPressed="@color/fab_quicksilence_pressed"/>
+        fab:fab_colorPressed="@color/fab_quicksilence_pressed"
+        fab:fab_shadow="false"/>
 </RelativeLayout>

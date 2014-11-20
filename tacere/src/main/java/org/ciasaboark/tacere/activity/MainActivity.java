@@ -16,17 +16,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -35,21 +32,18 @@ import android.widget.TextView;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.ciasaboark.tacere.R;
-import org.ciasaboark.tacere.activity.fragment.EventDetailsFragment;
+import org.ciasaboark.tacere.adapter.EventCursorAdapter;
+import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
-import org.ciasaboark.tacere.database.EventCursorAdapter;
-import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
-import org.ciasaboark.tacere.event.EventInstance;
-import org.ciasaboark.tacere.event.EventManager;
-import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
+import org.ciasaboark.tacere.prefs.Updates;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
-public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
+public class MainActivity extends ActionBarActivity {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
     private EventCursorAdapter cursorAdapter;
@@ -79,33 +73,45 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 String source = intent.getStringExtra(DataSetManager.SOURCE_KEY);
                 Log.d(TAG, "got a notification from the service on behalf of " + source);
 
-                //save the current position of the listview
+                Cursor newCursor = databaseInterface.getEventCursor();
+                Cursor oldCursor = cursorAdapter.getCursor();
+
+                //TODO this should properly go from populated listView to an error message, but might
+                //not go from error message back to populated listView
+
+                if (oldCursor.getCount() == 0 && newCursor.getCount() != 0) {
+                    hideError();
+                    drawEventList();
+                } else if (oldCursor.getCount() != 0 && newCursor.getCount() == 0) {
+                    hideEventList();
+                    drawError();
+                }
+
+                //save the old position
                 int index = eventListview.getFirstVisiblePosition();
                 View v = eventListview.getChildAt(0);
                 int top = (v == null) ? 0 : v.getTop();
 
-                cursor = databaseInterface.getEventCursor();
-                //TODO this should properly go from populated listView to an error message, but might
-                //not go from error message back to populated listView
-                if (cursor.getCount() == 0) {
-                    drawEventListOrError();
-                } else {
-                    cursorAdapter.changeCursor(cursor);
-
+                cursorAdapter.changeCursor(newCursor);
+                if (newCursor.getCount() != 0) {
                     long rowChanged = intent.getLongExtra(DataSetManager.ROW_CHANGED, -1);
-                    if (rowChanged != -1) {
+                    if (rowChanged == -1) {
+                        //the notification does not specify a row, so update everything just to be sure
+                        cursorAdapter.notifyDataSetChanged();
+                    } else {
                         //a specific row has been updated, check that this row is visible, and, if so,
                         //update only that row
                         int start = eventListview.getFirstVisiblePosition();
-                        for (int i = start, j = eventListview.getLastVisiblePosition(); i <= j; i++)
-                            if (rowChanged == eventListview.getItemIdAtPosition(i)) {
-                                View view = eventListview.getChildAt(i - start);
-                                eventListview.getAdapter().getView(i, view, eventListview);
+                        int curPos = start;
+                        int end = eventListview.getLastVisiblePosition();
+                        while (curPos <= end) {
+                            if (rowChanged == eventListview.getItemIdAtPosition(curPos)) {
+                                View view = eventListview.getChildAt(curPos - start);
+                                cursorAdapter.getView(curPos, view, eventListview);
                                 break;
                             }
-                    } else {
-                        //the notification does not specify a row, so update everything just to be sure
-                        cursorAdapter.notifyDataSetChanged();
+                            curPos++;
+                        }
                     }
 
                     //restore the last position of the list view
@@ -113,9 +119,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
                     //redraw the widgets
                     setupAndDrawActionButtons();
-
-                    //we might be comming from an empty database to one that has entries, or vice versa
-                    drawEventListOrError();
 
                     //if this broadcast message came from the anywhere besides the event silencer service
                     //or the database interface then the service needs to be restarted
@@ -135,35 +138,24 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         LocalBroadcastManager.getInstance(this).registerReceiver(datasetChangedReceiver,
                 new IntentFilter(DataSetManager.BROADCAST_MESSAGE_KEY));
 
-        // start the background service
-        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
-        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
+        BroadcastReceiver quickSilenceReceiver = new BroadcastReceiver() {
+            private static final String TAG = "QuickSilenceReceiver";
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "received quicksilence broadcast notification");
+                drawActionButton();
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(quickSilenceReceiver,
+                new IntentFilter("quicksilence"));
 
         // display the updates dialog if it hasn't been shown yet
-        ShowUpdatesActivity.showUpdatesDialogIfNeeded(this);
-
-        // display the "thank you" dialog once if the donation key is installed
-        DonationActivity.showDonationDialogIfNeeded(this);
+        Updates updates = new Updates(this, this);
+        updates.showUpdatesDialogIfNeeded();
 
         showFirstRunWizardIfNeeded();
-    }
-
-    private void drawEventListOrError() {
-        setupListView();
-        setupErrorMessage();
-
-        if (databaseInterface.isDatabaseEmpty()) {
-            hideEventList();
-            drawError();
-        } else {
-            hideError();
-            drawEventList();
-        }
-    }
-
-    private void setupAndDrawActionButtons() {
-        setupActionButtons();
-        drawActionButton();
     }
 
     private void showFirstRunWizardIfNeeded() {
@@ -189,15 +181,99 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        listViewIndex = eventListview.getFirstVisiblePosition();
+        final FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        if (Build.VERSION.SDK_INT >= 21) {
+            int cx = (quickSilenceImageButton.getLeft() + quickSilenceImageButton.getRight()) / 2;
+            int cy = (quickSilenceImageButton.getTop() + quickSilenceImageButton.getBottom()) / 2;
+
+            // get the initial radius for the clipping circle
+            int initialRadius = quickSilenceImageButton.getWidth();
+
+            // create the animation (the final radius is zero)
+
+            //TODO triggers illegalstateexception
+//            Animator anim =
+//                    ViewAnimationUtils.createCircularReveal(quickSilenceImageButton, cx, cy, initialRadius, 0);
+//            anim.addListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    super.onAnimationEnd(animation);
+//                    quickSilenceImageButton.setVisibility(View.INVISIBLE);
+//                }
+//            });
+//            anim.start();
+        } else {
+            quickSilenceImageButton.hide();
+//            quickSilenceImageButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        eventListview.setSelectionFromTop(listViewIndex, 0);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setContentView(R.layout.activity_main);
+        drawEventListOrError();
+        setupAndDrawActionButtons();
+        // start the background service
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
+        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
+        final FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
+        if (Build.VERSION.SDK_INT >= 21) {
+            quickSilenceImageButton.setVisibility(View.INVISIBLE);
+            int cx = (quickSilenceImageButton.getLeft() + quickSilenceImageButton.getRight()) / 2;
+            int cy = (quickSilenceImageButton.getTop() + quickSilenceImageButton.getBottom()) / 2;
+
+            // get the final radius for the clipping circle
+            int finalRadius = quickSilenceImageButton.getWidth();
+
+            // create and start the animator for this view
+            // (the start radius is zero)
+            //TODO triggers illegal state exception
+            quickSilenceImageButton.setVisibility(View.VISIBLE);
+//            Animator anim =
+//                    ViewAnimationUtils.createCircularReveal(quickSilenceImageButton, cx, cy, 0, finalRadius);
+//            anim.start();
+        } else {
+            quickSilenceImageButton.setVisibility(View.VISIBLE);
+            quickSilenceImageButton.show();
+        }
+    }
+
+    private void drawEventListOrError() {
+        setupListView();
+        setupErrorMessage();
+
+        if (databaseInterface.isDatabaseEmpty()) {
+            hideEventList();
+            drawError();
+        } else {
+            hideError();
+            drawEventList();
+        }
+    }
+
+    private void setupAndDrawActionButtons() {
+        setupActionButtons();
+        drawActionButton();
+    }
+
     private void setupListView() {
         eventListview = (ListView) findViewById(R.id.eventListView);
         eventListview.setFadingEdgeLength(32);
-        eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_item_future_background));
+        eventListview.setBackgroundColor(getResources().getColor(R.color.event_list_background));
         cursor = databaseInterface.getEventCursor();
         cursorAdapter = new EventCursorAdapter(this, cursor);
         eventListview.setAdapter(cursorAdapter);
-        eventListview.setOnItemClickListener(this);
-        eventListview.setOnItemLongClickListener(this);
     }
 
     private void setupErrorMessage() {
@@ -211,7 +287,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         if (!shouldAllCalendarsBeSynced && selectedCalendarsIsEmpty) {
             errorText = getString(R.string.list_error_no_calendars);
         } else if ((prefs.shouldAllCalendarsBeSynced() || !prefs.getSelectedCalendarsIds().isEmpty()) && databaseInterface.isDatabaseEmpty()) {
-            errorText = String.format(getString(R.string.main_error_no_events), prefs.getLookaheadDays().string);
+            errorText = String.format(getString(R.string.main_error_no_events), prefs.getLookaheadDays().injectString);
         }
         noEventsTv.setText(errorText);
     }
@@ -255,6 +331,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     private void setupActionButtons() {
         final FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
         quickSilenceImageButton.attachToListView(eventListview);
+        if (Build.VERSION.SDK_INT < 21) {
+            //a shadow will be applied automatically on api versions >= 21, otherwise we have to
+            //emulate one here
+            quickSilenceImageButton.setShadow(true);
+        }
 
         quickSilenceImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,7 +344,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
                 quickSilenceImageButton.hide();
                 quickSilenceImageButton.setVisibility(View.GONE);
 
-                ServiceStateManager ssManager = new ServiceStateManager(getApplicationContext());
+                ServiceStateManager ssManager = ServiceStateManager.getInstance(getApplicationContext());
                 if (ssManager.isQuicksilenceActive()) {
                     stopOngoingQuicksilence();
                     drawStartQuicksilenceActionButton();
@@ -281,7 +362,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
     private void drawActionButton() {
         FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
-        ServiceStateManager ssManager = new ServiceStateManager(this);
+        ServiceStateManager ssManager = ServiceStateManager.getInstance(getApplicationContext());
 
         if (ssManager.isQuicksilenceActive()) {
             drawStopQuicksilenceActionButton();
@@ -308,7 +389,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
         quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_quicksilence_normal));
         quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_quicksilence_pressed));
-        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_silent));
+        Drawable quicksilenceDrawable = getResources().getDrawable(R.drawable.fab_silent);
+        quicksilenceDrawable.mutate().setColorFilter(getResources()
+                .getColor(R.color.fab_quicksilence_icon_tint), PorterDuff.Mode.MULTIPLY);
+        quickSilenceImageButton.setImageDrawable(quicksilenceDrawable);
     }
 
     private void startQuicksilence() {
@@ -322,40 +406,30 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
         quickSilenceImageButton.setColorNormal(getResources().getColor(R.color.fab_stop_normal));
         quickSilenceImageButton.setColorPressed(getResources().getColor(R.color.fab_stop_pressed));
-        quickSilenceImageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_state_normal));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        listViewIndex = eventListview.getFirstVisiblePosition();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        eventListview.setSelectionFromTop(listViewIndex, 0);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        setContentView(R.layout.activity_main);
-        drawEventListOrError();
-        setupAndDrawActionButtons();
+        Drawable quicksilenceDrawable = getResources().getDrawable(R.drawable.fab_normal);
+        quicksilenceDrawable.mutate().setColorFilter(getResources()
+                .getColor(R.color.fab_stop_icon_tint), PorterDuff.Mode.MULTIPLY);
+        quickSilenceImageButton.setImageDrawable(quicksilenceDrawable);
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem upgrade = menu.findItem(R.id.action_buy_upgrade);
+        Authenticator authenticator = new Authenticator(this);
+        if (authenticator.isAuthenticated()) {
+            upgrade.setVisible(false);
+        } else {
+            upgrade.setVisible(true);
+        }
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_buy_upgrade:
-                Intent buyNowActivityIntent = new Intent(this, InAppBillingActivity.class);
+                Intent buyNowActivityIntent = new Intent(this, ProUpgradeActivity.class);
                 buyNowActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(buyNowActivityIntent);
                 return true;
@@ -381,52 +455,9 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        try {
-            EventInstance thisEvent = databaseInterface.getEvent(id);
-            //we want the ringer to cycle to the next visible ringer, so if the event does
-            //not have a ringer set we jump to the next based on what the event manager provides
-            RingerType nextRingerType;
-            if (thisEvent.getRingerType() == RingerType.UNDEFINED) {
-                EventManager eventManager = new EventManager(this, thisEvent);
-                RingerType currentRinger = eventManager.getBestRinger();
-                nextRingerType = currentRinger.getNext();
-            } else {
-                nextRingerType = thisEvent.getRingerType().getNext();
-            }
-
-            databaseInterface.setRingerForInstance((int) id, nextRingerType);
-            eventListview.getAdapter().getView(position, view, eventListview);
-
-            // since the database has changed we need to wake the service
-            AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
-            alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
-        } catch (NoSuchEventInstanceException e) {
-            // if the selected event is no longer in the DB, then we need to remove it from the list
-            // view, since this might also be the only item in the list we will use the broadcast
-            // receiver to manage the transition
-            dataSetManager.broadcastDataSetChangedMessage();
-        }
-    }
-
     private void removeListViewEvent(View view) {
         cursor = databaseInterface.getEventCursor();
         cursorAdapter.swapCursor(cursor);
         cursorAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        try {
-            EventInstance event = databaseInterface.getEvent((int) id);
-
-            android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-            EventDetailsFragment dialogFragment = EventDetailsFragment.newInstance(event);
-            dialogFragment.show(fm, EventDetailsFragment.TAG);
-        } catch (NoSuchEventInstanceException e) {
-            Log.d(TAG, "unable to find event with id " + id);
-        }
-        return true;
     }
 }
