@@ -9,6 +9,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.ciasaboark.tacere.database.DataSetManager;
@@ -16,7 +17,6 @@ import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerType;
-import org.ciasaboark.tacere.manager.ActiveEventManager;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.NotificationManagerWrapper;
 import org.ciasaboark.tacere.manager.RingerStateManager;
@@ -28,6 +28,7 @@ import java.util.Deque;
 
 public class EventSilencerService extends IntentService {
     public static final String QUICKSILENCE_DURATION = "duration";
+    public static final String WAKE_REASON = "wake_reason";
     private static final String TAG = "EventSilencerService";
     private static final long TEN_SECONDS = 10000;
     private static Prefs prefs;
@@ -58,13 +59,13 @@ public class EventSilencerService extends IntentService {
         notificationManager = new NotificationManagerWrapper(this);
         ringerStateManager = new RingerStateManager(this);
         volumesManager = new VolumesManager(this);
-        stateManager = new ServiceStateManager(this);
+        stateManager = ServiceStateManager.getInstance(this);
         databaseInterface = DatabaseInterface.getInstance(this);
 
         // pull extra info (if any) from the incoming intent
         RequestTypes requestType = RequestTypes.NORMAL;
         if (intent.getExtras() != null) {
-            requestType = (RequestTypes) intent.getSerializableExtra(AlarmManagerWrapper.WAKE_REASON);
+            requestType = (RequestTypes) intent.getSerializableExtra(WAKE_REASON);
         }
         Log.d(TAG, "waking for request type: " + requestType.toString());
 
@@ -77,12 +78,14 @@ public class EventSilencerService extends IntentService {
                 //sync the calendar database and schedule an immediate restart
                 databaseInterface.syncCalendarDb();
                 scheduleServiceRestart();
+                notifyCursorAdapterDataChanged();
                 break;
             case SETTINGS_CHANGED:
                 //the user might have selected different calendars or changed some other settings
                 //update the database and restart
                 databaseInterface.syncCalendarDb();
                 scheduleServiceRestart();
+                notifyCursorAdapterDataChanged();
                 break;
             case QUICKSILENCE:
                 // we should never get a quicksilence request with a zero or negative duration
@@ -98,7 +101,11 @@ public class EventSilencerService extends IntentService {
                 cancelQuickSilence();
                 break;
             case NORMAL:
-                syncDatabaseIfEmpty();
+                if (!prefs.shouldAllCalendarsBeSynced() && prefs.getSelectedCalendarsIds().isEmpty()) {
+                    Log.d(TAG, "no calendars have been selected, skipping sync");
+                } else {
+                    syncDatabaseIfEmpty();
+                }
                 if (prefs.isServiceActivated() && !stateManager.isQuicksilenceActive()) {
                     checkForActiveEventsAndSilence();
                 } else { // normal wake requests (but service is marked to be inactive)
@@ -117,8 +124,10 @@ public class EventSilencerService extends IntentService {
      */
     private void firstWake() {
         ringerStateManager.clearStoredRingerState();
+        volumesManager.clearStoredVolumes();
         stateManager.resetServiceState();
         databaseInterface.syncCalendarDb();
+        notifyCursorAdapterDataChanged();
         // since the state is saved in a SharedPreferences file it can become out of sync
         // if the device restarts. To solve this set the service as not active, then schedule an
         // immediate restart to look for active events
@@ -130,6 +139,11 @@ public class EventSilencerService extends IntentService {
         if (stateManager.isQuicksilenceNotActive()) {
             alarmManager.scheduleImmediateAlarm(RequestTypes.NORMAL);
         }
+    }
+
+    private void notifyCursorAdapterDataChanged() {
+        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
+        dsm.broadcastDataSetChangedMessage();
     }
 
     private void quickSilence(int durationMinutes) {
@@ -149,6 +163,7 @@ public class EventSilencerService extends IntentService {
         ringerStateManager.setPhoneRinger(RingerType.SILENT);
         vibrate();
         notificationManager.displayQuickSilenceNotification(durationMinutes);
+        sendQuicksilenceBroadcast();
     }
 
     /**
@@ -162,11 +177,13 @@ public class EventSilencerService extends IntentService {
         vibrate();
         // schedule an immediate normal wakeup
         alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
+        sendQuicksilenceBroadcast();
     }
 
     private void syncDatabaseIfEmpty() {
         if (databaseInterface.isDatabaseEmpty()) {
             databaseInterface.syncCalendarDb();
+            notifyCursorAdapterDataChanged();
         }
     }
 
@@ -176,7 +193,6 @@ public class EventSilencerService extends IntentService {
         for (EventInstance event : events) {
             if (shouldEventSilence(event)) {
                 foundEvent = true;
-                ActiveEventManager.setActiveEvent(event);
                 silenceForEventAndShowNotification(event);
                 break;
             }
@@ -187,7 +203,6 @@ public class EventSilencerService extends IntentService {
             //restarted when the last active checked event ends. If there were no active events,
             //then we need to sleep until the next event in the database starts.  If there are no
             //events in the database either, then just sleep for 24 hours.
-            ActiveEventManager.removeActiveEvent();
             if (stateManager.isEventActive()) {
                 vibrate();
                 stateManager.resetServiceState();
@@ -237,6 +252,11 @@ public class EventSilencerService extends IntentService {
         vibrator.vibrate(pattern, -1);
     }
 
+    private void sendQuicksilenceBroadcast() {
+        Intent intent = new Intent("quicksilence");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     private boolean shouldEventSilence(EventInstance event) {
         boolean eventShouldSilence = false;
         EventManager eventManger = new EventManager(this, event);
@@ -248,35 +268,37 @@ public class EventSilencerService extends IntentService {
     }
 
     private void silenceForEventAndShowNotification(EventInstance event) {
+        //only vibrate if we are transitioning from no event active to an active event
+        long oldEventId = stateManager.getActiveEventId();
+        if (!stateManager.isEventActive()) {
+            vibrate();
+        } else {
+            DataSetManager dataSetManager = new DataSetManager(this, this);
+            long id = stateManager.getActiveEventId();
+            dataSetManager.broadcastDataSetChangedForId(id);
+        }
+
+        stateManager.resetServiceState();
+        stateManager.setActiveEvent(event);
         ringerStateManager.storeRingerStateIfNeeded();
+        volumesManager.storeVolumesIfNeeded();
 
         EventManager eventManager = new EventManager(this, event);
         RingerType bestRinger = eventManager.getBestRinger();
         ringerStateManager.setPhoneRinger(bestRinger);
-
         volumesManager.silenceMediaAndAlarmVolumesIfNeeded();
-        //only vibrate if we are transitioning from no event active to an active event
-        if (!stateManager.isEventActive()) {
-            vibrate();
-        }
 
-        //we only need to send a notification if the new active event is not the same as the old
-        if (stateManager.getActiveEventId() == event.getId()) {
-            notifyCursorAdapterDataChanged();
-        }
-        stateManager.resetServiceState();
-        stateManager.setEventActive(event);
+        //nofity the listview that both the old event and the new event rows should be updated
+        DataSetManager dataSetManager = new DataSetManager(this, this);
+        dataSetManager.broadcastDataSetChangedForId(oldEventId);
+        dataSetManager.broadcastDataSetChangedForId(event.getEventId());
+
         notificationManager.displayEventNotification(event);
         // the extra ten seconds is to make sure that the event ending is pushed into the
         // correct minute
         long wakeAt = event.getEnd()
                 + (EventInstance.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
         alarmManager.scheduleNormalWakeAt(wakeAt);
-    }
-
-    private void notifyCursorAdapterDataChanged() {
-        DataSetManager dsm = new DataSetManager(this, getApplicationContext());
-        dsm.broadcastDataSetChangedMessage();
     }
 
     private void shutdown() {
