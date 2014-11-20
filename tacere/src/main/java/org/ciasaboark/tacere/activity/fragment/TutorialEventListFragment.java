@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.event.EventInstance;
+import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.view.EventListItem;
 
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ public class TutorialEventListFragment extends Fragment {
                 layout, container, false);
 
         eventTitles.add("Meeting with Tom");
-        eventTitles.add("Vacation");
         eventTitles.add("Yoga");
         eventTitles.add("Super secret spy mission");
+        eventTitles.add("Mission to Mars");
 
         renderEventListItems();
         return rootView;
@@ -59,9 +60,11 @@ public class TutorialEventListFragment extends Fragment {
                 getResources().getColor(R.color.tutorial_event_default),
                 false, false);
         defaultEvent.setLocation("Somewhere USA");
+        defaultEvent.setRingerType(RingerType.IGNORE);
         EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.default_event);
         eventListItem.setEvent(defaultEvent);
         eventListItem.setCalendarTitle("Primary calendar");
+        eventListItem.refresh();
     }
 
     private void renderActiveEvent() {
@@ -69,7 +72,7 @@ public class TutorialEventListFragment extends Fragment {
         EventInstance defaultEvent = new EventInstance(1, -1, -1,
                 eventTitle,
                 NOW,
-                NOW + EventInstance.MILLISECONDS_IN_DAY,
+                NOW + EventInstance.MILLISECONDS_IN_MINUTE * 75,
                 "A default item",
                 getResources().getColor(R.color.tutorial_event_active),
                 false, false);
@@ -77,12 +80,13 @@ public class TutorialEventListFragment extends Fragment {
         eventListItem.setCalendarTitle("Work calendar");
         eventListItem.setIsActiveEvent(true);
         eventListItem.setEvent(defaultEvent);
+        eventListItem.refresh();
     }
 
     private void renderFutureEvent() {
         String eventTitle = getRandomTitle();
         long begin = NOW + EventInstance.MILLISECONDS_IN_DAY * 3;
-        long end = begin + EventInstance.MILLISECONDS_IN_DAY;
+        long end = begin + EventInstance.MILLISECONDS_IN_MINUTE * 45;
         EventInstance defaultEvent = new EventInstance(1, -1, -1,
                 eventTitle,
                 begin,
@@ -91,10 +95,12 @@ public class TutorialEventListFragment extends Fragment {
                 getResources().getColor(R.color.tutorial_event_future),
                 false, false);
         defaultEvent.setLocation("CCT room 403");
+        defaultEvent.setRingerType(RingerType.NORMAL);
         EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.future_event);
         eventListItem.setIsFutureEvent(true);
         eventListItem.setCalendarTitle("Vacation time");
         eventListItem.setEvent(defaultEvent);
+        eventListItem.refresh();
     }
 
     private String getRandomTitle() {
