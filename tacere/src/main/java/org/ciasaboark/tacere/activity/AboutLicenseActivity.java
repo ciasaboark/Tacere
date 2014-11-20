@@ -5,13 +5,11 @@
 
 package org.ciasaboark.tacere.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +18,12 @@ import android.webkit.WebViewClient;
 
 import org.ciasaboark.tacere.R;
 
-public class AboutLicenseActivity extends Activity {
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class AboutLicenseActivity extends ActionBarActivity {
     private static final String TAG = "AboutLicenseActivity";
 
     @Override
@@ -30,13 +33,29 @@ public class AboutLicenseActivity extends Activity {
         // Show the Up button in the action bar.
         setupActionBar();
 
-        Drawable upIcon = getResources().getDrawable(R.drawable.copyright_icon);
-        int c = getResources().getColor(R.color.header_text_color);
-        upIcon.mutate().setColorFilter(c, PorterDuff.Mode.MULTIPLY);
-        getActionBar().setIcon(upIcon);
-
         WebView wv = (WebView) findViewById(R.id.webView1);
-        wv.loadUrl("file:///android_asset/license.html");
+
+        String htmlData = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("license.html")));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                htmlData += line;
+            }
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        int colorInt = getResources().getColor(R.color.link_color);
+        String hexColor = String.format("#%06X", (0xFFFFFF & colorInt));
+        while (htmlData.contains("LINKCOLOR")) {
+            htmlData = htmlData.replace("LINKCOLOR", hexColor);
+        }
+
+        wv.loadData(htmlData, "text/html", "UTF8");
 
         // All links should open in the default browser, not this WebView
         wv.setWebViewClient(new WebViewClient() {
@@ -56,12 +75,11 @@ public class AboutLicenseActivity extends Activity {
      */
     private void setupActionBar() {
         try {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(R.drawable.copyright_icon);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
         } catch (NullPointerException e) {
             Log.e(TAG, "unable to setup action bar");
         }
-
     }
 
     @Override
