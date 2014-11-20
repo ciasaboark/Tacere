@@ -16,6 +16,7 @@ import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 
 public class SkipEventService extends IntentService {
+    public static final String EVENT_ID_TAG = "eventId";
     private static final String TAG = "SkipEventService";
 
     public SkipEventService() {
@@ -29,7 +30,7 @@ public class SkipEventService extends IntentService {
 
         if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            long eventId = b.getLong("org.ciasaboark.tacere.eventId", -1);
+            long eventId = b.getLong(EVENT_ID_TAG, -1);
             if (eventId != -1) {
                 DatabaseInterface dbIface = DatabaseInterface.getInstance(ctx);
                 dbIface.setRingerForInstance(eventId, RingerType.IGNORE);
