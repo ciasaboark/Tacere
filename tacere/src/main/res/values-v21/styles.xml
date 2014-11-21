@@ -3,29 +3,15 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
+
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
-        <item name="android:textColor">@color/textcolor</item>
-        <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="android:actionMenuTextColor">@color/textColorMenu</item>
-        <!--<item name="android:actionMenuTextAppearance">@color/menu_text</item>-->
-        <item name="android:colorPrimary">@color/primary</item>
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorAccent">@color/accent</item>
-    </style>
-
-    <style name="Dialog" parent="android:Theme.Material.Light.Dialog">
-        <item name="android:textColor">@color/textcolor</item>
-        <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="android:actionMenuTextColor">@color/textColorMenu</item>
-        <!--<item name="android:actionMenuTextAppearance">@color/menu_text</item>-->
-        <item name="android:colorPrimary">@color/primary</item>
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorAccent">@color/accent</item>
-    </style>
-
-    <style name="CustomAlertDialog" parent="@android:style/Theme.Dialog">
-
+    <style name="DialogNoTitle" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <!--<item name="android:windowBackground">@color/dialog_background</item>-->
+        <!--<item name="android:textColor">@color/text_color_alt</item>-->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>

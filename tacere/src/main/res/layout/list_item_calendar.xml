@@ -63,6 +63,7 @@
             android:background="@drawable/blank"
             android:clickable="false"
             android:focusable="false"
+            android:tint="@color/icon_tint"
             android:visibility="gone"/>
 
         <ImageView
@@ -74,7 +75,7 @@
             android:clickable="true"
             android:padding="8dp"
             android:src="@drawable/action_settings"
-            android:tint="@color/primary"/>
+            android:tint="@color/icon_tint"/>
     </LinearLayout>
 
     <LinearLayout

@@ -4,8 +4,8 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
     <LinearLayout
 
@@ -34,21 +34,21 @@
                     android:layout_height="wrap_content"
                     android:text="@string/settings_section_service_toggle"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/header_text_color" />
+                    android:textColor="@color/header_text_color"/>
             </LinearLayout>
 
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/activateServiceSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:checked="true"
-                android:clickable="false" />
+                android:clickable="false"/>
 
         </RelativeLayout>
 
-        <View style="@style/Divider" />
+        <View style="@style/Divider"/>
 
 
         <ScrollView

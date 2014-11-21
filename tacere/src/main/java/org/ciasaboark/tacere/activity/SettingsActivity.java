@@ -12,15 +12,15 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
@@ -30,17 +30,17 @@ import org.ciasaboark.tacere.activity.fragment.MainSettingsFragment;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 
-public class SettingsActivity extends FragmentActivity implements MainSettingsFragment.OnSelectCalendarsListener {
+public class SettingsActivity extends ActionBarActivity implements MainSettingsFragment.OnSelectCalendarsListener {
     @SuppressWarnings("unused")
     private static final String TAG = "Settings";
-    private final Prefs prefs = new Prefs(this);
+    private Prefs prefs;
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
+        prefs = new Prefs(this);
         if (savedInstanceState == null) {
             context = this;
             // Show the Up button in the action bar.
@@ -56,16 +56,13 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         }
     }
 
-    public void onPause() {
-        super.onPause();
-    }
-
     /**
      * Set up the {@link android.app.ActionBar}.
      */
     private void setupActionBar() {
         try {
-            getActionBar().setIcon(R.drawable.action_settings);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
         } catch (NullPointerException e) {
             Log.e(TAG, "unable to setup action bar");
         }
@@ -84,7 +81,7 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
 
     private void drawServiceWidget() {
         //the service state toggle
-        Switch serviceActivatedSwitch = (Switch) findViewById(id.activateServiceSwitch);
+        SwitchCompat serviceActivatedSwitch = (SwitchCompat) findViewById(id.activateServiceSwitch);
         if (prefs.isServiceActivated()) {
             serviceActivatedSwitch.setChecked(true);
         } else {
@@ -123,6 +120,10 @@ public class SettingsActivity extends FragmentActivity implements MainSettingsFr
         }
 
 
+    }
+
+    public void onPause() {
+        super.onPause();
     }
 
     public void onFragmentInteraction(Uri uri) {

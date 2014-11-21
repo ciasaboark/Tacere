@@ -7,21 +7,21 @@ package org.ciasaboark.tacere.manager;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.util.Log;
 
 import org.ciasaboark.tacere.prefs.Prefs;
 
 public class VolumesManager {
     private static final int MAX_MEDIA_VOLUME = 15;
     private static final int MAX_ALARM_VOLUME = 7;
+    private static final String TAG = "VolumesManager";
 
     private Context context;
     private Prefs prefs;
-    private RingerStateManager ringerState;
 
     public VolumesManager(Context ctx) {
         this.context = ctx;
         this.prefs = new Prefs(ctx);
-        this.ringerState = new RingerStateManager(ctx);
     }
 
     public static int getMaxMediaVolume() {
@@ -35,50 +35,75 @@ public class VolumesManager {
 
     public void restoreVolumes() {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        switch (ringerState.getStoredRingerState()) {
-            case NORMAL:
-                audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
-            case SILENT:
-                audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                break;
-            case VIBRATE:
-                audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-                break;
-            default:
-                // by default the ringer will be set back to normal
-                audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        }
-
-        ringerState.clearStoredRingerState();
         restoreAlarmVolume();
         restoreMediaVolume();
+        clearStoredVolumes();
     }
 
     private void restoreAlarmVolume() {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int storedAlarmVolume = prefs.getStoredAlarmVolume();
-        audio.setStreamVolume(AudioManager.STREAM_ALARM, storedAlarmVolume, 0);
+        if (!hasAlarmVolumeBeenStored()) {
+            Log.w(TAG, "asked to restore alarm volume when none has been previously stored");
+        } else {
+            audio.setStreamVolume(AudioManager.STREAM_ALARM, storedAlarmVolume, 0);
+        }
     }
 
     private void restoreMediaVolume() {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int storedMediaVolume = prefs.getStoredMediaVolume();
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, storedMediaVolume, 0);
+        if (!hasMediaVolumeBeenStored()) {
+            Log.w(TAG, "asked to restore media volume when none has been previously stored");
+        } else {
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, storedMediaVolume, 0);
+        }
+    }
 
+    public void clearStoredVolumes() {
+        prefs.storeAlarmVolume(-1);
+        prefs.storeMediaVolume(-1);
+    }
+
+    private boolean hasAlarmVolumeBeenStored() {
+        return getStoredAlarmVolume() != -1;
+    }
+
+    private boolean hasMediaVolumeBeenStored() {
+        return getStoredMediaVolume() != -1;
+    }
+
+    private int getStoredAlarmVolume() {
+        return prefs.getStoredAlarmVolume();
+    }
+
+    private int getStoredMediaVolume() {
+        return prefs.getStoredMediaVolume();
     }
 
     public void silenceMediaAndAlarmVolumesIfNeeded() {
         // change media volume, and alarm volume
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (prefs.shouldMediaVolumeBeSilenced()) {
-            storeMediaVolume();
             audio.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+        } else {
+            restoreMediaVolume();
         }
 
         if (prefs.shouldAlarmVolumeBeSilenced()) {
-            storeAlarmVolume();
             audio.setStreamVolume(AudioManager.STREAM_ALARM, 0, 0);
+        } else {
+            restoreAlarmVolume();
+        }
+    }
+
+    public void storeVolumesIfNeeded() {
+        //store the current media and alarm volumes if none are already set
+        if (!hasMediaVolumeBeenStored() && prefs.shouldMediaVolumeBeSilenced()) {
+            storeMediaVolume();
+        }
+        if (!hasAlarmVolumeBeenStored() && prefs.shouldAlarmVolumeBeSilenced()) {
+            storeAlarmVolume();
         }
     }
 

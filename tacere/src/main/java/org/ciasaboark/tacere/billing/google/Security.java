@@ -8,6 +8,8 @@ package org.ciasaboark.tacere.billing.google;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.ciasaboark.tacere.BuildConfig;
+
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -42,10 +44,15 @@ public class Security {
      * @param signedData      the signed JSON string (signed, not encrypted)
      * @param signature       the signature for the data, signed with the private key
      */
-    public static boolean verifyPurchase(String base64PublicKey, String signedData, String signature) {
-        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey) ||
+    public static boolean verifyPurchase(String base64PublicKey,
+                                         String signedData, String signature) {
+        if (TextUtils.isEmpty(signedData) ||
+                TextUtils.isEmpty(base64PublicKey) ||
                 TextUtils.isEmpty(signature)) {
             Log.e(TAG, "Purchase verification failed: missing data.");
+            if (BuildConfig.DEBUG) {
+                return true;
+            }
             return false;
         }
 

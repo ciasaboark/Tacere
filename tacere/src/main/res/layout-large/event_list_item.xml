@@ -25,7 +25,7 @@
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="italic"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <android.support.v7.widget.CardView
 

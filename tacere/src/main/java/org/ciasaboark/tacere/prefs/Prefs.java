@@ -30,57 +30,61 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
     private static final String TAG = "Prefs";
     private static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
     private static SharedPreferences sharedPreferences;
-    private static SharedPreferences.Editor editor;
-    private static Context context;
-//    private static SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private static SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private SharedPreferences.Editor editor;
+    private Context context;
 
     public Prefs(final Context ctx) {
-        if (this.context == null) {
-            this.context = ctx;
-        }
-        if (Prefs.sharedPreferences == null) {
-            Prefs.sharedPreferences = ctx.getSharedPreferences(PREFERENCES_NAME,
+        this.context = ctx;
+        if (sharedPreferences == null) {
+            sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME,
                     Context.MODE_PRIVATE);
-            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         }
 
-        if (Prefs.editor == null) {
-            editor = sharedPreferences.edit();
+        if (listener == null) {
+            listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    //the only preferences that we care to monitor changes on
+                    String[] preferences = {
+                            Keys.SILENCE_MEDIA,
+                            Keys.BUFFER_MINUTES,
+                            Keys.CALENDAR_RINGERS,
+                            Keys.DO_NOT_DISTURB,
+                            Keys.EVENT_RINGERS,
+                            Keys.IS_SERVICE_ACTIVATED,
+                            Keys.LOOKAHEAD_DAYS,
+                            Keys.RINGER_TYPE,
+                            Keys.SELECTED_CALENDARS,
+                            Keys.SILENCE_ALARM,
+                            Keys.SILENCE_ALL_DAY_EVENTS,
+                            Keys.SILENCE_FREE_TIME_EVENTS,
+                            Keys.SYNC_ALL_CALENDARS
+                    };
+                    //a few preferences get updated fairly often, it might be worth checking for them by
+                    // name to avoid the loop
+                    if (TextUtils.equals(key, ServiceStateManager.SERVICE_STATE_KEY)) {
+                        return;
+                    }
+
+                    for (String pref : preferences) {
+                        if (TextUtils.equals(pref, key)) {
+                            AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
+                            alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.SETTINGS_CHANGED);
+                            break;
+                        }
+                    }
+                }
+            };
+            sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
         }
 
+        this.editor = sharedPreferences.edit();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        //the only preferences that we care to monitor changes on
-        String[] preferences = {
-                Keys.SILENCE_MEDIA,
-                Keys.BUFFER_MINUTES,
-                Keys.CALENDAR_RINGERS,
-                Keys.DO_NOT_DISTURB,
-                Keys.EVENT_RINGERS,
-                Keys.IS_SERVICE_ACTIVATED,
-                Keys.LOOKAHEAD_DAYS,
-                Keys.RINGER_TYPE,
-                Keys.SELECTED_CALENDARS,
-                Keys.SILENCE_ALARM,
-                Keys.SILENCE_ALL_DAY_EVENTS,
-                Keys.SILENCE_FREE_TIME_EVENTS,
-                Keys.SYNC_ALL_CALENDARS
-        };
-        //a few preferences get updated fairly often, it might be worth checking for them by
-        // name to avoid the loop
-        if (TextUtils.equals(key, ServiceStateManager.SERVICE_STATE_KEY)) {
-            return;
-        }
 
-        for (String pref : preferences) {
-            if (TextUtils.equals(pref, key)) {
-                AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(context);
-                alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.SETTINGS_CHANGED);
-                break;
-            }
-        }
     }
 
     public List<Long> getSelectedCalendarsIds() {
@@ -439,19 +443,21 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
     }
 
     public int getStoredMediaVolume() {
-        return sharedPreferences.getInt(Keys.VOLUME_MEDIA, DefaultPrefs.MEDIA_VOLUME);
+        return sharedPreferences.getInt(Keys.VOLUME_MEDIA, -1);
     }
 
     public int getStoredAlarmVolume() {
-        return sharedPreferences.getInt(Keys.VOL, DefaultPrefs.ALARM_VOLUME);
+        return sharedPreferences.getInt(Keys.VOL, -1);
     }
 
     public boolean isFirstRun() {
-        return sharedPreferences.getBoolean(Keys.IS_FIRSTRUN, true);
+        SharedPreferences firstRunPreferences = context.getSharedPreferences("FIRSTRUN", Context.MODE_PRIVATE);
+        return firstRunPreferences.getBoolean(Keys.IS_FIRSTRUN, true);
     }
 
     public void disableFirstRun() {
-        editor.putBoolean(Keys.IS_FIRSTRUN, false).commit();
+        SharedPreferences firstRunPreferences = context.getSharedPreferences("FIRSTRUN", Context.MODE_PRIVATE);
+        firstRunPreferences.edit().putBoolean(Keys.IS_FIRSTRUN, false).commit();
     }
 
 

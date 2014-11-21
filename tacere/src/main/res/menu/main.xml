@@ -3,34 +3,35 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_buy_upgrade"
-        android:icon="@drawable/clock"
+        android:icon="@drawable/shopping_cart"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="buy upgrade"/>
+        android:title="@string/upgrade_to_pro"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_add_event"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_add_event"/>
+        android:title="@string/action_add_event"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/action_about"
         android:icon="@drawable/info_icon"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/main_action_about"/>
+        android:title="@string/main_action_about"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/main_action_settings"/>
+        android:title="@string/main_action_settings"
+        app:showAsAction="always"/>
 
 
 </menu>

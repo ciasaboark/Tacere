@@ -12,19 +12,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.AdvancedSettingsActivity;
+import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
@@ -97,7 +97,6 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
     public void drawAllWidgets() {
         drawCalendarWidgets();
         drawRingerWidgets();
-        drawDoNotDisturbWidgets();
         drawMediaWidgets();
         drawAlarmWidgets();
         drawAdvancedSettingsWidget();
@@ -127,7 +126,12 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         calendarBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onSelectCalendarsSelectedListener();
+                Authenticator authenticator = new Authenticator(context);
+                if (authenticator.isAuthenticated()) {
+                    mListener.onSelectCalendarsSelectedListener();
+                } else {
+                    authenticator.showUpgradeDialog();
+                }
 
             }
         });
@@ -201,37 +205,13 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         }
 
 
-        int iconColor = getResources().getColor(R.color.primary);
+        int iconColor = getResources().getColor(R.color.icon_tint);
         icon.mutate().setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
-        ringerDescriptionTV.setTextColor(getResources().getColor(R.color.textcolor));
-        ringerTV.setTextColor(getResources().getColor(R.color.textcolor));
+        ringerDescriptionTV.setTextColor(getResources().getColor(R.color.text_color));
+        ringerTV.setTextColor(getResources().getColor(R.color.text_color));
 
         ImageView ringerIcon = (ImageView) rootView.findViewById(R.id.settings_ringerIcon);
         ringerIcon.setImageDrawable(icon);
-    }
-
-    private void drawDoNotDisturbWidgets() {
-        RelativeLayout doNotDisturbBox = (RelativeLayout) rootView.findViewById(R.id.do_not_disturb_box);
-        doNotDisturbBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean doNotDisturbEnabled = prefs.getDoNotDisturb();
-                prefs.setDoNotDisturb(!doNotDisturbEnabled);
-                drawDoNotDisturbWidgets();
-            }
-        });
-
-        Switch doNotDisturbSwitch = (Switch) rootView.findViewById(R.id.doNotDisturbSwitch);
-        boolean isDoNotDisturbEnabled = prefs.getDoNotDisturb();
-        doNotDisturbSwitch.setChecked(isDoNotDisturbEnabled);
-
-        int apiLevelAvailable = Build.VERSION.SDK_INT;
-        RelativeLayout layout = (RelativeLayout) rootView.findViewById(R.id.do_not_disturb_box);
-        if (apiLevelAvailable >= 20) { //TODO this should be 21
-            layout.setVisibility(View.VISIBLE);
-        } else {
-            layout.setVisibility(View.GONE);
-        }
     }
 
     private void drawMediaWidgets() {
@@ -245,7 +225,7 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         });
 
         //the media volumes toggle
-        Switch mediaSwitch = (Switch) rootView.findViewById(R.id.adjustMediaCheckBox);
+        SwitchCompat mediaSwitch = (SwitchCompat) rootView.findViewById(R.id.adjustMediaCheckBox);
         if (prefs.shouldMediaVolumeBeSilenced()) {
             mediaSwitch.setChecked(true);
         } else {
@@ -264,7 +244,7 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
         });
 
         //the alarm volumes toggle
-        Switch alarmSwitch = (Switch) rootView.findViewById(R.id.adjustAlarmCheckBox);
+        SwitchCompat alarmSwitch = (SwitchCompat) rootView.findViewById(R.id.adjustAlarmCheckBox);
         alarmSwitch.setChecked(prefs.shouldAlarmVolumeBeSilenced());
     }
 

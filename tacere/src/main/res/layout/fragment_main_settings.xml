@@ -4,10 +4,10 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="org.ciasaboark.tacere.activity.fragment.MainSettingsFragment">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="org.ciasaboark.tacere.activity.fragment.MainSettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:background="@color/section_background"
             android:padding="16dp"
             android:text="@string/settings_section_general_title"
-            android:textColor="@color/section_text_color" />
+            android:textColor="@color/section_text_color"/>
 
         <RelativeLayout
             android:id="@+id/select_calendar_box"
@@ -38,7 +38,7 @@
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/calendar_calendar"
-                android:tint="@color/primary"/>
+                android:tint="@color/icon_tint"/>
 
             <TextView
                 android:id="@+id/calendar_text"
@@ -48,10 +48,10 @@
                 android:layout_toRightOf="@+id/calendar_icon"
                 android:paddingLeft="16dp"
                 android:text="@string/settings_section_general_select_calendars"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
         </RelativeLayout>
 
-        <View style="@style/Divider" />
+        <View style="@style/Divider"/>
 
         <RelativeLayout
             android:id="@+id/settings_ringerBox"
@@ -71,7 +71,7 @@
                 android:layout_marginRight="16dp"
                 android:clickable="false"
                 android:src="@drawable/ic_state_silent"
-                android:tint="@color/primary"/>
+                android:tint="@color/icon_tint"/>
 
             <TextView
                 android:id="@+id/settings_ringerTitle"
@@ -80,7 +80,7 @@
                 android:layout_toRightOf="@+id/settings_ringerIcon"
                 android:clickable="false"
                 android:text="@string/settings_section_general_ringer"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
                 android:id="@+id/ringerTypeDescription"
@@ -90,38 +90,11 @@
                 android:layout_toRightOf="@+id/settings_ringerIcon"
                 android:clickable="false"
                 android:text="@string/placeholder"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         </RelativeLayout>
 
-        <View style="@style/Divider" />
-
-        <RelativeLayout
-            android:id="@+id/do_not_disturb_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:padding="16dp">
-
-            <Switch
-                android:id="@+id/doNotDisturbSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/do_not_disturb_header"
-                android:layout_centerVertical="true"
-                android:checked="false"
-                android:clickable="false" />
-
-            <TextView
-                android:id="@+id/do_not_disturb_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_section_general_do_not_disturb"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </RelativeLayout>
+        <View style="@style/Divider"/>
 
         <TextView
             android:id="@+id/textView4"
@@ -130,7 +103,7 @@
             android:background="@color/section_background"
             android:padding="16dp"
             android:text="@string/settings_section_volumes_title"
-            android:textColor="@color/section_text_color" />
+            android:textColor="@color/section_text_color"/>
 
         <RelativeLayout
             android:id="@+id/settings_mediaBox"
@@ -147,15 +120,15 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/volume_media"
-                android:tint="@color/primary"/>
+                android:tint="@color/icon_tint"/>
 
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/adjustMediaCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:clickable="false" />
+                android:clickable="false"/>
 
             <TextView
                 android:id="@+id/settings_mediaText"
@@ -167,7 +140,7 @@
 
         </RelativeLayout>
 
-        <View style="@style/Divider" />
+        <View style="@style/Divider"/>
 
         <RelativeLayout
             android:id="@+id/settings_alarmBox"
@@ -183,16 +156,17 @@
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/volume_alarm"
-                android:tint="@color/primary"/>
+                android:tint="@color/icon_tint"
+                android:visibility="visible"/>
 
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/adjustAlarmCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerHorizontal="false"
                 android:layout_centerVertical="true"
-                android:clickable="false" />
+                android:clickable="false"/>
 
             <TextView
                 android:id="@+id/settings_alarmText"
@@ -218,7 +192,7 @@
                 android:background="@color/section_background"
                 android:padding="16dp"
                 android:text="@string/settings_section_advanced_title"
-                android:textColor="@color/section_text_color" />
+                android:textColor="@color/section_text_color"/>
 
             <LinearLayout
                 android:id="@+id/settings_advanced_settings_box"
@@ -234,18 +208,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_section_advanced_additional"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <TextView
                     android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/pref_advanced_sub"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
             </LinearLayout>
         </LinearLayout>
 
-        <View style="@style/Divider" />
+        <View style="@style/Divider"/>
 
     </LinearLayout>
 

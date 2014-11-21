@@ -17,11 +17,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.database.DataSetManager;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.database.NoSuchEventInstanceException;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 public class EventDetailsFragment extends DialogFragment {
     public static final String TAG = "EventLongClickFragment";
     DataSetManager dataSetManager;
+    Authenticator authenticator;
     private DatabaseInterface databaseInterface;
     private Prefs prefs;
     private EventInstance event;
@@ -60,6 +62,7 @@ public class EventDetailsFragment extends DialogFragment {
         dataSetManager = new DataSetManager(this, context);
         databaseInterface = DatabaseInterface.getInstance(context);
         prefs = new Prefs(context);
+        authenticator = new Authenticator(context);
 
         try {
             event = databaseInterface.getEvent(instanceId);
@@ -79,18 +82,18 @@ public class EventDetailsFragment extends DialogFragment {
 
         if (eventManager.getRingerSource() == RingerSource.EVENT_SERIES ||
                 eventManager.getRingerSource() == RingerSource.INSTANCE) {
-            dialogBuilder.setNeutralButton(R.string.clear, new DialogInterface.OnClickListener() {
+            dialogBuilder.setNegativeButton(R.string.clear, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialogInterface, int i) {
                     resetEvent();
                 }
             });
+
         }
 
-
-        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        dialogBuilder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(DialogInterface dialog, int which) {
                 //nothing to do here
             }
         });
@@ -127,12 +130,11 @@ public class EventDetailsFragment extends DialogFragment {
         }
 
         colorizeIcons();
-        drawIndicators();
 
-        ImageButton buttonNormal = (ImageButton) view.findViewById(R.id.imageButtonNormal);
-        ImageButton buttonVibrate = (ImageButton) view.findViewById(R.id.imageButtonVibrate);
-        ImageButton buttonSilent = (ImageButton) view.findViewById(R.id.imageButtonSilent);
-        ImageButton buttonIgnore = (ImageButton) view.findViewById(R.id.imageButtonIgnore);
+        ImageView buttonNormal = (ImageView) view.findViewById(R.id.imageButtonNormal);
+        ImageView buttonVibrate = (ImageView) view.findViewById(R.id.imageButtonVibrate);
+        ImageView buttonSilent = (ImageView) view.findViewById(R.id.imageButtonSilent);
+        ImageView buttonIgnore = (ImageView) view.findViewById(R.id.imageButtonIgnore);
         buttonNormal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,38 +165,74 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void resetEvent() {
-        if (databaseInterface.doesEventRepeat(event.getEventId())) {
-            long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
-            String positiveButtonText = getResources().getString(R.string.event_dialog_reset_all_instances_message);
-            Drawable icon = getResources().getDrawable(R.drawable.history);
-            icon.mutate().setColorFilter(
-                    getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.event_dialog_repeating_event_conformation_title)
-                    .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
-                    .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            resetAllEvents();
-                        }
-                    })
-                    .setNegativeButton(R.string.event_dialog_save_instance, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            resetEventInstance();
-                        }
-                    })
-                    .setIcon(icon);
-            AlertDialog dialog = builder.show();
-            Button seriesButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            if (seriesButton != null) {
-                seriesButton.setTextColor(getResources().getColor(R.color.accent));
+        boolean eventRepeats = databaseInterface.doesEventRepeat(event.getEventId());
+        boolean eventSeriesRingerSet = prefs.getRingerForEventSeries(event.getEventId()) != RingerType.UNDEFINED;
+        if (eventRepeats && eventSeriesRingerSet) {
+            if (event.getRingerType() == RingerType.UNDEFINED) {
+                //this event does not have an instance ringer set, the reset button should prompt that
+                //resetting will reset the entire event series
+                String message = getResources().getString(R.string.event_dialog_reset_event_series);
+                //if this events calendar has a custom ringer then notify the user that this is what
+                //we will drop back to, otherwize use the default ringer
+                if (prefs.getRingerForCalendar(event.getCalendarId()) != RingerType.UNDEFINED) {
+                    message = String.format(message, new String[]{"calendar"});
+                } else {
+                    message = String.format(message, new String[]{"default"});
+                }
+
+                Drawable icon = getResources().getDrawable(R.drawable.history);
+                icon.mutate().setColorFilter(
+                        getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.event_dialog_repeating_event_conformation_title)
+                        .setMessage(message)
+                        .setPositiveButton(R.string.event_dialog_reset_event_series_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                resetAllEvents();
+                            }
+                        })
+                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //nothing to do here
+                            }
+                        })
+                        .setIcon(icon);
+                AlertDialog dialog = builder.show();
+
+            } else {
+                //this event has instance and event series ringers set, prompt for which to reset
+                long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
+                String message = getResources().getString(R.string.event_dialog_reset_all_instances_message);
+                Drawable icon = getResources().getDrawable(R.drawable.history);
+                icon.mutate().setColorFilter(
+                        getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.event_dialog_repeating_event_conformation_title)
+                        .setMessage(String.format(message, event.getTitle(), eventRepetions))
+                        .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                resetAllEvents();
+                            }
+                        })
+                        .setNegativeButton(R.string.event_dialog_save_instance, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                resetEventInstance();
+                            }
+                        })
+                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //nothing to do here
+                            }
+                        })
+                        .setIcon(icon);
+                AlertDialog dialog = builder.show();
             }
 
-            Button instanceButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
-            if (instanceButton != null) {
-                instanceButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
-            }
         } else {
             resetEventInstance();
         }
@@ -206,7 +244,7 @@ public class EventDetailsFragment extends DialogFragment {
             String positiveButtonText = getResources().getString(R.string.event_dialog_save_all_instances_message);
             Drawable icon = getResources().getDrawable(R.drawable.history);
             icon.mutate().setColorFilter(
-                    getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
+                    getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                     .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
@@ -224,74 +262,29 @@ public class EventDetailsFragment extends DialogFragment {
                     })
                     .setIcon(icon);
             AlertDialog dialog = builder.show();
-            Button seriesButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            if (seriesButton != null) {
-                seriesButton.setTextColor(getResources().getColor(R.color.accent));
-            }
-
-            Button instanceButton = dialog.getButton(Dialog.BUTTON_NEGATIVE);
-            if (instanceButton != null) {
-                instanceButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
-            }
         } else {
             saveSettingsForEventInstance();
         }
     }
 
     private void colorizeIcons() {
-        HashMap<ImageButton, RingerType> buttons = new HashMap<ImageButton, RingerType>();
-        buttons.put((ImageButton) view.findViewById(R.id.imageButtonNormal), RingerType.NORMAL);
-        buttons.put((ImageButton) view.findViewById(R.id.imageButtonVibrate), RingerType.VIBRATE);
-        buttons.put((ImageButton) view.findViewById(R.id.imageButtonSilent), RingerType.SILENT);
-        buttons.put((ImageButton) view.findViewById(R.id.imageButtonIgnore), RingerType.IGNORE);
+        HashMap<ImageView, RingerType> buttons = new HashMap<ImageView, RingerType>();
+        buttons.put((ImageView) view.findViewById(R.id.imageButtonNormal), RingerType.NORMAL);
+        buttons.put((ImageView) view.findViewById(R.id.imageButtonVibrate), RingerType.VIBRATE);
+        buttons.put((ImageView) view.findViewById(R.id.imageButtonSilent), RingerType.SILENT);
+        buttons.put((ImageView) view.findViewById(R.id.imageButtonIgnore), RingerType.IGNORE);
 
-        for (ImageButton thisButton : buttons.keySet()) {
+        for (ImageView thisButton : buttons.keySet()) {
             thisButton.setImageDrawable(getColorizedIcon(buttons.get(thisButton)));
+            thisButton.invalidate();
         }
 
 
-    }
-
-    private void drawIndicators() {
-        LinearLayout indicatorNormal = (LinearLayout) view.findViewById(R.id.indicator_normal);
-        LinearLayout indicatorVibrate = (LinearLayout) view.findViewById(R.id.indicator_vibrate);
-        LinearLayout indicatorSilent = (LinearLayout) view.findViewById(R.id.indicator_silent);
-        LinearLayout indicatorIgnore = (LinearLayout) view.findViewById(R.id.indicator_ignore);
-
-        int colorActive = getResources().getColor(R.color.accent);
-        int colorInactive = getResources().getColor(R.color.primary);
-        RingerType ringerMode = event.getRingerType();
-
-        if (ringerMode == RingerType.NORMAL) {
-            indicatorNormal.setBackgroundColor(colorActive);
-        } else {
-            indicatorNormal.setBackgroundColor(colorInactive);
-        }
-
-        if (ringerMode == RingerType.VIBRATE) {
-            indicatorVibrate.setBackgroundColor(colorActive);
-        } else {
-            indicatorVibrate.setBackgroundColor(colorInactive);
-        }
-
-        if (ringerMode == RingerType.SILENT) {
-            indicatorSilent.setBackgroundColor(colorActive);
-        } else {
-            indicatorSilent.setBackgroundColor(colorInactive);
-        }
-
-        if (ringerMode == RingerType.IGNORE) {
-            indicatorIgnore.setBackgroundColor(colorActive);
-        } else {
-            indicatorIgnore.setBackgroundColor(colorInactive);
-        }
     }
 
     private void setRingerType(RingerType type) {
         positiveButton.setEnabled(true);
-        positiveButton.setTextColor(getResources().getColor(R.color.accent));
         event.setRingerType(type);
-        drawIndicators();
         colorizeIcons();
     }
 
@@ -308,12 +301,16 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     private void saveSettingsForAllEvents() {
-        prefs.unsetRingerTypeForEventSeries(event.getEventId());
-        databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
-                RingerType.UNDEFINED);
+        if (authenticator.isAuthenticated()) {
+            prefs.unsetRingerTypeForEventSeries(event.getEventId());
+            databaseInterface.setRingerForAllInstancesOfEvent(event.getEventId(),
+                    RingerType.UNDEFINED);
 
-        prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
-        dataSetManager.broadcastDataSetChangedMessage();
+            prefs.setRingerForEventSeries(event.getEventId(), event.getRingerType());
+            dataSetManager.broadcastDataSetChangedMessage();
+        } else {
+            authenticator.showUpgradeDialog();
+        }
     }
 
     private void saveSettingsForEventInstance() {
@@ -337,7 +334,7 @@ public class EventDetailsFragment extends DialogFragment {
                 colorizedIcon = getResources().getDrawable(R.drawable.ic_state_ignore);
         }
 
-        int color = getResources().getColor(R.color.primary);
+        int color = getResources().getColor(R.color.icon_tint);
         if (event.getRingerType() == ringerType) {
             color = getResources().getColor(R.color.accent);
         }
@@ -353,14 +350,6 @@ public class EventDetailsFragment extends DialogFragment {
         positiveButton = thisDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         if (positiveButton != null) {
             positiveButton.setEnabled(event.getRingerType() == RingerType.UNDEFINED ? false : true);
-            positiveButton.setTextColor(positiveButton.isEnabled() ?
-                    getResources().getColor(R.color.accent) :
-                    getResources().getColor(R.color.textColorDisabled));
-        }
-
-        Button negativeButton = thisDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.textColorDisabled));
         }
     }
 }

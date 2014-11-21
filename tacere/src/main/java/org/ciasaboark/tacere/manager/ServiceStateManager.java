@@ -14,11 +14,24 @@ public class ServiceStateManager {
     @SuppressWarnings("unused")
     public static final String SERVICE_STATE_KEY = "serviceState";
     private static final String TAG = "StateManager";
+    private static ServiceStateManager instance = null;
+    private static EventInstance activeEvent = null;
     private final Prefs prefs;
-    private EventInstance activeEvent = null;
 
-    public ServiceStateManager(Context ctx) {
+    private ServiceStateManager(Context ctx) {
         this.prefs = new Prefs(ctx);
+    }
+
+    public static ServiceStateManager getInstance(Context ctx) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("Context can not be null");
+        }
+
+        if (instance == null) {
+            instance = new ServiceStateManager(ctx);
+        }
+
+        return instance;
     }
 
     public void resetServiceState() {
@@ -35,7 +48,7 @@ public class ServiceStateManager {
     }
 
     public boolean isEventActive() {
-        return activeEvent == null &&
+        return activeEvent != null &&
                 ServiceStates.EVENT_ACTIVE.equals(getServiceState());
     }
 
@@ -66,22 +79,6 @@ public class ServiceStateManager {
         return storedString;
     }
 
-    public void setEventActive(EventInstance event) throws IllegalStateException {
-        if (event == null) {
-            throw new IllegalArgumentException("event can not be null");
-        }
-        if (isQuicksilenceActive()) {
-            throw new IllegalStateException("An event can not become active while quicksilence is still active");
-        }
-
-        activeEvent = event;
-        setServiceState(ServiceStates.EVENT_ACTIVE);
-    }
-
-    public boolean isQuicksilenceActive() {
-        return ServiceStates.QUICKSILENCE.equals(getServiceState());
-    }
-
     public boolean isEventNotActive() {
         return !isEventActive();
     }
@@ -108,6 +105,22 @@ public class ServiceStateManager {
 
     public EventInstance getActiveEvent() {
         return activeEvent;
+    }
+
+    public void setActiveEvent(EventInstance event) throws IllegalStateException {
+        if (event == null) {
+            throw new IllegalArgumentException("event can not be null");
+        }
+        if (isQuicksilenceActive()) {
+            throw new IllegalStateException("An event can not become active while quicksilence is still active");
+        }
+
+        activeEvent = event;
+        setServiceState(ServiceStates.EVENT_ACTIVE);
+    }
+
+    public boolean isQuicksilenceActive() {
+        return ServiceStates.QUICKSILENCE.equals(getServiceState());
     }
 
     public class ServiceStates {

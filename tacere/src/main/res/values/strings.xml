@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
@@ -21,6 +20,16 @@
     <string name="about_action_tutorial">Tutorial</string>
     <string name="about_action_license">License</string>
     <string name="about_version">Version %1$s</string>
+    <string name="about_list">
+            • Adjust your preferences for each event, or let Tacere silence everything by default.\n
+            • Tap an event to cycle the ringer state.\n
+            • Long press an event for additional settings.\n
+            • Select calendars to sync and set defaults\n
+    </string>
+    <string name="about_intro">Tacere automatically silences your phone whenever there is an active event in the calendar.</string>
+    <string name="about_source">Tacere is Open Source.  The code is hosted at <a href="http://www.github.com/ciasaboark/Tacere">GitHub</a>.</string>
+    <string name="about_bugs">Bugs and other issues can be reported via the <a href="https://github.com/ciasaboark/Tacere/issues">Issues</a> tab on the project website.</string>
+    <string name="about_comments">If you found Tacere useful or have a suggestion feel free to leave a comment on the <a href="https://play.google.com/store/apps/details?id=org.ciasaboark.tacere">Google Play Store</a> or send me an <a href="mailto:ciasaboark@gmail.com?subject=Tacere is so awesome, thank you so much!">email</a>.</string>
 
     <!-- About License Activity -->
     <string name="about_license_title">License/Credits</string>
@@ -61,6 +70,7 @@
     <!-- titles -->
     <string name="advanced_settings_section_events_title">Events</string>
     <string name="advanced_settings_section_intervals_title">Intervals</string>
+    <string name="advanced_settings_section_beta_title">Beta Settings</string>
     <!-- section events -->
     <string name="advanced_settings_section_events_available">Available Events</string>
     <string name="advanced_settings_section_events_available_enabled">Events marked as available will be silenced</string>
@@ -75,6 +85,9 @@
     <string name="advanced_settings_section_intervals_lookahead_duration">Events for the next %1$s will be fetched</string>
     <string name="advanced_settings_section_intervals_quicksilence">Adjust Quick Silence Duration</string>
     <string name="advanced_settings_section_interval_quicksilence_duration">Quick silencing will last for %1$s%2$d minutes</string>
+    <!-- section beta -->
+    <string name="advanced_settings_section_beta_largedisplay">Force large display</string>
+    <string name="advanced_settings_section_beta_largedisplay_description">Use the same event view as a tablet.  Not recommened for devices under 5 inches</string>
 
     <!-- Generics -->
     <string name="placeholder">Placeholder String</string>
@@ -107,8 +120,10 @@
     <string name="silent">Silent</string>
     <string name="event_dialog_save_all_instances_message">%1$s repeats %2$d times.\nSave this setting for all events in this series?</string>
     <string name="event_dialog_reset_all_instances_message">%1$s repeats %2$d times.\nWould you like to reset all events in this series?</string>
+    <string name="event_dialog_reset_event_series">Reset all events in this series to use the %1$s ringer?</string>
     <string name="event_dialog_save_instance">Just this one</string>
     <string name="event_dialog_save_all_instances">All events</string>
+    <string name="event_dialog_reset_event_series_ok">Reset Series</string>
     <string name="event_dialog_repeating_event_conformation_title">Apply to event series?</string>
 
     <!-- Updates Dialog -->
@@ -129,6 +144,7 @@
     <string name="notification_quicksilence_description">Silencing for %1$s%2$s. Touch to cancel.</string>
     <string name="notification_quicksilence_ticker">Quick Silence activating</string>
     <string name="notification_event_active_title">Tacere: Event active</string>
+    <string name="notification_event_active_title_public">Tacere: Active</string>
     <string name="notification_event_active_starting">Tacere event starting: </string>
     <string name="notification_event_skip">Ignore this event</string>
     <string name="notification_event_enable">Enable auto silencing</string>
@@ -152,35 +168,41 @@
     <string name="tutorial_button_skip">Skip</string>
     <!-- Ringer priority tutorial page -->
     <string name="tutorial_ringer_priority_title">Ringer Priorities</string>
-    <string name="tutorial_ringer_priority_intro">When an event starts I\'ll try to find the most appropriate way to adjust your device\'s ringer.  By default I\'ll put the device in silent mode.  This can be changed in settings.  Preferences can also be set on a per-calendar and per-event basis.  Repeating events can share settings, or have different settings for each instance.</string>
+    <string name="tutorial_ringer_priority_intro">When an event starts I\'ll try to find the most appropriate way to adjust your device\'s ringer.  By default I\'ll put the device in silent mode.  This can be changed in settings.</string>
     <string name="tutorial_ringer_priority_continued">If an event has more than one setting, I\'ll use the one that\'s closest to the event instance.</string>
     <string name="tutorial_ringer_priority_precedence">In order of increasing precedence I\'ll look for</string>
-    <string name="tutorial_ringer_priority_calendar">A calendar specific ringer</string>
-    <string name="tutorial_ringer_priority_series">An event series ringer</string>
+    <string name="tutorial_ringer_priority_calendar">A calendar specific ringer (Pro version)</string>
+    <string name="tutorial_ringer_priority_series">An event series ringer (Pro version)</string>
     <string name="tutorial_ringer_priority_instance">An event instance ringer.</string>
     <string name="tutorial_ringer_priority_final">If none of these are set, I\'ll use the default setting.</string>
 
     <!-- Welcome tutorial page -->
     <string name="tutorial_welcome_title">Welcome!</string>
     <string name="tutorial_welcome_intro">Tacere will automatically silence your device during calendar events.</string>
-    <string name="tutorial_welcome_details">By default I\'ll silence your device\'s ringer for all events that are not all day events or are not marked as available within the calendar.  Silencing will begin 5 minutes before an event begins, and last 5 after the event ends.  I\'ll post a notification whenever an event starts.</string>
+    <string name="tutorial_welcome_details">By default I\'ll silence your device\'s ringer for all events except those that are all day or those marked as \'available\' in the calendar.  Silencing will begin 5 minutes before an event begins, and last 5 after the event ends.  I\'ll post a notification whenever an event starts.</string>
     <string name="tutorial_welcome_skip">If these defaults sound good, feel free to skip this tutorial, otherwise swipe over for more details on what can be configured.</string>
 
     <!-- Event list tutorial page -->
     <string name="tutorial_event_list_title">Event List</string>
-    <string name="tutorial_event_list_main_description">The main view shows a list of current and upcoming calendar events. By default I\'ll show events from all calendars for the next week.  Calendars can be selected, and the period shown can be adjusted within settings.</string>
-    <string name="tutorial_event_list_item_description">Each item in the list represents a single event instance, so if an event repeats over multiple days I\'ll show a separate entry for each repetition.</string>
-    <string name="tutorial_event_list_item_description_continued">Each entry in the list will display the event\'s title, the beginning  and end date and time, and the ringer that will be applied when the event becomes active.</string>
-    <string name="tutorial_event_list_active_description">If an event is active its background will change color.</string>
-    <string name="tutorial_event_list_future_description">Events that do not start today are dimmed slightly.</string>
+    <string name="tutorial_event_list_main_description">By default I\'ll show events from all calendars for the next week.</string>
+    <string name="tutorial_event_list_item_description">Each item in the list represents a single occurrence, so if an event repeats over multiple days I\'ll show a separate entry for each repetition.</string>
+
+    <!-- Crash reporter tutorial page -->
+    <string name="tutorial_crash_report_title">Help Improve Tacere</string>
+    <string name="tutorial_crash_report_haiku">The code was willing\nIt considered your request,\nBut the chips were weak.</string>
+    <string name="tutorial_crash_report_description">Sending in crash reports will help me keep Tacere running smoothly on the myriad number of Android devices and versions.</string>
+    <string name="tutorial_crash_report_description_cont"> Bug reports include device and version information, no sensitive data is transferred.</string>
+    <string name="tutorial_crash_report_sample">See a sample report</string>
+    <string name="tutorial_crash_report_sample_title">Sample crash report</string>
+    <string name="tutorial_crash_report_checkbox">Send crash reports</string>
 
     <!-- Ringer sources tutorial page -->
-    <string name="tutorial_event_ringers_title">Event Ringers</string>
-    <string name="tutorial_event_ringers_default_description">The default ringer will be used if I can not find a more specific ringer for an event.  The default ringer can be changed in the settings.</string>
-    <string name="tutorial_event_ringers_calendar_description">Calendar specific ringers can be set within settings.  If an event belongs to a calendar that has a ringer set, then that ringer will be used instead of the default.</string>
-    <string name="tutorial_event_ringers_series_description">Repeating events can share a common ringer.  To set the ringer long press on any repeating event in the list and be sure to check \'Use for all repetitions of this event\'.</string>
-    <string name="tutorial_event_ringers_instance_description">The instance specific ringer can be toggled by tapping on an event, or by long pressing on an event and choosing a specific ringer.</string>
-    <string name="tutorial_event_ringers_ignore_description">By default I\'ll will ignore all day events and events that are marked as \'available\'.  These events will ignore the default and calendar specific ringers, but will silence if their event series or instance ringers have been set.</string>
+    <string name="tutorial_pro_title">Upgrade to Pro</string>
+    <string name="tutorial_pro_default_description">Upgrade to the pro version of Tacere to unlock additional features</string>
+    <string name="tutorial_pro_feature_calendar">Select which calendars to show, and set different ringers for each calendar</string>
+    <string name="tutorial_pro_feature_series">Set a ringer for a series of events</string>
+    <string name="tutorial_pro_feature_future">Pro version gets access to additional features as soon as they become available</string>
+    <string name="tutorial_pro_button_upgrade">Upgrade now</string>
 
     <!-- End tutorial page -->
     <string name="tutorial_end_title">Thats It!</string>
@@ -190,5 +212,11 @@
     <!-- Misc testing strings -->
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
     <string name="title_activity_in_app_billing">InAppBillingActivity</string>
+    <string name="title_activity_pro_upgrade">Upgrade to Pro</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_license_check_wrapper">"Tacere"</string>
+    <string name="upgrade_to_pro">Upgrade to Pro</string>
+    <string name="title_activity_beta_settings">BetaSettingsActivity</string>
+    <string name="toast_crash">Errors have occurred.\nWe won\'t tell you where or why.\nLazy programmers.</string>
 
 </resources>

@@ -13,6 +13,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,7 +84,7 @@ public class SelectCalendarsFragment extends Fragment {
     }
 
     private void drawSyncBoxSwitch() {
-        final Switch syncAllCalendarsSwitch = (Switch) rootView.findViewById(R.id.sync_all_calendars_switch);
+        final SwitchCompat syncAllCalendarsSwitch = (SwitchCompat) rootView.findViewById(R.id.sync_all_calendars_switch);
         syncAllCalendarsSwitch.setChecked(prefs.shouldAllCalendarsBeSynced());
     }
 
@@ -217,19 +217,6 @@ public class SelectCalendarsFragment extends Fragment {
             return row;
         }
 
-        private void drawCheckBox() {
-            CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
-            if (calendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                calendarCheckBox.setChecked(true);
-            } else {
-                calendarCheckBox.setChecked(false);
-            }
-
-            if (prefs.shouldAllCalendarsBeSynced()) {
-                calendarCheckBox.setEnabled(false);
-            }
-        }
-
         private void drawSidebar() {
             ImageView calendarSidebar = (ImageView) row.findViewById(R.id.calendar_sidebar);
             Drawable sideBarImage = (Drawable) getResources().getDrawable(R.drawable.sidebar).mutate();
@@ -246,9 +233,9 @@ public class SelectCalendarsFragment extends Fragment {
 
             int textColor;
             if (!calendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                textColor = getResources().getColor(R.color.textColorDisabled);
+                textColor = getResources().getColor(R.color.text_color_disabled);
             } else {
-                textColor = getResources().getColor(R.color.textcolor);
+                textColor = getResources().getColor(R.color.text_color);
             }
 
             calendarName.setTextColor(textColor);
@@ -259,7 +246,7 @@ public class SelectCalendarsFragment extends Fragment {
             ImageView calendarIcon = (ImageView) row.findViewById(R.id.configure_calendar_icon);
             int iconColor;
             if (calendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                iconColor = getResources().getColor(R.color.icon_enabled);
+                iconColor = getResources().getColor(R.color.icon_tint);
             } else {
                 iconColor = getResources().getColor(R.color.icon_disabled);
             }
@@ -295,7 +282,7 @@ public class SelectCalendarsFragment extends Fragment {
             Drawable settingsIcon = getResources().getDrawable(R.drawable.action_settings);
             int iconColor;
             if (calendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
-                iconColor = getResources().getColor(R.color.icon_enabled);
+                iconColor = getResources().getColor(R.color.icon_tint);
             } else {
                 iconColor = getResources().getColor(R.color.icon_disabled);
             }
@@ -370,6 +357,19 @@ public class SelectCalendarsFragment extends Fragment {
                     }
                 }
             });
+        }
+
+        private void drawCheckBox() {
+            CheckBox calendarCheckBox = (CheckBox) row.findViewById(R.id.calendar_checkbox);
+            if (calendar.isSelected() || prefs.shouldAllCalendarsBeSynced()) {
+                calendarCheckBox.setChecked(true);
+            } else {
+                calendarCheckBox.setChecked(false);
+            }
+
+            if (prefs.shouldAllCalendarsBeSynced()) {
+                calendarCheckBox.setEnabled(false);
+            }
         }
 
     }

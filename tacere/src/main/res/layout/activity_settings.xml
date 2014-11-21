@@ -3,8 +3,9 @@
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:id="@+id/linearlayout5"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
@@ -15,35 +16,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:elevation="@dimen/header_elevation"
         android:padding="16dp"
         android:theme="@style/Header_Switch">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/activateServiceDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="left"
+            android:text="@string/settings_section_service_toggle"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/header_text_color"/>
 
-            <TextView
-                android:id="@+id/activateServiceDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_section_service_toggle"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/header_text_color" />
-        </LinearLayout>
-
-        <Switch
+        <android.support.v7.widget.SwitchCompat
             android:id="@+id/activateServiceSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:layout_gravity="center|right"
             android:checked="true"
-            android:clickable="false" />
+            android:clickable="false"/>
 
     </RelativeLayout>
-
-    <View style="@style/Divider" />
 
 
     <ScrollView

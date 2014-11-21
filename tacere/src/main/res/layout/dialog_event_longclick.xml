@@ -29,13 +29,14 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:src="@drawable/calendar_calendar"
-                android:tint="@color/primary"/>
+                android:src="@drawable/calendar_instance"
+                android:tint="@color/icon_tint"/>
 
             <TextView
                 android:id="@+id/event_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:text="Event Name"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="24dp"
@@ -54,12 +55,13 @@
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/history"
-                android:tint="@color/primary"/>
+                android:tint="@color/icon_tint"/>
 
             <TextView
                 android:id="@+id/event_details_repetition_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:text="@string/placeholder"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -75,13 +77,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
-                android:src="@drawable/calendar_icon"
-                android:tint="@color/primary"/>
+                android:src="@drawable/calendar_calendar"
+                android:tint="@color/icon_tint"/>
 
             <TextView
                 android:id="@+id/calendar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:text="@string/placeholder"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
         </LinearLayout>
@@ -94,86 +97,35 @@
             android:layout_marginTop="16dp"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/linearLayout9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="16dp">
+            <ImageView
+                android:id="@+id/imageButtonNormal"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_state_normal"/>
 
-                <ImageButton
-                    android:id="@+id/imageButtonNormal"
-                    android:layout_width="48dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_state_normal"/>
+            <ImageView
+                android:id="@+id/imageButtonVibrate"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_state_vibrate"/>
 
-                <LinearLayout
-                    android:id="@+id/indicator_normal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/accent"
-                    android:orientation="horizontal"/>
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/imageButtonSilent"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_state_silent"
+                />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="16dp">
-
-                <ImageButton
-                    android:id="@+id/imageButtonVibrate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_state_vibrate"/>
-
-                <LinearLayout
-                    android:id="@+id/indicator_vibrate"
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/accent"
-                    android:orientation="horizontal"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingLeft="16dp">
-
-                <ImageButton
-                    android:id="@+id/imageButtonSilent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_state_silent"/>
-
-                <LinearLayout
-                    android:id="@+id/indicator_silent"
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/accent"
-                    android:orientation="horizontal"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="16dp">
-
-                <ImageButton
-                    android:id="@+id/imageButtonIgnore"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_state_ignore"/>
-
-                <LinearLayout
-                    android:id="@+id/indicator_ignore"
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/accent"
-                    android:orientation="horizontal"/>
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/imageButtonIgnore"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_state_ignore"
+                />
 
         </LinearLayout>
 

@@ -15,7 +15,6 @@ import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 public class AlarmManagerWrapper {
-    public static final String WAKE_REASON = "wake_reason";
     // requestCodes for the different pending intents
     private static final int RC_EVENT = 1;
     private static final int RC_QUICKSILENT = 2;
@@ -51,7 +50,7 @@ public class AlarmManagerWrapper {
             args = new Bundle();
         }
 
-        args.putSerializable(WAKE_REASON, type);
+        args.putSerializable(EventSilencerService.WAKE_REASON, type);
         i.putExtras(args);
 
         // note that the android alarm manager allows multiple pending intents to be scheduled per

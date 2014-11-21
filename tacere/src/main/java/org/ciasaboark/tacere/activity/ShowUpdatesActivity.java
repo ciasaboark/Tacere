@@ -6,77 +6,31 @@
 package org.ciasaboark.tacere.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 
 import org.ciasaboark.tacere.R;
-import org.ciasaboark.tacere.prefs.Prefs;
-import org.ciasaboark.tacere.versioning.Versioning;
+import org.ciasaboark.tacere.prefs.Updates;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class ShowUpdatesActivity extends Activity {
-    public static final String VERSION_PREFIX = "version-";
-    private Prefs prefs;
+    private static final String TAG = "ShowUpdatesActivity";
     private boolean showingUpdatesFromMainScreen = false;
-
-    public static void showUpdatesDialogIfNeeded(Context ctx) {
-        if (ctx == null) {
-            throw new IllegalArgumentException("Context can not be null");
-        }
-
-        Prefs staticPrefs = new Prefs(ctx);
-        if (staticPrefs.isFirstRun()) {
-            hideChangelogForCurrentAppVersion(ctx);
-        }
-
-        boolean showUpdates = shouldChangelogForCurrentAppVersionBeShown(ctx);
-        if (showUpdates) {
-            Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
-            updatesIntent.putExtra("initiator", "main"); //TODO need a better way of keeping track of who started this activity
-            ctx.startActivity(updatesIntent);
-        }
-    }
-
-    private static void hideChangelogForCurrentAppVersion(Context ctx) {
-        Prefs staticPrefs = new Prefs(ctx);
-        staticPrefs.storePreference(VERSION_PREFIX + Versioning.getVersionCode(), false);
-    }
-
-    private static boolean shouldChangelogForCurrentAppVersionBeShown(Context ctx) {
-        if (ctx == null) {
-            throw new IllegalArgumentException("context can not be null");
-        }
-
-        //if this is the first run then disable showing the updates dialog for the current version
-        Prefs staticPrefs = new Prefs(ctx);
-        if (staticPrefs.isFirstRun()) {
-            hideChangelogForCurrentAppVersion(ctx);
-        }
-
-        boolean shouldChangelogBeShown = false;
-        //the updates dialog should be shown if no value has been stored for the current app version
-        try {
-            staticPrefs.getBoolean(VERSION_PREFIX + Versioning.getVersionCode());
-        } catch (IllegalArgumentException e) {
-            shouldChangelogBeShown = true;
-        }
-
-        return shouldChangelogBeShown;
-    }
-
-    public static void showUpdatesDialog(Context ctx) {
-        Intent updatesIntent = new Intent(ctx, ShowUpdatesActivity.class);
-        ctx.startActivity(updatesIntent);
-    }
+    private Updates updates;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        prefs = new Prefs(this);
+        updates = new Updates(this, this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_updates);
         Intent i = getIntent();
@@ -93,8 +47,29 @@ public class ShowUpdatesActivity extends Activity {
     public void onStart() {
         super.onStart();
         this.setTitle(R.string.updates_title);
+
+        String htmlData = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("updates.html")));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                htmlData += line;
+            }
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        int colorInt = getResources().getColor(R.color.link_color);
+        String hexColor = String.format("#%06X", (0xFFFFFF & colorInt));
+        while (htmlData.contains("LINKCOLOR")) {
+            htmlData = htmlData.replace("LINKCOLOR", hexColor);
+        }
+
         WebView webView = (WebView) findViewById(R.id.updatesWebView);
-        webView.loadUrl("file:///android_asset/updates.html");
+        webView.loadData(htmlData, "text/html", "UTF8");
 
         //All links should open in the default browser, not this WebView
         //NOTE: this does not seem to work for POST links.
@@ -120,17 +95,11 @@ public class ShowUpdatesActivity extends Activity {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideChangelogForCurrentAppVersion();
+                updates.hideChangelogForCurrentAppVersion();
                 finish();
             }
         });
     }
 
-    private void hideChangelogForCurrentAppVersion() {
-        try {
-            prefs.storePreference(Versioning.getVersionCode(), false);
-        } catch (IllegalArgumentException e) {
-            //boolean values are accepted, should not reach here
-        }
-    }
+
 }

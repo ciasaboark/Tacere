@@ -5,5 +5,5 @@
 
 <menu
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.ciasaboark.tacere.activity.Tutorial">
+    tools:context="org.ciasaboark.tacere.activity.ProUpgradeActivity">
 </menu>

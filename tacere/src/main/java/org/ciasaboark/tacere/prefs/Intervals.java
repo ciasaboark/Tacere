@@ -6,17 +6,19 @@
 package org.ciasaboark.tacere.event.ringer;
 
 public enum Intervals {
-    WEEK(7, "One week"),
-    TWO_WEEKS(14, "Two weeks"),
-    MONTH(31, "One Month"),
-    THREE_MONTHS(91, "Three Months");
+    WEEK(7, "One week", "week"),
+    TWO_WEEKS(14, "Two weeks", "two weeks"),
+    MONTH(31, "One Month", "month"),
+    THREE_MONTHS(91, "Three Months", "three months");
 
     public final int value;
     public final String string;
+    public final String injectString;
 
-    Intervals(int value, String string) {
+    Intervals(int value, String string, String injectString) {
         this.value = value;
         this.string = string;
+        this.injectString = injectString;
     }
 
     public static Intervals getTypeForInt(int intervalDuration) {

@@ -32,7 +32,7 @@ public class EventInstance {
     private String location;
 
 
-    public EventInstance(long calendarId, int instanceId, int eventId, String title, long begin, long end,
+    public EventInstance(long calendarId, long instanceId, long eventId, String title, long begin, long end,
                          String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
         if (begin < 0) {
             throw new IllegalArgumentException("date can not be negative");
@@ -59,7 +59,7 @@ public class EventInstance {
     }
 
     public static EventInstance getBlankEvent() {
-        return new EventInstance(-1, -1, -1, "", 0, 0, "", 0, false, false);
+        return new EventInstance(-2, -2, -2, "", 0, 0, "", 0, false, false);
     }
 
     public RingerType getRingerType() {

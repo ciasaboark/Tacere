@@ -22,17 +22,10 @@ public class RingerStateManager {
         this.prefs = new Prefs(ctx);
     }
 
-    /**
-     * Remove stored ringer state from preferences
-     */
-    public void clearStoredRingerState() {
-        prefs.remove("curRinger");
-    }
-
     public void storeRingerStateIfNeeded() {
         // only store the current ringer state if we are not transitioning from one event to the
         // next and we are not in a quick silence period
-        ServiceStateManager stateManager = new ServiceStateManager(context);
+        ServiceStateManager stateManager = ServiceStateManager.getInstance(context);
         if (stateManager.isServiceNotActive()) {
             storeRingerState();
         }
@@ -56,6 +49,7 @@ public class RingerStateManager {
             storedRinger = RingerType.NORMAL;
         }
         setPhoneRinger(storedRinger);
+        clearStoredRingerState();
     }
 
     /**
@@ -89,5 +83,12 @@ public class RingerStateManager {
                 break;
 
         }
+    }
+
+    /**
+     * Remove stored ringer state from preferences
+     */
+    public void clearStoredRingerState() {
+        prefs.remove("curRinger");
     }
 }
