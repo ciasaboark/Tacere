@@ -40,6 +40,10 @@
         <item name="android:textColor">@color/text_color_alt</item>
     </style>
 
+    <style name="Dialog.Light" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
     <style name="DialogNoTitle" parent="Theme.AppCompat.Dialog">
         <item name="android:windowNoTitle">true</item>
         <!--<item name="android:windowBackground">@color/dialog_background</item>-->

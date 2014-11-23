@@ -47,7 +47,7 @@ public class DatabaseInterface {
     private static final String[] LOCAL_DB_PROJECTION = new String[]{
             Columns._ID,
             Columns.BEGIN,
-            Columns.END,
+            Columns.EFFECTIVE_END,
             Columns.EVENT_ID,
             Columns.TITLE,
             Columns.CAL_ID,
@@ -56,11 +56,13 @@ public class DatabaseInterface {
             Columns.IS_ALLDAY,
             Columns.IS_FREETIME,
             Columns.LOCATION,
-            Columns.RINGER_TYPE
+            Columns.RINGER_TYPE,
+            Columns.EXTEND_BUFFER,
+            Columns.ORGINAL_END
     };
     private static final int LOCAL_DB_PROJECTION_ID = 0;
     private static final int LOCAL_DB_PROJECTION_BEGIN = 1;
-    private static final int LOCAL_DB_PROJECTION_END = 2;
+    private static final int LOCAL_DB_PROJECTION_EFFECTIVE_END = 2;
     private static final int LOCAL_DB_PROJECTION_EVENT_ID = 3;
     private static final int LOCAL_DB_PROJECTION_TITLE = 4;
     private static final int LOCAL_DB_PROJECTION_CAL_ID = 5;
@@ -70,6 +72,9 @@ public class DatabaseInterface {
     private static final int LOCAL_DB_PROJECTION_AVAILABLE = 9;
     private static final int LOCAL_DB_PROJECTION_LOCATION = 10;
     private static final int LOCAL_DB_PROJECTION_RINGER = 11;
+    private static final int LOCAL_DB_PROJECTION_EXTEND_MINUTES = 12;
+    private static final int LOCAL_DB_PROJECTION_ORIGINAL_END = 13;
+
     private static final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
     private static DatabaseInterface instance;
     private static Context context = null;
@@ -114,7 +119,7 @@ public class DatabaseInterface {
         assert end >= 0;
 
         String[] args = {String.valueOf(begin), String.valueOf(end)};
-        String selection = Columns.BEGIN + " >= ? AND " + Columns.END + " <= ?";
+        String selection = Columns.BEGIN + " >= ? AND " + Columns.EFFECTIVE_END + " <= ?";
         Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, selection, args, null, null, Columns.BEGIN, null);
         return cursor;
     }
@@ -135,6 +140,97 @@ public class DatabaseInterface {
 
     private Cursor getOrderedEventCursor(String order) {
         return eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, null, null, null, null, null, order, null);
+    }
+
+    public void setExtendMinutesForInstance(long instanceId, int extendMinutes) {
+        if (extendMinutes < 0) {
+            throw new IllegalArgumentException("extendMinutes must be >= 0");
+        }
+        try {
+            EventInstance eventInstance = getEvent(instanceId);
+            eventInstance.setExtendMinutes(extendMinutes);
+            insertEvent(eventInstance);
+        } catch (NoSuchEventInstanceException e) {
+            Log.e(TAG, "not able to find event with instance id : " + instanceId +
+                    ", can not extend minutes");
+        }
+    }
+
+    // returns the event that matches the given Instance id, throws NoSuchEventException if no match
+    public EventInstance getEvent(long instanceId) throws NoSuchEventInstanceException {
+        //TODO remove loop
+        String whereClause = Columns._ID + " = ?";
+        String[] whereArgs = new String[]{String.valueOf(instanceId)};
+        Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, LOCAL_DB_PROJECTION, whereClause, whereArgs, null, null, null);
+        EventInstance thisEvent = null;
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
+                if (id == instanceId) {
+                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
+                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
+                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
+                    long originalEnd = cursor.getLong(cursor.getColumnIndex(Columns.ORGINAL_END));
+                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+                    int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
+                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
+                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
+                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
+                    String location = cursor.getString(cursor.getColumnIndex(Columns.LOCATION));
+                    int extendBuffer = cursor.getInt(cursor.getColumnIndex(Columns.EXTEND_BUFFER));
+
+                    thisEvent = new EventInstance(cal_id, id, event_id, title, begin, originalEnd, description,
+                            displayColor, isFreeTime, isAllDay, extendBuffer);
+                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
+                    thisEvent.setRingerType(ringerType);
+                    thisEvent.setLocation(location);
+
+                    break;
+                }
+            } while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (thisEvent == null) {
+            throw new NoSuchEventInstanceException(TAG + " can not find event with given id " + instanceId);
+        }
+        return thisEvent;
+    }
+
+    public void insertEvent(EventInstance e) {
+        if (!isEventValidToInsert(e)) {
+            throw new IllegalArgumentException(
+                    "DatabaseInterface:insertEvent given an event with blank values");
+        }
+
+        ContentValues cv = new ContentValues();
+        cv.put(Columns._ID, e.getId());
+        cv.put(Columns.TITLE, e.getTitle());
+        cv.put(Columns.BEGIN, e.getBegin());
+        cv.put(Columns.ORGINAL_END, e.getOriginalEnd());
+        cv.put(Columns.DESCRIPTION, e.getDescription());
+        cv.put(Columns.IS_ALLDAY, e.isAllDay());
+        cv.put(Columns.IS_FREETIME, e.isFreeTime());
+        cv.put(Columns.RINGER_TYPE, e.getRingerType().value);
+        cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
+        cv.put(Columns.CAL_ID, e.getCalendarId());
+        cv.put(Columns.EVENT_ID, e.getEventId());
+        cv.put(Columns.LOCATION, e.getLocation());
+        cv.put(Columns.EXTEND_BUFFER, e.getExtendMinutes());
+        cv.put(Columns.EFFECTIVE_END, e.getEffectiveEnd());
+
+        long rowID = eventsDB.insertWithOnConflict(EventDatabaseOpenHelper.TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
+    }
+
+    private boolean isEventValidToInsert(EventInstance e) {
+        boolean eventIsValid = false;
+        if (e != null && e.getTitle() != null && e.getId() >= 0 && e.getBegin() != null && e.getOriginalEnd() != null
+                && e.isFreeTime() != null && e.isAllDay() != null) {
+            eventIsValid = true;
+        }
+        return eventIsValid;
     }
 
     public void setRingerForInstance(long instanceId, RingerType ringerType) {
@@ -167,7 +263,7 @@ public class DatabaseInterface {
     public Deque<EventInstance> getAllActiveEvents() {
         //TODO better SQL select
         Deque<EventInstance> events = new ArrayDeque<EventInstance>();
-        String whereClause = Columns.END + " > ? AND " +
+        String whereClause = Columns.EFFECTIVE_END + " > ? AND " +
                 Columns.BEGIN + " < ?";
         long beginTime = System.currentTimeMillis()
                 - (EventInstance.MILLISECONDS_IN_MINUTE * (long) prefs.getBufferMinutes());
@@ -185,7 +281,7 @@ public class DatabaseInterface {
                 long calId = cursor.getLong(LOCAL_DB_PROJECTION_CAL_ID);
                 long eventId = cursor.getLong(LOCAL_DB_PROJECTION_EVENT_ID);
                 long begin = cursor.getLong(LOCAL_DB_PROJECTION_BEGIN);
-                long end = cursor.getLong(LOCAL_DB_PROJECTION_END);
+                long end = cursor.getLong(LOCAL_DB_PROJECTION_ORIGINAL_END);
                 String title = cursor.getString(LOCAL_DB_PROJECTION_TITLE);
                 String description = cursor.getString(LOCAL_DB_PROJECTION_DESCRIPTION);
                 String location = cursor.getString(LOCAL_DB_PROJECTION_LOCATION);
@@ -194,9 +290,10 @@ public class DatabaseInterface {
                 boolean isAvailable = cursor.getInt(LOCAL_DB_PROJECTION_AVAILABLE) == 1;
                 int ringerInt = cursor.getInt(LOCAL_DB_PROJECTION_RINGER);
                 RingerType ringerType = RingerType.getTypeForInt(ringerInt);
+                int extendMinutes = cursor.getInt(LOCAL_DB_PROJECTION_EXTEND_MINUTES);
 
                 EventInstance e = new EventInstance(calId, id, eventId, title, begin, end,
-                        description, displayColor, isAvailable, isAllDay);
+                        description, displayColor, isAvailable, isAllDay, extendMinutes);
                 e.setLocation(location);
                 e.setRingerType(ringerType);
                 if (e.isActiveBetween(beginTime, endTime)) {
@@ -286,7 +383,7 @@ public class DatabaseInterface {
 
 
                 EventInstance newEvent = new EventInstance(cal_id, id, event_id, event_title, event_begin, event_end,
-                        event_description, event_displayColor, isEventAvailable, isEventAllDay);
+                        event_description, event_displayColor, isEventAvailable, isEventAllDay, 0);
                 newEvent.setLocation(event_location);
 
                 // if the event is already in the local database then we need to preserve
@@ -295,7 +392,9 @@ public class DatabaseInterface {
                 try {
                     EventInstance oldEvent = getEvent(id);
                     RingerType oldRinger = oldEvent.getRingerType();
+                    int oldExtendMinutes = oldEvent.getExtendMinutes();
                     newEvent.setRingerType(oldRinger);
+                    newEvent.setExtendMinutes(oldExtendMinutes);
                 } catch (NoSuchEventInstanceException e) {
                     // its perfectly reasonable that this event does not exist within our database
                     // yet
@@ -316,7 +415,7 @@ public class DatabaseInterface {
     }
 
     private void pruneEventsEndBefore(long time) {
-        String whereClause = Columns.END + " < ?";
+        String whereClause = Columns.EFFECTIVE_END + " < ?";
         String[] args = new String[]{String.valueOf(time)};
         int rowsDeleted = eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, whereClause, args);
         Log.d(TAG, "pruned " + rowsDeleted + " events that end after " + time);
@@ -370,76 +469,6 @@ public class DatabaseInterface {
         }
     }
 
-    private Cursor getCalendarCursor(long begin, long end) {
-        return Instances.query(context.getContentResolver(), SYSTEM_DB_PROJECTION,
-                begin, end);
-    }
-
-    // returns the event that matches the given Instance id, throws NoSuchEventException if no match
-    public EventInstance getEvent(long instanceId) throws NoSuchEventInstanceException {
-        //TODO remove loop
-        String whereClause = Columns._ID + " = ?";
-        String[] whereArgs = new String[]{String.valueOf(instanceId)};
-        Cursor cursor = eventsDB.query(EventDatabaseOpenHelper.TABLE_EVENTS, LOCAL_DB_PROJECTION, whereClause, whereArgs, null, null, null);
-        EventInstance thisEvent = null;
-        if (cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndex(Columns._ID));
-                if (id == instanceId) {
-                    long cal_id = cursor.getInt(cursor.getColumnIndex(Columns.CAL_ID));
-                    int event_id = cursor.getInt(cursor.getColumnIndex(Columns.EVENT_ID));
-                    String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
-                    long begin = cursor.getLong(cursor.getColumnIndex(Columns.BEGIN));
-                    long end = cursor.getLong(cursor.getColumnIndex(Columns.END));
-                    String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
-                    int ringerInt = cursor.getInt(cursor.getColumnIndex(Columns.RINGER_TYPE));
-                    int displayColor = cursor.getInt(cursor.getColumnIndex(Columns.DISPLAY_COLOR));
-                    boolean isFreeTime = cursor.getInt(cursor.getColumnIndex(Columns.IS_FREETIME)) == 1;
-                    boolean isAllDay = cursor.getInt(cursor.getColumnIndex(Columns.IS_ALLDAY)) == 1;
-                    String location = cursor.getString(cursor.getColumnIndex(Columns.LOCATION));
-
-                    thisEvent = new EventInstance(cal_id, id, event_id, title, begin, end, description,
-                            displayColor, isFreeTime, isAllDay);
-                    RingerType ringerType = RingerType.getTypeForInt(ringerInt);
-                    thisEvent.setRingerType(ringerType);
-                    thisEvent.setLocation(location);
-
-                    break;
-                }
-            } while (cursor.moveToNext());
-
-        }
-        cursor.close();
-        if (thisEvent == null) {
-            throw new NoSuchEventInstanceException(TAG + " can not find event with given id " + instanceId);
-        }
-        return thisEvent;
-    }
-
-    public void insertEvent(EventInstance e) {
-        if (!isEventValidToInsert(e)) {
-            throw new IllegalArgumentException(
-                    "DatabaseInterface:insertEvent given an event with blank values");
-        }
-
-        ContentValues cv = new ContentValues();
-        cv.put(Columns._ID, e.getId());
-        cv.put(Columns.TITLE, e.getTitle());
-        cv.put(Columns.BEGIN, e.getBegin());
-        cv.put(Columns.END, e.getEnd());
-        cv.put(Columns.DESCRIPTION, e.getDescription());
-        cv.put(Columns.IS_ALLDAY, e.isAllDay());
-        cv.put(Columns.IS_FREETIME, e.isFreeTime());
-        cv.put(Columns.RINGER_TYPE, e.getRingerType().value);
-        cv.put(Columns.DISPLAY_COLOR, e.getDisplayColor());
-        cv.put(Columns.CAL_ID, e.getCalendarId());
-        cv.put(Columns.EVENT_ID, e.getEventId());
-        cv.put(Columns.LOCATION, e.getLocation());
-
-        long rowID = eventsDB.insertWithOnConflict(EventDatabaseOpenHelper.TABLE_EVENTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-        Log.d(TAG, "inserted event " + e.toString() + " as row " + rowID);
-    }
-
 //    private void pruneEventsNotInList(List<Long> calendarInstanceIds) {
 //        //TODO test
 //        if (calendarInstanceIds == null || calendarInstanceIds.size() == 0) {
@@ -471,6 +500,11 @@ public class DatabaseInterface {
 //            }
 //        }
 //    }
+
+    private Cursor getCalendarCursor(long begin, long end) {
+        return Instances.query(context.getContentResolver(), SYSTEM_DB_PROJECTION,
+                begin, end);
+    }
 
     private void removeEventIfExists(EventInstance event) {
         long instanceId = event.getId();
@@ -516,15 +550,6 @@ public class DatabaseInterface {
     private void deleteEventWithId(long id) {
         String selection = Columns._ID + " = ?";
         eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, selection, new String[]{String.valueOf(id)});
-    }
-
-    private boolean isEventValidToInsert(EventInstance e) {
-        boolean eventIsValid = false;
-        if (e.getTitle() != null && e.getId() >= 0 && e.getBegin() != null && e.getEnd() != null
-                && e.isFreeTime() != null && e.isAllDay() != null) {
-            eventIsValid = true;
-        }
-        return eventIsValid;
     }
 
     public List<Long> getInstanceIdsForEvent(long eventId) {

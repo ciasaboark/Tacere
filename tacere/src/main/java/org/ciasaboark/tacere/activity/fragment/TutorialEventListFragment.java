@@ -58,7 +58,7 @@ public class TutorialEventListFragment extends Fragment {
                 end,
                 "A default item",
                 getResources().getColor(R.color.tutorial_event_default),
-                false, false);
+                false, false, 0);
         defaultEvent.setLocation("Somewhere USA");
         defaultEvent.setRingerType(RingerType.IGNORE);
         EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.default_event);
@@ -75,7 +75,7 @@ public class TutorialEventListFragment extends Fragment {
                 NOW + EventInstance.MILLISECONDS_IN_MINUTE * 75,
                 "A default item",
                 getResources().getColor(R.color.tutorial_event_active),
-                false, false);
+                false, false, 0);
         EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.active_event);
         eventListItem.setCalendarTitle("Work calendar");
         eventListItem.setIsActiveEvent(true);
@@ -93,7 +93,7 @@ public class TutorialEventListFragment extends Fragment {
                 end,
                 "A default item",
                 getResources().getColor(R.color.tutorial_event_future),
-                false, false);
+                false, false, 0);
         defaultEvent.setLocation("CCT room 403");
         defaultEvent.setRingerType(RingerType.NORMAL);
         EventListItem eventListItem = (EventListItem) rootView.findViewById(R.id.future_event);

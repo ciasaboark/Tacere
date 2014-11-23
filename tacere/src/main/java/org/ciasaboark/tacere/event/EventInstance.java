@@ -22,7 +22,7 @@ public class EventInstance {
     private long eventId;        //event ids are shared among repeating events
     private String title;
     private long begin;
-    private long end; // in milliseconds from epoch
+    private long effectiveEnd; // original end + extendMinutes
     private String description;
     private RingerType ringer;
     private boolean hasCustomRinger;
@@ -30,17 +30,19 @@ public class EventInstance {
     private boolean isFreeTime;
     private boolean isAllDay;
     private String location;
+    private int extendMinutes;
+    private long originalEnd;
 
 
-    public EventInstance(long calendarId, long instanceId, long eventId, String title, long begin, long end,
-                         String description, int displayColor, boolean isFreeTime, boolean isAllDay) {
+    public EventInstance(long calendarId, long instanceId, long eventId, String title, long begin, long originalEnd,
+                         String description, int displayColor, boolean isFreeTime, boolean isAllDay, int extendMinutes) {
         if (begin < 0) {
             throw new IllegalArgumentException("date can not be negative");
         }
-        if (end < 0) {
+        if (originalEnd < 0) {
             throw new IllegalArgumentException("date can not be negative");
         }
-        if (end < begin) {
+        if (originalEnd < begin) {
             throw new IllegalArgumentException("event can not end before it begins");
         }
 
@@ -49,17 +51,29 @@ public class EventInstance {
         this.eventId = eventId;
         this.title = title == null ? "" : title;
         this.begin = begin;
-        this.end = end;
+        this.originalEnd = originalEnd;
         this.description = description == null ? "" : description;
         this.dispColor = displayColor;
         this.isFreeTime = isFreeTime;
         this.isAllDay = isAllDay;
         this.ringer = RingerType.UNDEFINED;
         this.location = "";
+        this.extendMinutes = extendMinutes;
+
+        this.effectiveEnd = originalEnd + (long) extendMinutes * MILLISECONDS_IN_MINUTE;
     }
 
     public static EventInstance getBlankEvent() {
-        return new EventInstance(-2, -2, -2, "", 0, 0, "", 0, false, false);
+        return new EventInstance(-2, -2, -2, "", 0, 0, "", 0, false, false, 0);
+    }
+
+    public int getExtendMinutes() {
+        return extendMinutes;
+    }
+
+    public void setExtendMinutes(int extendMinutes) {
+        this.extendMinutes = extendMinutes;
+        this.effectiveEnd = originalEnd + (long) extendMinutes * MILLISECONDS_IN_MINUTE;
     }
 
     public RingerType getRingerType() {
@@ -88,15 +102,33 @@ public class EventInstance {
     }
 
     public String getLocalBeginTime() {
+        return getFormattedTime(this.getBegin());
+    }
+
+    public String getFormattedTime(long time) {
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-        Date date = new Date(begin);
+        Date date = new Date(time);
         return dateFormatter.format(date);
     }
 
+    public Long getBegin() {
+        return begin;
+    }
+
     public String getLocalEndTime() {
-        DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-        Date date = new Date(end);
-        return dateFormatter.format(date);
+        return getFormattedTime(this.getOriginalEnd());
+    }
+
+    public Long getOriginalEnd() {
+        return originalEnd;
+    }
+
+    public String getLocalEffectiveEndTime() {
+        return getFormattedTime(this.getEffectiveEnd());
+    }
+
+    public long getEffectiveEnd() {
+        return effectiveEnd;
     }
 
     public long getCalendarId() {
@@ -108,26 +140,33 @@ public class EventInstance {
     }
 
     public String getLocalBeginDate() {
-        DateFormat dateFormatter = DateFormat.getDateInstance();
-        Date date;
-
+        long time;
         // according to the android calendar all day events start at
         // + 8 PM the day before the event is scheduled. This can
         // + result in a wrong date being returned.
         if (this.isAllDay) {
             // shift ahead by one full day
-            date = new Date(begin + MILLISECONDS_IN_DAY);
+            time = getBegin() + MILLISECONDS_IN_DAY;
         } else {
-            date = new Date(begin);
+            time = getBegin();
         }
 
+        return getFormattedDate(time);
+    }
+
+    public String getFormattedDate(long time) {
+        DateFormat dateFormatter = DateFormat.getDateInstance();
+        Date date;
+        date = new Date(time);
         return dateFormatter.format(date);
     }
 
     public String getLocalEndDate() {
-        DateFormat dateFormatter = DateFormat.getDateInstance();
-        Date date = new Date(end);
-        return dateFormatter.format(date);
+        return getFormattedDate(getOriginalEnd());
+    }
+
+    public String getLocalEffectiveEndDate() {
+        return getFormattedDate(getEffectiveEnd());
     }
 
     /**
@@ -139,20 +178,12 @@ public class EventInstance {
      */
     public boolean isActiveBetween(long startTime, long endTime) {
         boolean isEventActive = false;
-        if (this.getEnd() > startTime) {
+        if (this.getEffectiveEnd() > startTime) {
             if (this.getBegin() < endTime) {
                 isEventActive = true;
             }
         }
         return isEventActive;
-    }
-
-    public Long getEnd() {
-        return end;
-    }
-
-    public Long getBegin() {
-        return begin;
     }
 
     public String getDescription() {
@@ -194,7 +225,7 @@ public class EventInstance {
         DateFormat dateFormatter;
         dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT,
                 Locale.getDefault());
-        Date date = new Date(end);
+        Date date = new Date(effectiveEnd);
         String fdate = dateFormatter.format(date);
         return title + ", ends " + fdate;
     }

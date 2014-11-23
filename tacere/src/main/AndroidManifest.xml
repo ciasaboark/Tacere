@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name=".Tacere"
+        android:name="org.ciasaboark.tacere.Tacere"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -25,20 +25,21 @@
         <uses-library android:name="android.test.runner"/>
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="org.ciasaboark.tacere.activity.MainActivity"
             android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".activity.ProUpgradeActivity"
+            android:name="org.ciasaboark.tacere.activity.ProUpgradeActivity"
             android:label="@string/title_activity_pro_upgrade"
-            android:parentActivityName=".activity.MainActivity"
+            android:launchMode="singleInstance"
+            android:parentActivityName="org.ciasaboark.tacere.activity.MainActivity"
             android:theme="@style/DialogNoTitle">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.LicenseCheckWrapper"
+            android:name="org.ciasaboark.tacere.activity.LicenseCheckWrapper"
             android:label="@string/title_activity_license_check_wrapper">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -47,9 +48,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SettingsActivity"
+            android:name="org.ciasaboark.tacere.activity.SettingsActivity"
             android:label="@string/settings_title"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName="org.ciasaboark.tacere.activity.MainActivity">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.SettingsActivity"/>
 
@@ -61,9 +62,9 @@
                 android:value="org.ciasaboark.tacere.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.AboutActivity"
+            android:name="org.ciasaboark.tacere.activity.AboutActivity"
             android:label="@string/about_title"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName="org.ciasaboark.tacere.activity.MainActivity">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.activity.AboutActivity"/>
 
@@ -75,57 +76,82 @@
                 android:value="org.ciasaboark.tacere.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.ShowUpdatesActivity"
+            android:name="org.ciasaboark.tacere.activity.ShowUpdatesActivity"
+            android:theme="@style/Dialog.Light"/>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.DonationActivity"
             android:theme="@style/Dialog"/>
         <activity
-            android:name=".activity.DonationActivity"
-            android:theme="@style/Dialog"/>
-        <activity
-            android:name=".activity.SelectCalendarsActivity"
+            android:name="org.ciasaboark.tacere.activity.SelectCalendarsActivity"
             android:label="@string/title_activity_select_calendars"
-            android:parentActivityName=".activity.SettingsActivity"
+            android:parentActivityName="org.ciasaboark.tacere.activity.SettingsActivity"
             android:theme="@style/DialogOnLargeDisplay">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.SettingsActivity"/>
         </activity>
         <activity
-            android:name=".activity.AboutLicenseActivity"
+            android:name="org.ciasaboark.tacere.activity.AboutLicenseActivity"
             android:label="@string/about_license_title"
-            android:parentActivityName=".activity.AboutActivity">
+            android:parentActivityName="org.ciasaboark.tacere.activity.AboutActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.AboutActivity"/>
         </activity>
         <activity
-            android:name=".activity.AdvancedSettingsActivity"
+            android:name="org.ciasaboark.tacere.activity.AdvancedSettingsActivity"
             android:label="@string/advanced_settings_title"
-            android:parentActivityName=".activity.SettingsActivity">
+            android:parentActivityName="org.ciasaboark.tacere.activity.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.ciasaboark.tacere.activity.SettingsActivity"/>
         </activity>
         <activity
-            android:name=".activity.TutorialActivity"
+            android:name="org.ciasaboark.tacere.activity.TutorialActivity"
             android:label="Wizard"
-            android:theme="@style/Tutorial"/>
+            android:theme="@style/Tutorial">
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.activity.BetaSettingsActivity"
+            android:label="@string/title_activity_beta_settings">
+        </activity>
+        <activity
+            android:name="org.ciasaboark.tacere.widget.activity.WidgetPopupRinger"
+            android:label="@string/title_activity_widget_popup_ringer"
+            android:launchMode="singleInstance"
+            android:theme="@style/Dialog">
+        </activity>
 
         <service
-            android:name=".service.EventSilencerService"
+            android:name="org.ciasaboark.tacere.service.EventSilencerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.EventSilencerService"/>
             </intent-filter>
         </service>
         <service
-            android:name=".service.SkipEventService"
+            android:name="org.ciasaboark.tacere.service.SkipEventService"
             android:exported="false">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.SkipEventService"/>
             </intent-filter>
         </service>
         <service
-            android:name=".service.ResetEventService"
+            android:name="org.ciasaboark.tacere.service.ExtendQuicksilenceService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.ExtendQuicksilenceService"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.ExtendEventService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.ciasaboark.tacere.ExtendEventService"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.ciasaboark.tacere.service.ResetEventService"
             android:exported="false">
             <intent-filter>
                 <action android:name="org.ciasaboark.tacere.ResetEventService"/>
@@ -133,7 +159,7 @@
         </service>
 
         <receiver
-            android:name=".receiver.BootCompletedReceiver"
+            android:name="org.ciasaboark.tacere.receiver.BootCompletedReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -142,7 +168,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.ProviderChangedReceiver">
+        <receiver android:name="org.ciasaboark.tacere.receiver.ProviderChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PROVIDER_CHANGED"/>
 
@@ -151,10 +177,43 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".activity.BetaSettingsActivity"
-            android:label="@string/title_activity_beta_settings">
-        </activity>
+        <!-- <receiver -->
+        <!-- android:name=".widget.QuickSilenceWidgetProvider" -->
+        <!-- android:label="Tacere - Quicksilence" -->
+        <!-- android:icon="@drawable/ic_launcher"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> -->
+        <!-- </intent-filter> -->
+        <!-- <meta-data android:name="android.appwidget.provider" -->
+        <!-- android:resource="@xml/quicksilence_widget_info" /> -->
+        <!-- </receiver> -->
+
+
+        <!-- <receiver -->
+        <!-- android:name=".widget.EventListWidgetProvider" -->
+        <!-- android:label="Tacere - Events" -->
+        <!-- android:icon="@drawable/ic_launcher"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> -->
+        <!-- </intent-filter> -->
+        <!-- <meta-data android:name="android.appwidget.provider" -->
+        <!-- android:resource="@xml/event_list_widget_info" /> -->
+        <!-- </receiver> -->
+
+        <receiver
+            android:name="org.ciasaboark.tacere.widget.ActiveEventWidgetProvider"
+            android:icon="@drawable/ic_launcher"
+            android:label="Tacere - Active Event">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_active_event_info"/>
+        </receiver>
+
+
     </application>
 
 </manifest>

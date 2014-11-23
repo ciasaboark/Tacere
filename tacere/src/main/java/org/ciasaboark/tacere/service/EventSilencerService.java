@@ -215,7 +215,7 @@ public class EventSilencerService extends IntentService {
             long wakeAt;
             if (!events.isEmpty()) {
                 EventInstance lastActiveEvent = events.getLast();
-                wakeAt = lastActiveEvent.getEnd();
+                wakeAt = lastActiveEvent.getOriginalEnd();
             } else {
                 EventInstance nextInactiveEvent = databaseInterface.nextEvent();
                 if (nextInactiveEvent != null) {
@@ -296,7 +296,7 @@ public class EventSilencerService extends IntentService {
         notificationManager.displayEventNotification(event);
         // the extra ten seconds is to make sure that the event ending is pushed into the
         // correct minute
-        long wakeAt = event.getEnd()
+        long wakeAt = event.getEffectiveEnd()
                 + (EventInstance.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes()) + TEN_SECONDS;
         alarmManager.scheduleNormalWakeAt(wakeAt);
     }

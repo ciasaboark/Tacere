@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
 import android.util.AttributeSet;
@@ -314,6 +315,13 @@ public class EventListItem extends LinearLayout {
         String endDate = event.getLocalEndDate();
         String beginTime = event.getLocalBeginTime();
         String endTime = event.getLocalEndTime();
+        boolean usingExtendedMinutes = false;
+        int extendMinutes = event.getExtendMinutes();
+        if (extendMinutes != 0) {
+            usingExtendedMinutes = true;
+            endDate = event.getLocalEffectiveEndDate();
+            endTime = event.getLocalEffectiveEndTime();
+        }
 
         //there are a number of different ways to display the date and time
         if (beginDate.equals(endDate)) {
@@ -339,6 +347,9 @@ public class EventListItem extends LinearLayout {
                 //field2: <end date> <end time>
                 dateTimeField1.setText(beginDate + " " + beginTime);
                 dateTimeField2.setText(endDate + " " + endTime);
+                if (usingExtendedMinutes) {
+                    dateTimeField2.setTypeface(null, Typeface.BOLD);
+                }
             }
         }
 

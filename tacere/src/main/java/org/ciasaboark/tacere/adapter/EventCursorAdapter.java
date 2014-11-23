@@ -18,16 +18,16 @@ import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.view.EventListItem;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventCursorAdapter extends CursorAdapter {
     private static final String TAG = "EventCursorAdapter";
     private final LayoutInflater layoutInflator;
     private final DatabaseInterface databaseInterface;
     private final Context context;
-    private List<Long> animatedViews = new ArrayList<Long>();
+    private Map<Long, Boolean> animatedViews = new HashMap<Long, Boolean>();
     private boolean hasTodayHeaderBeenDrawn = false;
     private boolean hasFutureHeaderBeenDrawn = false;
 
@@ -75,12 +75,25 @@ public class EventCursorAdapter extends CursorAdapter {
         }
         eventListItem.refresh();
 
-
-//        if (!animatedViews.contains(id)) {
-//            Animation animation = AnimationUtils.loadAnimation(context, R.anim.abc_fade_in);
-//            view.startAnimation(animation);
-//            animatedViews.add(id);
-//        }
+        boolean viewAlreadyShown = animatedViews.containsKey(id) && animatedViews.get(id);
+        if (!viewAlreadyShown) {
+//            // get the center for the clipping circle
+//            int cx = (view.getLeft() + view.getRight()) / 2;
+//            int cy = (view.getTop() + view.getBottom()) / 2;
+//
+//
+//            // get the final radius for the clipping circle
+//            int finalRadius = view.getWidth();
+//
+//            // create and start the animator for this view
+//            // (the start radius is zero)
+//            Animator anim =
+//                    ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+//            anim.setDuration(500);
+//            anim.start();
+//
+            animatedViews.put(id, true);
+        }
 
     }
 }

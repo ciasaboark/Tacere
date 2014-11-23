@@ -5,18 +5,20 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
-def APP_VERSION_RELEASE = "0 - beta 10";
+def APP_VERSION_RELEASE = "0";
 
 def dateTime = new Date()
 def DATE_STRING = dateTime.getDateString()
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 21
+def VERSION_CODE = 22
 
 android {
     compileSdkVersion 21

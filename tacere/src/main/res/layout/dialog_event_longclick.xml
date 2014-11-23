@@ -90,6 +90,41 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/event_extend_box"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/event_extend_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/calendar_calendar"
+                android:tint="@color/icon_tint"/>
+
+            <TextView
+                android:id="@+id/event_extend_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true"
+                android:text="@string/placeholder"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <Button
+                android:id="@+id/event_extend_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Reset"
+                android:textColor="@color/text_button_positive"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/linearLayout13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

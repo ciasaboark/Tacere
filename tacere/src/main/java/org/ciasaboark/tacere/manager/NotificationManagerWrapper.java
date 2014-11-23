@@ -27,11 +27,14 @@ import android.util.Log;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.MainActivity;
+import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.database.DatabaseInterface;
 import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.prefs.BetaPrefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.service.ExtendEventService;
+import org.ciasaboark.tacere.service.ExtendQuicksilenceService;
 import org.ciasaboark.tacere.service.RequestTypes;
 import org.ciasaboark.tacere.service.SkipEventService;
 
@@ -84,12 +87,34 @@ public class NotificationManagerWrapper {
                     NOTIFICATION_ID, notificationIntent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
 
+            //an intent to open the main app
+            Intent openMainIntent = new Intent(context, MainActivity.class);
+            PendingIntent openMainPendIntent = PendingIntent.getActivity(context, 0,
+                    openMainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            //An additional button to extend the quicksilence by 15min
+            // this intent will be attached to the button on the notification
+            Intent addMinutesIntent = new Intent(context, ExtendQuicksilenceService.class);
+            long endTimeStamp = System.currentTimeMillis() + (long) quicksilenceDurationMinutes
+                    * EventInstance.MILLISECONDS_IN_MINUTE;
+            addMinutesIntent.putExtra(ExtendQuicksilenceService.ORIGINAL_END_TIMESTAMP, endTimeStamp);
+            addMinutesIntent.putExtra(ExtendQuicksilenceService.EXTEND_LENGTH, 15);
+            PendingIntent addMinPendIntent = PendingIntent.getService(context, 15, addMinutesIntent,
+                    PendingIntent.FLAG_CANCEL_CURRENT);
+
             NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
                     context).setContentTitle(context.getString(R.string.notification_quicksilence_title))
                     .setContentText(formattedString).setTicker(context.getString(R.string.notification_quicksilence_ticker))
                     .setSmallIcon(R.drawable.small_mono).setAutoCancel(true).setOngoing(true)
                     .setContentIntent(pendIntent)
                     .setTicker(context.getString(R.string.notification_quicksilence_ticker));
+
+            notBuilder.addAction(R.drawable.ic_launcher, "Open Tacere", openMainPendIntent);
+            //the +15 button should only be available in the Pro version
+            Authenticator authenticator = new Authenticator(context);
+            if (authenticator.isAuthenticated()) {
+                notBuilder.addAction(R.drawable.not_clock, "+15", addMinPendIntent);
+            }
 
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.cancel(NOTIFICATION_ID);
@@ -152,6 +177,7 @@ public class NotificationManagerWrapper {
                 NOTIFICATION_ID, notificationIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
+
         Notification.Builder notBuilder = new Notification.Builder(context)
                 .setContentTitle(context.getString(R.string.notification_event_active_title)).setContentText(event.toString())
                 .setSmallIcon(R.drawable.small_mono).setAutoCancel(false).setOnlyAlertOnce(true)
@@ -163,17 +189,24 @@ public class NotificationManagerWrapper {
         skipEventIntent.putExtra(SkipEventService.EVENT_ID_TAG, event.getId());
         PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
-
         notBuilder
-                .addAction(R.drawable.ic_state_ignore, context.getString(R.string.notification_event_skip), skipEventPendIntent);
+                .addAction(R.drawable.not_ignore, context.getString(R.string.notification_event_skip), skipEventPendIntent);
+
+        //an intent to add an additional 15 minutes of silencing for an event
+        Intent addSilencingIntent = new Intent(context, ExtendEventService.class);
+        addSilencingIntent.putExtra(ExtendEventService.INSTANCE_ID, event.getId());
+        addSilencingIntent.putExtra(ExtendEventService.NEW_EXTEND_LENGTH, event.getExtendMinutes() + 15); //TODO use minutes stored in prefs
+        PendingIntent addSilenceingPendIntent = PendingIntent.getService(context, 0,
+                addSilencingIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Authenticator authenticator = new Authenticator(context);
+        if (authenticator.isAuthenticated()) {
+            notBuilder.addAction(R.drawable.not_clock, "+15", addSilenceingPendIntent);
+        }
 
         // the ticker text should only be shown the first time the notification is
         // created, not on each update
-        notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + event.toString());
-
-        // the ticker text should only be shown the first time the notification is
-        // created, not on each update
-        notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + event.toString());
+        notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) +
+                " " + event.toString());
 
         if (Build.VERSION.SDK_INT >= 21) {
             notBuilder.setVisibility(Notification.VISIBILITY_PRIVATE);

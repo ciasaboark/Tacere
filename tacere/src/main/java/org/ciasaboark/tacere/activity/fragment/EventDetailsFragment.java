@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import org.ciasaboark.tacere.event.EventManager;
 import org.ciasaboark.tacere.event.ringer.RingerSource;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
+import org.ciasaboark.tacere.service.ExtendEventService;
 
 import java.util.HashMap;
 
@@ -128,6 +130,8 @@ public class EventDetailsFragment extends DialogFragment {
         } else {
             eventRepetitonBox.setVisibility(View.GONE);
         }
+
+        drawExtendMinutesWidgets();
 
         colorizeIcons();
 
@@ -264,6 +268,28 @@ public class EventDetailsFragment extends DialogFragment {
             AlertDialog dialog = builder.show();
         } else {
             saveSettingsForEventInstance();
+        }
+    }
+
+    private void drawExtendMinutesWidgets() {
+        final LinearLayout extendMinutesBox = (LinearLayout) view.findViewById(R.id.event_extend_box);
+        if (event.getExtendMinutes() == 0) {
+            extendMinutesBox.setVisibility(View.GONE);
+        } else {
+            extendMinutesBox.setVisibility(View.VISIBLE);
+            TextView extendMinutesText = (TextView) view.findViewById(R.id.event_extend_text);
+            extendMinutesText.setText("+" + event.getExtendMinutes() + " minutes");
+            Button extendMinutesResetButton = (Button) view.findViewById(R.id.event_extend_button);
+            extendMinutesResetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ExtendEventService.class);
+                    i.putExtra(ExtendEventService.INSTANCE_ID, event.getId());
+                    i.putExtra(ExtendEventService.NEW_EXTEND_LENGTH, 0);
+                    context.startService(i);
+                    extendMinutesBox.setVisibility(View.INVISIBLE);
+                }
+            });
         }
     }
 

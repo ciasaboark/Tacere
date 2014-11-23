@@ -20,12 +20,10 @@
     <string name="about_action_tutorial">Tutorial</string>
     <string name="about_action_license">License</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_list">
-            • Adjust your preferences for each event, or let Tacere silence everything by default.\n
+    <string name="about_list">            • Adjust your preferences for each event, or let Tacere silence everything by default.\n
             • Tap an event to cycle the ringer state.\n
             • Long press an event for additional settings.\n
-            • Select calendars to sync and set defaults\n
-    </string>
+            • Select calendars to sync and set defaults\n</string>
     <string name="about_intro">Tacere automatically silences your phone whenever there is an active event in the calendar.</string>
     <string name="about_source">Tacere is Open Source.  The code is hosted at <a href="http://www.github.com/ciasaboark/Tacere">GitHub</a>.</string>
     <string name="about_bugs">Bugs and other issues can be reported via the <a href="https://github.com/ciasaboark/Tacere/issues">Issues</a> tab on the project website.</string>
@@ -146,7 +144,7 @@
     <string name="notification_event_active_title">Tacere: Event active</string>
     <string name="notification_event_active_title_public">Tacere: Active</string>
     <string name="notification_event_active_starting">Tacere event starting: </string>
-    <string name="notification_event_skip">Ignore this event</string>
+    <string name="notification_event_skip">Ignore</string>
     <string name="notification_event_enable">Enable auto silencing</string>
     <string name="startQuicksilence">Quicksilence</string>
     <string name="cancelQuicksilence">Cancel quicksilence</string>
@@ -218,5 +216,6 @@
     <string name="upgrade_to_pro">Upgrade to Pro</string>
     <string name="title_activity_beta_settings">BetaSettingsActivity</string>
     <string name="toast_crash">Errors have occurred.\nWe won\'t tell you where or why.\nLazy programmers.</string>
+    <string name="title_activity_widget_popup_ringer">WidgetPopupRinger</string>
 
 </resources>
