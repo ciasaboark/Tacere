@@ -42,7 +42,8 @@ public class Authenticator {
     public boolean isAuthenticated() {
         boolean isDonationKeyInstalled = isDonationKeyInstalled();
         boolean hasProVersionBeenPurchased = prefs.getBoolean(KEY_PRO_VERSION, false);
-        return isDonationKeyInstalled || hasProVersionBeenPurchased;
+        boolean isFDroidBuild = isFDroidBuild();
+        return isDonationKeyInstalled || hasProVersionBeenPurchased || isFDroidBuild;
     }
 
     private boolean isDonationKeyInstalled() {
@@ -57,9 +58,18 @@ public class Authenticator {
             } catch (PackageManager.NameNotFoundException e) {
             }
         } else {
-            keyIsInstalled = manager.checkSignatures("org.ciasaboark.tacere", "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH;
+            keyIsInstalled = manager.checkSignatures("org.ciasaboark.tacere",
+                    "org.ciasaboark.tacere.key") == PackageManager.SIGNATURE_MATCH;
         }
         return keyIsInstalled;
+    }
+
+    private boolean isFDroidBuild() {
+        boolean isFDroidBuild = false;
+        PackageManager manager = context.getPackageManager();
+        isFDroidBuild = manager.checkSignatures("org.ciasaboark.tacere", "org.fdroid.fdroid")
+                == PackageManager.SIGNATURE_MATCH;
+        return isFDroidBuild;
     }
 
     public void showUpgradeDialog() {
