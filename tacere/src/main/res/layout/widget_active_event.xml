@@ -46,13 +46,13 @@
                     android:src="@drawable/ic_launcher"/>
 
                 <ImageView
-                    android:id="@+id/silence_icon"
+                    android:id="@+id/ringer_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:padding="6dp"
-                    android:src="@drawable/ic_state_ignore"/>
+                    android:src="@drawable/blank"/>
 
                 <TextView
                     android:id="@+id/event_title"
@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="6dp"
-                    android:layout_toLeftOf="@+id/silence_icon"
+                    android:layout_toLeftOf="@+id/ringer_icon"
                     android:layout_toRightOf="@+id/app_icon"
                     android:singleLine="true"
                     android:text="@string/lorem_ipsum"

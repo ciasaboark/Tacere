@@ -38,6 +38,9 @@ import org.ciasaboark.tacere.service.ExtendQuicksilenceService;
 import org.ciasaboark.tacere.service.RequestTypes;
 import org.ciasaboark.tacere.service.SkipEventService;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class NotificationManagerWrapper {
     private static final String TAG = "NotificationManagerWrapper";
     // an id to reference all notifications
@@ -61,25 +64,13 @@ public class NotificationManagerWrapper {
             // not launch the app
             Intent notificationIntent = new Intent(context, EventSilencerService.class);
             notificationIntent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.CANCEL_QUICKSILENCE);
+            long endTime = System.currentTimeMillis() + (long) quicksilenceDurationMinutes
+                    * EventInstance.MILLISECONDS_IN_MINUTE;
 
-            int hrs = quicksilenceDurationMinutes / 60;
-            int min = quicksilenceDurationMinutes % 60;
-            String formattedHours = "";
-            if (hrs == 1) {
-                formattedHours = String.format(context.getString(R.string.notification_time_and_unit), hrs, context.getString(R.string.hour_lower));
-            } else if (hrs > 1) {
-                formattedHours = String.format(context.getString(R.string.notification_time_and_unit), hrs, context.getString(R.string.hours_lower));
-            }
-
-            String formattedMinutes = "";
-            if (min == 1) {
-                formattedMinutes = " " + String.format(context.getString(R.string.notification_time_and_unit), min, context.getString(R.string.minute_lower));
-            } else if (min > 1) {
-                formattedMinutes = " " + String.format(context.getString(R.string.notification_time_and_unit), min, context.getString(R.string.minutes_lower));
-            }
-
-
-            String formattedString = String.format(context.getString(R.string.notification_quicksilence_description), formattedHours, formattedMinutes);
+            DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+            Date date = new Date(endTime);
+            String formattedDate = dateFormat.format(date);
+            String formattedString = String.format(context.getString(R.string.notification_quicksilence_description), formattedDate);
 
             // FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new
             // pending intent
@@ -95,9 +86,7 @@ public class NotificationManagerWrapper {
             //An additional button to extend the quicksilence by 15min
             // this intent will be attached to the button on the notification
             Intent addMinutesIntent = new Intent(context, ExtendQuicksilenceService.class);
-            long endTimeStamp = System.currentTimeMillis() + (long) quicksilenceDurationMinutes
-                    * EventInstance.MILLISECONDS_IN_MINUTE;
-            addMinutesIntent.putExtra(ExtendQuicksilenceService.ORIGINAL_END_TIMESTAMP, endTimeStamp);
+            addMinutesIntent.putExtra(ExtendQuicksilenceService.ORIGINAL_END_TIMESTAMP, endTime);
             addMinutesIntent.putExtra(ExtendQuicksilenceService.EXTEND_LENGTH, 15);
             PendingIntent addMinPendIntent = PendingIntent.getService(context, 15, addMinutesIntent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
@@ -105,11 +94,11 @@ public class NotificationManagerWrapper {
             NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
                     context).setContentTitle(context.getString(R.string.notification_quicksilence_title))
                     .setContentText(formattedString).setTicker(context.getString(R.string.notification_quicksilence_ticker))
-                    .setSmallIcon(R.drawable.small_mono).setAutoCancel(true).setOngoing(true)
-                    .setContentIntent(pendIntent)
+                    .setSmallIcon(R.drawable.not_silence).setAutoCancel(true).setOngoing(true)
+                    .setContentIntent(pendIntent).setColor(context.getResources().getColor(R.color.accent))
                     .setTicker(context.getString(R.string.notification_quicksilence_ticker));
 
-            notBuilder.addAction(R.drawable.ic_launcher, "Open Tacere", openMainPendIntent);
+            notBuilder.addAction(R.drawable.app_mono_small, "Open Tacere", openMainPendIntent);
             //the +15 button should only be available in the Pro version
             Authenticator authenticator = new Authenticator(context);
             if (authenticator.isAuthenticated()) {
@@ -180,8 +169,21 @@ public class NotificationManagerWrapper {
 
         Notification.Builder notBuilder = new Notification.Builder(context)
                 .setContentTitle(context.getString(R.string.notification_event_active_title)).setContentText(event.toString())
-                .setSmallIcon(R.drawable.small_mono).setAutoCancel(false).setOnlyAlertOnce(true)
+                .setAutoCancel(false).setOnlyAlertOnce(true)
                 .setOngoing(true).setContentIntent(pendIntent);
+
+        EventManager eventManager = new EventManager(context, event);
+        switch (eventManager.getBestRinger()) {
+            case SILENT:
+                notBuilder.setSmallIcon(R.drawable.not_silence);
+                break;
+            case VIBRATE:
+                notBuilder.setSmallIcon(R.drawable.not_vibrate);
+                break;
+            case NORMAL:
+                notBuilder.setSmallIcon(R.drawable.not_normal);
+                break;
+        }
 
 
         // this intent will be attached to the button on the notification
@@ -214,7 +216,7 @@ public class NotificationManagerWrapper {
             publicNotification.setContentTitle(context.getString(R.string.notification_event_active_title_public));
             publicNotification.setContentIntent(pendIntent);
             notBuilder.setPublicVersion(publicNotification.build());
-//            notBuilder.setColor(event.getDisplayColor());
+            notBuilder.setColor(context.getResources().getColor(R.color.accent));
 
             Drawable d = context.getResources().getDrawable(R.drawable.shape_circle);
             int height = (int) context.getResources().getDimension(android.R.dimen.notification_large_icon_height);
@@ -226,8 +228,8 @@ public class NotificationManagerWrapper {
             String c = ((Character) calendarTitle.charAt(0)).toString().toUpperCase();
 
 
-            Bitmap largeIcon = createMarkerIcon(d, c, width, height);
-//            Bitmap largeIcon = combineDrawablesToBitmap(d, getRingerIconForEvent(event), width, height);
+//            Bitmap largeIcon = createMarkerIcon(d, c, width, height);
+            Bitmap largeIcon = combineDrawablesToBitmap(d, getRingerIconForEvent(event), width, height);
             notBuilder.setLargeIcon(largeIcon);
         }
 
@@ -255,13 +257,26 @@ public class NotificationManagerWrapper {
 
         NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
                 context).setContentTitle(context.getString(R.string.notification_event_active_title))
-                .setContentText(event.toString()).setSmallIcon(R.drawable.small_mono)
-                .setAutoCancel(false).setOnlyAlertOnce(true).setOngoing(true)
-                .setContentIntent(pendIntent);
+                .setContentText(event.toString()).setAutoCancel(false)
+                .setOnlyAlertOnce(true).setOngoing(true).setContentIntent(pendIntent)
+                .setColor(context.getResources().getColor(R.color.accent));
+
+        EventManager eventManager = new EventManager(context, event);
+        switch (eventManager.getBestRinger()) {
+            case SILENT:
+                notBuilder.setSmallIcon(R.drawable.not_silence);
+                break;
+            case VIBRATE:
+                notBuilder.setSmallIcon(R.drawable.not_vibrate);
+                break;
+            case NORMAL:
+                notBuilder.setSmallIcon(R.drawable.not_normal);
+                break;
+        }
 
         // the ticker text should only be shown the first time the notification is
         // created, not on each update
-        notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + event.toString());
+        notBuilder.setTicker(context.getString(R.string.notification_event_active_starting) + " " + event.toString());
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(NOTIFICATION_ID, notBuilder.build());
@@ -282,6 +297,54 @@ public class NotificationManagerWrapper {
         notBuilder.setContentIntent(pendIntent).setOngoing(true).setOnlyAlertOnce(true)
                 .setAutoCancel(false).setSmallIcon(R.drawable.small_mono);
         return notBuilder;
+    }
+
+    private Bitmap combineDrawablesToBitmap(final Drawable backgroundImage, final BitmapDrawable overlayImage, int width, int height) {
+
+        Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
+                Bitmap.Config.ARGB_8888);
+        // Create a canvas, that will draw on to canvasBitmap.
+        Canvas imageCanvas = new Canvas(canvasBitmap);
+
+        // Draw the image to our canvas
+        backgroundImage.setBounds(0, 0, width, height);
+        backgroundImage.draw(imageCanvas);
+        overlayImage.setBounds(0, 0, (int) (overlayImage.getIntrinsicWidth() * 0.5),
+                (int) (overlayImage.getIntrinsicHeight() * 0.5));
+        final int scaleWidth = 24;
+        final int scaleHeight = 24;
+        final float scaleWidthPercent = ((float) scaleWidth) / overlayImage.getIntrinsicWidth();
+        final float scaleHeightPercent = ((float) scaleHeight) / overlayImage.getIntrinsicHeight();
+        ScaleDrawable scaleDrawable = new ScaleDrawable(overlayImage, 0, scaleWidthPercent,
+                scaleHeightPercent);
+        Drawable scaledOverlay = scaleDrawable.getDrawable();
+        scaledOverlay.setBounds(0, 0, width, height);
+        scaledOverlay.draw(imageCanvas);
+
+        // Combine background and text to a LayerDrawable
+        LayerDrawable layerDrawable = new LayerDrawable(
+                new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        layerDrawable.setBounds(0, 0, width, height);
+        layerDrawable.draw(new Canvas(newBitmap));
+        return newBitmap;
+    }
+
+    private BitmapDrawable getRingerIconForEvent(EventInstance event) {
+        Drawable d = context.getResources().getDrawable(R.drawable.blank);
+        EventManager eventManager = new EventManager(context, event);
+        switch (eventManager.getBestRinger()) {
+            case SILENT:
+                d = context.getResources().getDrawable(R.drawable.ic_state_silent);
+                break;
+            case VIBRATE:
+                d = context.getResources().getDrawable(R.drawable.ic_state_vibrate);
+                break;
+            case NORMAL:
+                d = context.getResources().getDrawable(R.drawable.not_normal_icon);
+                break;
+        }
+        return (BitmapDrawable) d;
     }
 
     private Bitmap createMarkerIcon(Drawable backgroundImage, String text, int width, int height) {
@@ -319,53 +382,5 @@ public class NotificationManagerWrapper {
         layerDrawable.setBounds(0, 0, width, height);
         layerDrawable.draw(new Canvas(newBitmap));
         return newBitmap;
-    }
-
-    private Bitmap combineDrawablesToBitmap(final Drawable backgroundImage, final Drawable overlayImage, int width, int height) {
-
-        Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
-                Bitmap.Config.ARGB_8888);
-        // Create a canvas, that will draw on to canvasBitmap.
-        Canvas imageCanvas = new Canvas(canvasBitmap);
-
-        // Draw the image to our canvas
-        backgroundImage.setBounds(0, 0, width, height);
-        backgroundImage.draw(imageCanvas);
-        overlayImage.setBounds(0, 0, (int) (overlayImage.getIntrinsicWidth() * 0.5),
-                (int) (overlayImage.getIntrinsicHeight() * 0.5));
-        final int scaleWidth = 24;
-        final int scaleHeight = 24;
-        final float scaleWidthPercent = ((float) scaleWidth) / overlayImage.getIntrinsicWidth();
-        final float scaleHeightPercent = ((float) scaleHeight) / overlayImage.getIntrinsicHeight();
-        ScaleDrawable scaleDrawable = new ScaleDrawable(overlayImage, 0, scaleWidthPercent,
-                scaleHeightPercent);
-        Drawable scaledOverlay = scaleDrawable.getDrawable();
-        scaledOverlay.setBounds(0, 0, width, height);
-        scaledOverlay.draw(imageCanvas);
-
-        // Combine background and text to a LayerDrawable
-        LayerDrawable layerDrawable = new LayerDrawable(
-                new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
-        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        layerDrawable.setBounds(0, 0, width, height);
-        layerDrawable.draw(new Canvas(newBitmap));
-        return newBitmap;
-    }
-
-    private Drawable getRingerIconForEvent(EventInstance event) {
-        Drawable d = context.getResources().getDrawable(R.drawable.small_mono);
-        EventManager eventManager = new EventManager(context, event);
-        switch (eventManager.getBestRinger()) {
-            case SILENT:
-                d = context.getResources().getDrawable(R.drawable.ic_state_silent);
-                break;
-            case VIBRATE:
-                d = context.getResources().getDrawable(R.drawable.ic_state_vibrate);
-                break;
-            case NORMAL:
-                d = context.getResources().getDrawable(R.drawable.ic_state_normal);
-                break;
-        }
-        return d;
     }
 }

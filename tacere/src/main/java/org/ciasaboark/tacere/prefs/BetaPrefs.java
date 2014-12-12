@@ -56,9 +56,18 @@ public class BetaPrefs {
         editor.putBoolean(Keys.DISABLE_NOTIFICATONS, disableNotifications).commit();
     }
 
+    public boolean getDisableVibration() {
+        return betaPrefs.getBoolean(Keys.DISABLE_VIBRATION, false);
+    }
+
+    public void setDisableVibration(boolean disableVibration) {
+        editor.putBoolean(Keys.DISABLE_VIBRATION, disableVibration).commit();
+    }
+
     private static class Keys {
         public static final String LARGEDISPLAY = "largedisplay";
         public static final String BETA_PREFS_UNLOCKED = "betaPrefsUnlocked";
         public static final String DISABLE_NOTIFICATONS = "disableNotifications";
+        public static final String DISABLE_VIBRATION = "disableVibration";
     }
 }

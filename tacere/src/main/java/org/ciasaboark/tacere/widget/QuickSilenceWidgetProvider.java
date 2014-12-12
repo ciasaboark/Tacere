@@ -13,10 +13,15 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.activity.ProUpgradeActivity;
+import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 public class QuickSilenceWidgetProvider extends AppWidgetProvider {
 
@@ -24,23 +29,51 @@ public class QuickSilenceWidgetProvider extends AppWidgetProvider {
         final int N = appWidgetIds.length;
         ServiceStateManager serviceStateManager = ServiceStateManager.getInstance(context);
         for (int widgetId : appWidgetIds) {
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                    R.layout.widget_quicksilence);
-            Intent intent = new Intent(context, EventSilencerService.class);
-            if (serviceStateManager.isQuicksilenceActive()) {
-                remoteViews.setImageViewResource(R.id.widget_quicksilence_icon, R.drawable.fab_normal);
-                intent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.CANCEL_QUICKSILENCE);
+            RemoteViews remoteViews;
+
+            Authenticator authenticator = new Authenticator(context);
+            if (!authenticator.isAuthenticated()) {
+                remoteViews = new RemoteViews(context.getPackageName(),
+                        R.layout.widget_quicksilence_pro);
+                Intent proUpgradeIntent = new Intent(context, ProUpgradeActivity.class);
+                PendingIntent upgradePendingIntent = PendingIntent.getActivity(context, 0,
+                        proUpgradeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_upgrade_button,
+                        upgradePendingIntent);
+                remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_fab,
+                        upgradePendingIntent);
             } else {
-                remoteViews.setImageViewResource(R.id.widget_quicksilence_icon, R.drawable.fab_silent);
-                intent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE);
-                Prefs prefs = new Prefs(context);
-                int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
-                intent.putExtra(EventSilencerService.QUICKSILENCE_DURATION, duration);
+
+                if (serviceStateManager.isQuicksilenceActive()) {
+                    remoteViews = new RemoteViews(context.getPackageName(),
+                            R.layout.widget_quicksilence_active);
+                    long endTimeStamp = serviceStateManager.getEndTimeStamp();
+                    DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+                    Date date = new Date(endTimeStamp);
+                    String formattedDate = dateFormatter.format(date);
+                    remoteViews.setTextViewText(R.id.widget_quicksilence_text,
+                            "Silencing until " + formattedDate);
+                    Intent intent = new Intent(context, EventSilencerService.class);
+                    intent.putExtra(EventSilencerService.WAKE_REASON,
+                            RequestTypes.CANCEL_QUICKSILENCE);
+                    PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_fab, pendingIntent);
+                } else {
+                    remoteViews = new RemoteViews(context.getPackageName(),
+                            R.layout.widget_quicksilence_inactive);
+                    Intent intent = new Intent(context, EventSilencerService.class);
+                    intent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE);
+                    Prefs prefs = new Prefs(context);
+                    int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
+                    intent.putExtra(EventSilencerService.QUICKSILENCE_DURATION, duration);
+                    PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_fab, pendingIntent);
+                }
+
+
             }
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_root, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_icon, pendingIntent);
 
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }

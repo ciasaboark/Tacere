@@ -105,8 +105,26 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
                     betaPrefs.setDisableNotifications(disableNotificationsCheckbox.isChecked());
                     AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(getActivity());
                     alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
+//                    if (disableNotificationsCheckbox.isChecked()) {
+//                        NotificationManagerWrapper notificationManagerWrapper = new NotificationManagerWrapper(context);
+//                        notificationManagerWrapper.cancelAllNotifications();
+//                    }
                 }
             });
+
+            final CheckBox disableVibrationCheckbox = (CheckBox) rootView.findViewById(R.id.beta_vibration_checkbox);
+            final RelativeLayout disableVibrationBox = (RelativeLayout) rootView.findViewById(R.id.disable_vibration_box);
+            if (betaPrefs.getDisableVibration()) {
+                disableVibrationCheckbox.setChecked(true);
+            }
+            disableVibrationBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    disableVibrationCheckbox.performClick();
+                    betaPrefs.setDisableVibration(disableVibrationCheckbox.isChecked());
+                }
+            });
+
         } else {
             betaSettingsBox.setVisibility(View.GONE);
         }

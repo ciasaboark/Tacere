@@ -7,18 +7,20 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
-def APP_VERSION_RELEASE = "0";
+def APP_VERSION_RELEASE = "1 - beta 1";
 
 def dateTime = new Date()
 def DATE_STRING = dateTime.getDateString()
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 22
+def VERSION_CODE = 23
 
 android {
     compileSdkVersion 21
@@ -39,7 +41,7 @@ android {
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "BUILD_DATE", "\"" + DATE_STRING + "\""
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""
@@ -48,7 +50,7 @@ android {
             buildConfigField "String", "APP_VERSION_NAME", "\"" + APP_VERSION_NAME + "\""
         }
         debug {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "BUILD_DATE", "\"" + DATE_STRING + "\""
             buildConfigField "String", "APP_VERSION_MAJOR", "\"" + APP_VERSION_MAJOR + "\""

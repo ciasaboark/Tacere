@@ -17,12 +17,13 @@
 
     <!--<item name="button_ongoing" type="color">#00bfa5</item>-->
     <item name="text_button_positive" type="color">@color/accent_alt_light</item>
-    <item name="text_button_negative" type="color">@color/primary_alt_light</item>
-    <item name="dialog_background" type="color">@color/primary_alt_dark</item>
+    <item name="text_button_negative" type="color">@color/accent_alt_light</item>
+    <item name="dialog_background" type="color">@color/accent_alt_dark</item>
 
-    <item name="accent" type="color">#40c4ff</item>
-    <item name="accent_alt_light" type="color">#ff6cd1ff</item>
-    <item name="accent_alt_dark" type="color">#ff1191d4</item>
+    <!--<item name="accent" type="color">#40c4ff</item>-->
+    <item name="accent" type="color">#ffff3c2f</item>
+    <item name="accent_alt_light" type="color">#ffff6054</item>
+    <item name="accent_alt_dark" type="color">#ff99201b</item>
 
     <!--<item name="accent" type="color">#8bc34a</item>-->
     <!--<item name="accent_alt_light" type="color">#9ccc65</item>-->
@@ -63,8 +64,8 @@
     <item name="event_list_background" type="color">@color/windowBackground</item>
 
     <!-- Floating action button colors -->
-    <item name="fab_quicksilence_normal" type="color">@color/accent</item>
-    <item name="fab_quicksilence_pressed" type="color">@color/accent_alt_light</item>
+    <item name="fab_quicksilence_normal" type="color">#ffff3c2f</item>
+    <item name="fab_quicksilence_pressed" type="color">#ffff6054</item>
     <item name="fab_quicksilence_icon_tint" type="color">#FFFFFF</item>
     <item name="fab_stop_normal" type="color">@color/primary</item>
     <item name="fab_stop_pressed" type="color">@color/primary_alt_light</item>
@@ -86,7 +87,7 @@
     <item name="tutorial_event_default" type="color">#fad165</item>
     <item name="tutorial_event_active" type="color">#ff887c</item>
     <item name="tutorial_event_future" type="color">#57d7de</item>
-    <item name="tutorial_icon_tint" type="color">@color/accent_alt_light</item>
+    <item name="tutorial_icon_tint" type="color">#ffffff</item>
     <item name="tutorial_text_button" type="color">@color/primary_alt_dark</item>
     <item name="tutorial_welcome_background" type="color">#ffd0deff</item>
     <item name="tutorial_event_list_background" type="color">#ffffffd1</item>

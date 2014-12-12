@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:initialLayout="@layout/widget_quicksilence_tiny_loading"
+                    android:minHeight="40dp"
+                    android:minWidth="40dp"
+
+                    android:resizeMode="horizontal|vertical"
+
+                    android:updatePeriodMillis="86400000"
+                    android:widgetCategory="home_screen|keyguard">
+</appwidget-provider>

@@ -6,9 +6,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="oval">
     <solid
-        android:background="@drawable/ic_state_normal"
-        android:color="@color/fab_quicksilence_normal"/>
+        android:color="@color/fab_stop_normal"/>
     <size
-        android:width="156dp"
-        android:height="156dp"/>
+        android:width="56dp"
+        android:height="56dp"/>
 </shape>

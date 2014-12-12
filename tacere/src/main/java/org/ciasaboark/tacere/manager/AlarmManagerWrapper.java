@@ -10,11 +10,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
 public class AlarmManagerWrapper {
+    private static final String TAG = "AlarmManagerWrapper";
     // requestCodes for the different pending intents
     private static final int RC_EVENT = 1;
     private static final int RC_QUICKSILENT = 2;
@@ -38,20 +40,21 @@ public class AlarmManagerWrapper {
     }
 
     private void scheduleAlarmAt(long time, RequestTypes type, Bundle additionalArgs) {
+        Log.d(TAG, "alarm scheduled at " + time + " for " + type);
         if (null == type) {
             throw new IllegalArgumentException("unknown type: " + type);
         }
 
         Intent i = new Intent(context, EventSilencerService.class);
-        Bundle args;
+        Bundle bundle;
         if (additionalArgs != null) {
-            args = new Bundle(additionalArgs);
+            bundle = new Bundle(additionalArgs);
         } else {
-            args = new Bundle();
+            bundle = new Bundle();
         }
 
-        args.putSerializable(EventSilencerService.WAKE_REASON, type);
-        i.putExtras(args);
+        bundle.putSerializable(EventSilencerService.WAKE_REASON, type);
+        i.putExtras(bundle);
 
         // note that the android alarm manager allows multiple pending intents to be scheduled per
         // app but only if each intent has a unique request code. Since we want to schedule wakeups
@@ -66,7 +69,7 @@ public class AlarmManagerWrapper {
         }
 
         PendingIntent pintent = PendingIntent.getService(context, requestCode, i,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
     }

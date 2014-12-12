@@ -26,30 +26,9 @@ public class RingerStateManager {
         // only store the current ringer state if we are not transitioning from one event to the
         // next and we are not in a quick silence period
         ServiceStateManager stateManager = ServiceStateManager.getInstance(context);
-        if (stateManager.isServiceNotActive()) {
+        if (getStoredRingerState() == RingerType.UNDEFINED) {
             storeRingerState();
         }
-    }
-
-    /**
-     * Store the current ringer state (vibrate, silent, or normal). Ringer state is stored into
-     * shared preferences
-     */
-    private void storeRingerState() {
-        // TODO this may return a state indicating that a call is ongoing, this should stop
-        // processing and wait for the call to end before adjusting volumes
-        int curRinger = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE))
-                .getRingerMode();
-        prefs.storePreference("curRinger", curRinger);
-    }
-
-    public void restorePhoneRinger() {
-        RingerType storedRinger = getStoredRingerState();
-        if (storedRinger == RingerType.UNDEFINED) {
-            storedRinger = RingerType.NORMAL;
-        }
-        setPhoneRinger(storedRinger);
-        clearStoredRingerState();
     }
 
     /**
@@ -63,6 +42,42 @@ public class RingerStateManager {
         int ringerInt = preferences.getInt("curRinger", RingerType.UNDEFINED.value);
         RingerType ringer = RingerType.getTypeForInt(ringerInt);
         return ringer;
+    }
+
+    /**
+     * Store the current ringer state (vibrate, silent, or normal). Ringer state is stored into
+     * shared preferences
+     */
+    private void storeRingerState() {
+        // TODO this may return a state indicating that a call is ongoing, this should stop
+        // processing and wait for the call to end before adjusting volumes
+        int curRinger = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE))
+                .getRingerMode();
+        RingerType curRingerType = null;
+        switch (curRinger) {
+            case AudioManager.RINGER_MODE_NORMAL:
+                curRingerType = RingerType.NORMAL;
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                curRingerType = RingerType.VIBRATE;
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                curRingerType = RingerType.SILENT;
+                break;
+            default:
+                curRingerType = RingerType.UNDEFINED;
+        }
+
+        prefs.storePreference("curRinger", curRingerType.value);
+    }
+
+    public void restorePhoneRinger() {
+        RingerType storedRinger = getStoredRingerState();
+        if (storedRinger == RingerType.UNDEFINED) {
+            storedRinger = RingerType.NORMAL;
+        }
+        setPhoneRinger(storedRinger);
+        clearStoredRingerState();
     }
 
     public void setPhoneRinger(RingerType ringerType) {

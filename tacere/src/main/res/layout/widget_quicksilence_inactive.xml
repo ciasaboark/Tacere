@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<RelativeLayout
+    android:id="@+id/widget_quicksilence_root"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="80dp"
+    android:layout_margin="6dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/header_background"
+        android:elevation="0dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_quicksilence_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="60dp"
+            android:clickable="false"
+            android:text="Quicksilence Inactive"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/text_color_alt"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/widget_quicksilence_fab"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/action_button_quicksilence"
+        android:foreground="?android:selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/widget_quicksilence_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:focusable="false"
+            android:src="@drawable/fab_silent"
+            android:tint="@android:color/white"/>
+    </FrameLayout>
+
+</RelativeLayout>

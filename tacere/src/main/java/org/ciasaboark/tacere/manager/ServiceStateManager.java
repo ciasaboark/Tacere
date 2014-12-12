@@ -13,6 +13,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 public class ServiceStateManager {
     @SuppressWarnings("unused")
     public static final String SERVICE_STATE_KEY = "serviceState";
+    private static final String SERVICE_STATE_TIMESTAMP_KEY = "serviceStateTimestampKey";
     private static final String TAG = "StateManager";
     private static ServiceStateManager instance = null;
     private static EventInstance activeEvent = null;
@@ -36,20 +37,26 @@ public class ServiceStateManager {
 
     public void resetServiceState() {
         activeEvent = null;
+        prefs.getBaseSharedPreferences().edit().remove(SERVICE_STATE_TIMESTAMP_KEY).commit();
         setServiceState(ServiceStates.NOT_ACTIVE);
     }
 
-    public void setQuickSilenceActive() throws IllegalStateException {
+    public void setQuickSilenceActive(long endTimestamp) throws IllegalStateException {
         if (isEventActive()) {
             throw new IllegalArgumentException("Can not transition to quicksilence while an event is still active");
         }
         activeEvent = null;
         setServiceState(ServiceStates.QUICKSILENCE);
+        storeEndTimeStamp(endTimestamp);
     }
 
     public boolean isEventActive() {
         return activeEvent != null &&
                 ServiceStates.EVENT_ACTIVE.equals(getServiceState());
+    }
+
+    private void storeEndTimeStamp(long timestamp) {
+        prefs.storePreference(SERVICE_STATE_TIMESTAMP_KEY, timestamp);
     }
 
     private String getServiceState() {
@@ -79,6 +86,11 @@ public class ServiceStateManager {
         return storedString;
     }
 
+    public long getEndTimeStamp() {
+        long endTimeStamp = prefs.getBaseSharedPreferences().getLong(SERVICE_STATE_TIMESTAMP_KEY, 0);
+        return endTimeStamp;
+    }
+
     public boolean isEventNotActive() {
         return !isEventActive();
     }
@@ -93,6 +105,10 @@ public class ServiceStateManager {
 
     public boolean isQuicksilenceNotActive() {
         return !isQuicksilenceActive();
+    }
+
+    public boolean isQuicksilenceActive() {
+        return ServiceStates.QUICKSILENCE.equals(getServiceState());
     }
 
     public long getActiveEventId() {
@@ -116,11 +132,8 @@ public class ServiceStateManager {
         }
 
         activeEvent = event;
+        prefs.storePreference(SERVICE_STATE_TIMESTAMP_KEY, event.getEffectiveEnd());
         setServiceState(ServiceStates.EVENT_ACTIVE);
-    }
-
-    public boolean isQuicksilenceActive() {
-        return ServiceStates.QUICKSILENCE.equals(getServiceState());
     }
 
     public class ServiceStates {

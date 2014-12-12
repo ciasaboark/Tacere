@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
@@ -139,7 +140,7 @@
     <string name="notification_quicksilence_title">Quick Silence</string>
     <string name="settings_restored">Settings have been restored to defaults</string>
     <string name="notification_time_and_unit">%1$d %2$s</string>
-    <string name="notification_quicksilence_description">Silencing for %1$s%2$s. Touch to cancel.</string>
+    <string name="notification_quicksilence_description">Silencing until %1$s. Touch to cancel.</string>
     <string name="notification_quicksilence_ticker">Quick Silence activating</string>
     <string name="notification_event_active_title">Tacere: Event active</string>
     <string name="notification_event_active_title_public">Tacere: Active</string>

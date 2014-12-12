@@ -22,6 +22,8 @@ import org.ciasaboark.tacere.manager.NotificationManagerWrapper;
 import org.ciasaboark.tacere.manager.RingerStateManager;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.manager.VolumesManager;
+import org.ciasaboark.tacere.notifier.WidgetNotifier;
+import org.ciasaboark.tacere.prefs.BetaPrefs;
 import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.Deque;
@@ -29,6 +31,7 @@ import java.util.Deque;
 public class EventSilencerService extends IntentService {
     public static final String QUICKSILENCE_DURATION = "duration";
     public static final String WAKE_REASON = "wake_reason";
+    public static final String QUICKSILENCE_BROADCAST_KEY = "quicksilence";
     private static final String TAG = "EventSilencerService";
     private static final long TEN_SECONDS = 10000;
     private static Prefs prefs;
@@ -111,6 +114,7 @@ public class EventSilencerService extends IntentService {
                 } else { // normal wake requests (but service is marked to be inactive)
                     shutdownService();
                 }
+                updateWidgets();
                 break;
             default:
                 Log.e(TAG, "got unknown request type, restarting normally");
@@ -150,9 +154,15 @@ public class EventSilencerService extends IntentService {
         // quick silence requests can occur during three states, either no event is active, an event
         // is active, or a previous quick silence request is still ongoing. If this request occurred
         // while no event was active, then save the current ringer state so it can be restored later
+        if (stateManager.isQuicksilenceNotActive()) {
+            //only vibrate if we are going from nothing active -> quicksilence or from
+            //event active -> quicksilence.
+            vibrate();
+        }
         ringerStateManager.storeRingerStateIfNeeded();
         stateManager.resetServiceState();
-        stateManager.setQuickSilenceActive();
+        long endTimeStamp = System.currentTimeMillis() + durationMinutes * EventInstance.MILLISECONDS_IN_MINUTE;
+        stateManager.setQuickSilenceActive(endTimeStamp);
 
         long wakeAt = System.currentTimeMillis() + (EventInstance.MILLISECONDS_IN_MINUTE
                 * durationMinutes);
@@ -161,9 +171,10 @@ public class EventSilencerService extends IntentService {
 
         //quick silence requests are always explicitly request to silence the ringer
         ringerStateManager.setPhoneRinger(RingerType.SILENT);
-        vibrate();
+
         notificationManager.displayQuickSilenceNotification(durationMinutes);
         sendQuicksilenceBroadcast();
+        updateWidgets();
     }
 
     /**
@@ -173,11 +184,13 @@ public class EventSilencerService extends IntentService {
     private void cancelQuickSilence() {
         stateManager.resetServiceState();
         volumesManager.restoreVolumes();
+        ringerStateManager.restorePhoneRinger();
         notificationManager.cancelAllNotifications();
         vibrate();
         // schedule an immediate normal wakeup
         alarmManager.scheduleNormalWakeAt(System.currentTimeMillis());
         sendQuicksilenceBroadcast();
+        updateWidgets();
     }
 
     private void syncDatabaseIfEmpty() {
@@ -246,14 +259,24 @@ public class EventSilencerService extends IntentService {
         shutdown();
     }
 
+    private void updateWidgets() {
+        WidgetNotifier widgetNotifier = new WidgetNotifier(this);
+        widgetNotifier.updateAllWidgets();
+    }
+
     private void vibrate() {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        long[] pattern = {0, 500, 200, 500};
-        vibrator.vibrate(pattern, -1);
+        BetaPrefs betaPrefs = new BetaPrefs(this);
+        if (betaPrefs.getDisableVibration()) {
+            Log.d(TAG, "vibrations disabled");
+        } else {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            long[] pattern = {0, 500, 200, 500};
+            vibrator.vibrate(pattern, -1);
+        }
     }
 
     private void sendQuicksilenceBroadcast() {
-        Intent intent = new Intent("quicksilence");
+        Intent intent = new Intent(QUICKSILENCE_BROADCAST_KEY);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

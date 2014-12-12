@@ -3,6 +3,8 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
+
+
 apply plugin: 'com.android.library'
 
 android {
@@ -10,14 +12,14 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "com.viewpagerindicator"
+//        applicationId "com.viewpagerindicator"
         minSdkVersion 4
         targetSdkVersion 4
     }
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }

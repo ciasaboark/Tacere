@@ -418,14 +418,14 @@ public class DatabaseInterface {
         String whereClause = Columns.EFFECTIVE_END + " < ?";
         String[] args = new String[]{String.valueOf(time)};
         int rowsDeleted = eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, whereClause, args);
-        Log.d(TAG, "pruned " + rowsDeleted + " events that end after " + time);
+        Log.d(TAG, "pruned " + rowsDeleted + " events that end before " + time);
     }
 
     private void pruneEventsBeginAfter(long time) {
         String whereClause = Columns.BEGIN + " > ?";
         String[] args = new String[]{String.valueOf(time)};
         int rowsDeleted = eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS, whereClause, args);
-        Log.d(TAG, "pruned " + rowsDeleted + " events that end after " + time);
+        Log.d(TAG, "pruned " + rowsDeleted + " events that begin after " + time);
     }
 
     private void pruneEventsFromRemovedCalendars() {
@@ -468,38 +468,6 @@ public class DatabaseInterface {
             }
         }
     }
-
-//    private void pruneEventsNotInList(List<Long> calendarInstanceIds) {
-//        //TODO test
-//        if (calendarInstanceIds == null || calendarInstanceIds.size() == 0) {
-//            return;
-//        } else {
-//
-//            String[] whereArgs = new String[calendarInstanceIds.size()];
-//            Iterator i = calendarInstanceIds.iterator();
-//            int index = 0;
-//            String idList = "";
-//            while (i.hasNext()) {
-//                String instanceId = String.valueOf(i.next());
-//                whereArgs[index] = instanceId;
-//                idList += " ?";
-//                index++;
-//                if (i.hasNext()) {
-//                    idList += ", ";
-//                }
-//            }
-//            String whereClause = Columns._ID + " NOT IN (" + idList + ")";
-//
-//            try {
-//                int deletedRowCount = eventsDB.delete(EventDatabaseOpenHelper.TABLE_EVENTS,
-//                        whereClause, whereArgs);
-//                Log.d(TAG, "deleted " + deletedRowCount + " events from local database that were no " +
-//                        "longer in system database");
-//            } catch (Exception e) {
-//                Log.e(TAG, "error deleting events not in system calendar: " + e.getMessage());
-//            }
-//        }
-//    }
 
     private Cursor getCalendarCursor(long begin, long end) {
         return Instances.query(context.getContentResolver(), SYSTEM_DB_PROJECTION,

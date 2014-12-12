@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014 Jonathan Nelson
+ * Released under the BSD license.  For details see the COPYING file.
+ */
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
@@ -6,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0-rc2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

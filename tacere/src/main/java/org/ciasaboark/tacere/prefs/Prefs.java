@@ -87,6 +87,10 @@ public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener
 
     }
 
+    public SharedPreferences getBaseSharedPreferences() {
+        return sharedPreferences;
+    }
+
     public List<Long> getSelectedCalendarsIds() {
         String calendars = sharedPreferences.getString(Keys.SELECTED_CALENDARS, "");
         String[] calendarIdArray = calendars.split(",");

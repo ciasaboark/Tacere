@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2014 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
@@ -168,6 +169,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
+
         <receiver android:name="org.ciasaboark.tacere.receiver.ProviderChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PROVIDER_CHANGED"/>
@@ -177,16 +179,29 @@
             </intent-filter>
         </receiver>
 
-        <!-- <receiver -->
-        <!-- android:name=".widget.QuickSilenceWidgetProvider" -->
-        <!-- android:label="Tacere - Quicksilence" -->
-        <!-- android:icon="@drawable/ic_launcher"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> -->
-        <!-- </intent-filter> -->
-        <!-- <meta-data android:name="android.appwidget.provider" -->
-        <!-- android:resource="@xml/quicksilence_widget_info" /> -->
-        <!-- </receiver> -->
+        <receiver
+            android:name=".widget.QuickSilenceWidgetProvider"
+            android:icon="@drawable/ic_launcher"
+            android:label="Tacere - Quicksilence 3x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quicksilence_widget_info"/>
+        </receiver>
+
+        <receiver
+            android:name=".widget.QuickSilenceTinyWidgetProvider"
+            android:icon="@drawable/ic_launcher"
+            android:label="Tacere - Quicksilence 1x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quicksilence_tiny_widget_info"/>
+        </receiver>
 
 
         <!-- <receiver -->

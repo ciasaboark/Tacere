@@ -25,6 +25,7 @@ import org.ciasaboark.tacere.billing.google.IabResult;
 import org.ciasaboark.tacere.billing.google.Inventory;
 import org.ciasaboark.tacere.billing.google.Purchase;
 import org.ciasaboark.tacere.billing.google.SkuDetails;
+import org.ciasaboark.tacere.notifier.WidgetNotifier;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -274,6 +275,9 @@ public class ProUpgradeActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        WidgetNotifier widgetNotifier = new WidgetNotifier(this);
+        widgetNotifier.updateAllWidgets();
+
         if (mHelper != null) mHelper.dispose();
         mHelper = null;
     }

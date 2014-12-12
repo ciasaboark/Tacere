@@ -5,15 +5,13 @@
 
 package org.ciasaboark.tacere.database;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.ciasaboark.tacere.widget.ActiveEventWidgetProvider;
+import org.ciasaboark.tacere.notifier.WidgetNotifier;
 
 /**
  * Created by Jonathan Nelson on 8/11/14.
@@ -54,21 +52,11 @@ public class DataSetManager {
         intent.putExtras(args);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
-        Intent activeEventWidgetIntent = new Intent(context, ActiveEventWidgetProvider.class);
-        activeEventWidgetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
-        // since it seems the onUpdate() is only fired on that:
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        ComponentName thisWidget = new ComponentName(context,
-                ActiveEventWidgetProvider.class);
-        int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
-        activeEventWidgetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-        context.sendBroadcast(activeEventWidgetIntent);
+        WidgetNotifier widgetNotifier = new WidgetNotifier(context);
+        widgetNotifier.updateAllWidgets();
     }
 
     public void broadcastDataSetChangedMessage() {
         broadcastDataSetChangedMessage(new Bundle());
     }
-
-
 }

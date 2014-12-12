@@ -149,7 +149,7 @@ public class MainActivity extends ActionBarActivity {
         };
 
         LocalBroadcastManager.getInstance(this).registerReceiver(quickSilenceReceiver,
-                new IntentFilter("quicksilence"));
+                new IntentFilter(EventSilencerService.QUICKSILENCE_BROADCAST_KEY));
 
         // display the updates dialog if it hasn't been shown yet
         Updates updates = new Updates(this, this);
@@ -185,31 +185,6 @@ public class MainActivity extends ActionBarActivity {
     public void onPause() {
         super.onPause();
         listViewIndex = eventListview.getFirstVisiblePosition();
-        final FloatingActionButton quickSilenceImageButton = (FloatingActionButton) findViewById(R.id.quickSilenceButton);
-        if (Build.VERSION.SDK_INT >= 21) {
-            int cx = (quickSilenceImageButton.getLeft() + quickSilenceImageButton.getRight()) / 2;
-            int cy = (quickSilenceImageButton.getTop() + quickSilenceImageButton.getBottom()) / 2;
-
-            // get the initial radius for the clipping circle
-            int initialRadius = quickSilenceImageButton.getWidth();
-
-            // create the animation (the final radius is zero)
-
-            //TODO triggers illegalstateexception
-//            Animator anim =
-//                    ViewAnimationUtils.createCircularReveal(quickSilenceImageButton, cx, cy, initialRadius, 0);
-//            anim.addListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    super.onAnimationEnd(animation);
-//                    quickSilenceImageButton.setVisibility(View.INVISIBLE);
-//                }
-//            });
-//            anim.start();
-        } else {
-            quickSilenceImageButton.hide();
-//            quickSilenceImageButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     @Override
@@ -341,9 +316,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 quickSilenceImageButton.setEnabled(false);
-                quickSilenceImageButton.hide();
-                quickSilenceImageButton.setVisibility(View.GONE);
-
                 ServiceStateManager ssManager = ServiceStateManager.getInstance(getApplicationContext());
                 if (ssManager.isQuicksilenceActive()) {
                     stopOngoingQuicksilence();
@@ -353,8 +325,6 @@ public class MainActivity extends ActionBarActivity {
                     drawStopQuicksilenceActionButton();
                 }
 
-                quickSilenceImageButton.setVisibility(View.VISIBLE);
-                quickSilenceImageButton.show();
                 quickSilenceImageButton.setEnabled(true);
             }
         });
