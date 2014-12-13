@@ -75,12 +75,15 @@ public class NotificationManagerWrapper {
             // FLAG_CANCEL_CURRENT is required to make sure that the extras are including in the new
             // pending intent
             PendingIntent pendIntent = PendingIntent.getService(context,
-                    NOTIFICATION_ID, notificationIntent,
+                    REQUEST_CODES.QUICKSILENCE_CANCEL, notificationIntent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
 
             //an intent to open the main app
             Intent openMainIntent = new Intent(context, MainActivity.class);
-            PendingIntent openMainPendIntent = PendingIntent.getActivity(context, 0,
+            openMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            openMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent openMainPendIntent = PendingIntent.getActivity(context,
+                    REQUEST_CODES.QUICKSILENCE_OPEN_MAIN,
                     openMainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
             //An additional button to extend the quicksilence by 15min
@@ -88,7 +91,8 @@ public class NotificationManagerWrapper {
             Intent addMinutesIntent = new Intent(context, ExtendQuicksilenceService.class);
             addMinutesIntent.putExtra(ExtendQuicksilenceService.ORIGINAL_END_TIMESTAMP, endTime);
             addMinutesIntent.putExtra(ExtendQuicksilenceService.EXTEND_LENGTH, 15);
-            PendingIntent addMinPendIntent = PendingIntent.getService(context, 15, addMinutesIntent,
+            PendingIntent addMinPendIntent = PendingIntent.getService(context,
+                    REQUEST_CODES.QUICKSILENCE_ADD_TIME, addMinutesIntent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
 
             NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
@@ -157,13 +161,13 @@ public class NotificationManagerWrapper {
     private void displayNewEventNotification(EventInstance event) {
         // clicking the notification should take the user to the app
         Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         // FLAG_CANCEL_CURRENT is required to make sure that the extras are including in
         // the new pending intent
         PendingIntent pendIntent = PendingIntent.getActivity(context,
-                NOTIFICATION_ID, notificationIntent,
+                REQUEST_CODES.EVENT_OPEN_MAIN, notificationIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
 
@@ -189,17 +193,16 @@ public class NotificationManagerWrapper {
         // this intent will be attached to the button on the notification
         Intent skipEventIntent = new Intent(context, SkipEventService.class);
         skipEventIntent.putExtra(SkipEventService.EVENT_ID_TAG, event.getId());
-        PendingIntent skipEventPendIntent = PendingIntent.getService(context, 0, skipEventIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        notBuilder
-                .addAction(R.drawable.not_ignore, context.getString(R.string.notification_event_skip), skipEventPendIntent);
+        PendingIntent skipEventPendIntent = PendingIntent.getService(context,
+                REQUEST_CODES.EVENT_IGNORE, skipEventIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        notBuilder.addAction(R.drawable.not_ignore, context.getString(R.string.notification_event_skip), skipEventPendIntent);
 
         //an intent to add an additional 15 minutes of silencing for an event
         Intent addSilencingIntent = new Intent(context, ExtendEventService.class);
         addSilencingIntent.putExtra(ExtendEventService.INSTANCE_ID, event.getId());
         addSilencingIntent.putExtra(ExtendEventService.NEW_EXTEND_LENGTH, event.getExtendMinutes() + 15); //TODO use minutes stored in prefs
-        PendingIntent addSilenceingPendIntent = PendingIntent.getService(context, 0,
-                addSilencingIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent addSilenceingPendIntent = PendingIntent.getService(context,
+                REQUEST_CODES.EVENT_ADD_TIME, addSilencingIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         Authenticator authenticator = new Authenticator(context);
         if (authenticator.isAuthenticated()) {
             notBuilder.addAction(R.drawable.not_clock, "+15", addSilenceingPendIntent);
@@ -252,7 +255,7 @@ public class NotificationManagerWrapper {
         // FLAG_CANCEL_CURRENT is required to make sure that the extras are including in
         // the new pending intent
         PendingIntent pendIntent = PendingIntent.getActivity(context,
-                NOTIFICATION_ID, notificationIntent,
+                REQUEST_CODES.EVENT_OPEN_MAIN, notificationIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(
@@ -382,5 +385,14 @@ public class NotificationManagerWrapper {
         layerDrawable.setBounds(0, 0, width, height);
         layerDrawable.draw(new Canvas(newBitmap));
         return newBitmap;
+    }
+
+    private class REQUEST_CODES {
+        public static final int QUICKSILENCE_OPEN_MAIN = 1;
+        public static final int QUICKSILENCE_CANCEL = 2;
+        public static final int QUICKSILENCE_ADD_TIME = 3;
+        public static final int EVENT_OPEN_MAIN = 4;
+        public static final int EVENT_IGNORE = 5;
+        public static final int EVENT_ADD_TIME = 6;
     }
 }
