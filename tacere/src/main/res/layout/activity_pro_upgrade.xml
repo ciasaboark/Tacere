@@ -340,15 +340,70 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                     <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/pro_upgrade_feature1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="24dp"
+                        android:paddingRight="16dp"
+                        android:singleLine="false"
+                        android:text="• choose which calendars to sync"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <TextView
+                        android:id="@+id/pro_upgrade_feature2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="24dp"
+                        android:paddingRight="16dp"
+                        android:singleLine="false"
+                        android:text="• set different defaults for each calendar"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <TextView
+                        android:id="@+id/pro_upgrade_feature3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="24dp"
+                        android:paddingRight="16dp"
+                        android:singleLine="false"
+                        android:text="• share settings among repeating events"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <TextView
+                        android:id="@+id/pro_upgrade_feature4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="24dp"
+                        android:paddingRight="16dp"
+                        android:singleLine="false"
+                        android:text="• unlock homescreen widgets"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <TextView
+                        android:id="@+id/pro_upgrade_feature5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="24dp"
+                        android:paddingRight="16dp"
+                        android:singleLine="false"
+                        android:text="• easily extend silencing period from notifications"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <TextView
+                        android:id="@+id/pro_upgrade_feature_more"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="16dp"
                         android:paddingLeft="24dp"
                         android:paddingRight="16dp"
                         android:singleLine="false"
-                        android:text="-choose which calendars to sync\n-set different defaults for each calendar\n-share settings among repeating events\n\nmore comming..."
-                        android:textAppearance="@android:style/TextAppearance.Medium"/>
+                        android:text="more comming..."
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
                 </LinearLayout>
 
                 <RelativeLayout
