@@ -109,9 +109,14 @@ public class EventSilencerService extends IntentService {
                 } else {
                     syncDatabaseIfEmpty();
                 }
-                if (prefs.isServiceActivated() && !stateManager.isQuicksilenceActive()) {
-                    checkForActiveEventsAndSilence();
+                if (prefs.isServiceActivated()) {
+                    if (stateManager.isQuicksilenceActive()) {
+                        Log.d(TAG, "normal wake, but quicksilence is active, will wait for next wake");
+                    } else {
+                        checkForActiveEventsAndSilence();
+                    }
                 } else { // normal wake requests (but service is marked to be inactive)
+                    Log.d(TAG, "normal wake, but service is not enabled, shutting down.");
                     shutdownService();
                 }
                 updateWidgets();
@@ -201,10 +206,12 @@ public class EventSilencerService extends IntentService {
     }
 
     private void checkForActiveEventsAndSilence() {
+        Log.d(TAG, "checking for events to silence");
         Deque<EventInstance> events = databaseInterface.getAllActiveEvents();
         boolean foundEvent = false;
         for (EventInstance event : events) {
             if (shouldEventSilence(event)) {
+                Log.d(TAG, "found event to silence for: " + event.toString());
                 foundEvent = true;
                 silenceForEventAndShowNotification(event);
                 break;
@@ -212,11 +219,13 @@ public class EventSilencerService extends IntentService {
         }
 
         if (!foundEvent) {
+            Log.d(TAG, "did not find an event to silence for");
             //if we couldn't find any events, then do some cleanup and schedule the service to be
             //restarted when the last active checked event ends. If there were no active events,
             //then we need to sleep until the next event in the database starts.  If there are no
             //events in the database either, then just sleep for 24 hours.
             if (stateManager.isEventActive()) {
+                Log.d(TAG, "event previously active, but non active now, restoring volumes");
                 vibrate();
                 stateManager.resetServiceState();
                 notificationManager.cancelAllNotifications();
@@ -229,13 +238,15 @@ public class EventSilencerService extends IntentService {
             if (!events.isEmpty()) {
                 EventInstance lastActiveEvent = events.getLast();
                 wakeAt = lastActiveEvent.getOriginalEnd();
+                Log.d(TAG, "sleeping until last known event ends at " + wakeAt);
             } else {
                 EventInstance nextInactiveEvent = databaseInterface.nextEvent();
                 if (nextInactiveEvent != null) {
                     wakeAt = nextInactiveEvent.getBegin() - (EventInstance.MILLISECONDS_IN_MINUTE * prefs.getBufferMinutes());
+                    Log.d(TAG, "sleeping until next known event starts at " + wakeAt);
                 } else {
+                    Log.d(TAG, "sleeping for 24 hrs");
                     wakeAt = System.currentTimeMillis() + EventInstance.MILLISECONDS_IN_DAY;
-
                 }
             }
 
@@ -248,18 +259,21 @@ public class EventSilencerService extends IntentService {
      * ringer and cancel any set alarms
      */
     private void shutdownService() {
+        Log.d(TAG, "shutting down service");
         if (stateManager.isEventActive()) {
+            Log.d(TAG, "event currently active, restoring volumes");
             vibrate();
             stateManager.resetServiceState();
             notificationManager.cancelAllNotifications();
             volumesManager.restoreVolumes();
+            ringerStateManager.setPhoneRinger(ringerStateManager.getStoredRingerState());
         }
-        ringerStateManager.setPhoneRinger(ringerStateManager.getStoredRingerState());
         alarmManager.cancelAllAlarms();
         shutdown();
     }
 
     private void updateWidgets() {
+        Log.d(TAG, "updating widgets");
         WidgetNotifier widgetNotifier = new WidgetNotifier(this);
         widgetNotifier.updateAllWidgets();
     }
