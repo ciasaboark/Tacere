@@ -1,31 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-   <WebView
-       android:id="@+id/updatesWebView"
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:layout_above="@+id/updatesButton"
-       android:layout_alignParentLeft="true"
-       android:layout_alignParentRight="true"
-       android:layout_alignParentTop="true"
-       android:layout_gravity="fill_horizontal"
-       android:layout_marginLeft="0dp"
-       android:layout_marginTop="0dp" />
+    <WebView
+        android:id="@+id/updatesWebView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/updates_title"
+        android:layout_gravity="fill_horizontal"/>
 
-   <Button
-       android:id="@+id/updatesButton"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentBottom="true"
-       android:layout_alignParentLeft="true"
-       android:layout_alignParentRight="true"
-       android:text="@string/hide_updates"
-       android:textAllCaps="false"
-       android:background="@null"
-       android:textColor="@color/primary"
-       />
+    <TextView
+        android:id="@+id/updates_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:padding="16dp"
+        android:text="Updates"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <Button
+        android:id="@+id/updatesButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="false"
+        android:layout_below="@id/updatesWebView"
+        android:layout_margin="16dp"
+        android:padding="16dp"
+        android:text="@string/close"
+        android:textAllCaps="false"
+        android:textColor="@color/text_button_negative"/>
 
 </RelativeLayout>

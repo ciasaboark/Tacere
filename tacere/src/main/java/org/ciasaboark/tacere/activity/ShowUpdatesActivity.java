@@ -69,6 +69,7 @@ public class ShowUpdatesActivity extends Activity {
         }
 
         WebView webView = (WebView) findViewById(R.id.updatesWebView);
+        webView.loadUrl("file:///android_asset/empty.html");
         webView.loadData(htmlData, "text/html", "UTF8");
 
         //All links should open in the default browser, not this WebView
@@ -84,6 +85,8 @@ public class ShowUpdatesActivity extends Activity {
         });
         webView.setBackgroundColor(0x00000000);
         webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+        webView.setVisibility(View.GONE);
+        webView.setVisibility(View.VISIBLE);
 
         Button closeButton = (Button) findViewById(R.id.updatesButton);
         if (showingUpdatesFromMainScreen) {

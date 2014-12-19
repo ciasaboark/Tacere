@@ -7,9 +7,7 @@ package org.ciasaboark.tacere.activity.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -19,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.bug.CrashReportManager;
 
 public class TutorialCrashReporterFragment extends Fragment {
     private int layout = R.layout.fragment_tutorial_crash_reporter;
@@ -61,16 +60,14 @@ public class TutorialCrashReporterFragment extends Fragment {
         });
 
         final CheckBox sendReportsCheckbox = (CheckBox) rootView.findViewById(R.id.tutorial_crash_report_checkbox);
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        final String ARCA_DISABLE = "acra.disable";
-        boolean isAcraDisabled = prefs.getBoolean(ARCA_DISABLE, false);
+        final CrashReportManager crashReportManager = new CrashReportManager(getActivity());
 
-        sendReportsCheckbox.setChecked(!isAcraDisabled);
+        sendReportsCheckbox.setChecked(crashReportManager.isReportsEnabled());
         sendReportsCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean willSendReports = sendReportsCheckbox.isChecked();
-                prefs.edit().putBoolean(ARCA_DISABLE, !willSendReports).commit();
+                crashReportManager.setReportsEnabled(willSendReports);
             }
         });
         return rootView;

@@ -5,8 +5,9 @@
 
 <resources>
 
-    <style name="DialogOnLargeDisplay" parent="Theme.AppCompat.Light.Dialog">
+    <style name="DialogOnLargeDisplay" parent="Dialog">
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
         <!--<item name="android:windowBackground">@color/dialog_background</item>-->
         <!--<item name="android:textColor">@color/text_color_alt</item>-->
         <item name="android:windowContentOverlay">@null</item>

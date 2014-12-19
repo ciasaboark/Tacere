@@ -14,6 +14,8 @@ import org.acra.ReportField;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
+import org.ciasaboark.tacere.prefs.BetaPrefs;
+import org.ciasaboark.tacere.prefs.Prefs;
 
 @ReportsCrashes(
         formUri = "https://ciasaboark.cloudant.com/acra-tacere/_design/acra-storage/_update/report",
@@ -35,7 +37,14 @@ import org.acra.sender.HttpSender;
                 ReportField.DEVICE_FEATURES,
                 ReportField.DISPLAY,
                 ReportField.USER_CRASH_DATE,
-
+                ReportField.LOGCAT,
+                ReportField.EVENTSLOG,
+                ReportField.SHARED_PREFERENCES,
+                ReportField.CUSTOM_DATA,
+        },
+        additionalSharedPreferences = {
+                Prefs.PREFERENCES_NAME,
+                BetaPrefs.PREFS_FILE,
         },
         mode = ReportingInteractionMode.TOAST,
         resToastText = R.string.toast_crash

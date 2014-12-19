@@ -49,14 +49,9 @@ public class AdvancedSettingsActivity extends ActionBarActivity {
     private void attachFragment() {
         if (findViewById(R.id.advanced_settings_fragment) != null) {
             AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment) getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
-            if (advancedSettingsFragment == null) {
-                advancedSettingsFragment = new AdvancedSettingsFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.advanced_settings_fragment, advancedSettingsFragment, AdvancedSettingsFragment.TAG).commit();
-            } else {
-                //fragment has already been attached, ask it to update its view
-                advancedSettingsFragment.drawAllWidgets();
-            }
+            advancedSettingsFragment = new AdvancedSettingsFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.advanced_settings_fragment, advancedSettingsFragment, AdvancedSettingsFragment.TAG).commit();
         }
     }
 

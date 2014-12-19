@@ -27,8 +27,8 @@ import java.util.Map;
  * @author Jonathan Nelson <ciasaboark@gmail.com>
  */
 public class Prefs implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
     private static final String TAG = "Prefs";
-    private static final String PREFERENCES_NAME = "org.ciasaboark.tacere.preferences";
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.OnSharedPreferenceChangeListener listener;
     private SharedPreferences.Editor editor;

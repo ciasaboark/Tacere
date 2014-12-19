@@ -14,6 +14,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -157,7 +158,9 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
                 int previouslySelectedRinger = ringerList.indexOf(prefs.getRingerType().toString());
 
 
-                final AlertDialog alert = new AlertDialog.Builder(context)
+                final AlertDialog alert = new AlertDialog.Builder(
+                        new ContextThemeWrapper(context, R.style.Dialog)
+                )
                         .setTitle(R.string.settings_section_general_ringer)
                         .setSingleChoiceItems(filteredRingerTypes, previouslySelectedRinger,
                                 new DialogInterface.OnClickListener() {

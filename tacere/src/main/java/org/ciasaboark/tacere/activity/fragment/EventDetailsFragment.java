@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -59,6 +60,8 @@ public class EventDetailsFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+
         long instanceId = getArguments().getLong("instanceId");
         context = getActivity();
         dataSetManager = new DataSetManager(this, context);
@@ -73,7 +76,9 @@ public class EventDetailsFragment extends DialogFragment {
             return null;
         }
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
+                new ContextThemeWrapper(getActivity(), R.style.Dialog)
+        );
         view = getActivity().getLayoutInflater().inflate(R.layout.dialog_event_longclick, null);
         setupWidgetsForView();
         dialogBuilder.setView(view);
@@ -186,8 +191,10 @@ public class EventDetailsFragment extends DialogFragment {
 
                 Drawable icon = getResources().getDrawable(R.drawable.history);
                 icon.mutate().setColorFilter(
-                        getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                        getResources().getColor(R.color.dialog_icon_tint), PorterDuff.Mode.MULTIPLY);
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        new ContextThemeWrapper(getActivity(), R.style.Dialog)
+                )
                         .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                         .setMessage(message)
                         .setPositiveButton(R.string.event_dialog_reset_event_series_ok, new DialogInterface.OnClickListener() {
@@ -210,9 +217,9 @@ public class EventDetailsFragment extends DialogFragment {
                 long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
                 String message = getResources().getString(R.string.event_dialog_reset_all_instances_message);
                 Drawable icon = getResources().getDrawable(R.drawable.history);
-                icon.mutate().setColorFilter(
-                        getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        new ContextThemeWrapper(getActivity(), R.style.Dialog)
+                )
                         .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                         .setMessage(String.format(message, event.getTitle(), eventRepetions))
                         .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
@@ -247,9 +254,9 @@ public class EventDetailsFragment extends DialogFragment {
             long eventRepetions = databaseInterface.getEventRepetitionCount(event.getEventId());
             String positiveButtonText = getResources().getString(R.string.event_dialog_save_all_instances_message);
             Drawable icon = getResources().getDrawable(R.drawable.history);
-            icon.mutate().setColorFilter(
-                    getResources().getColor(R.color.icon_tint), PorterDuff.Mode.MULTIPLY);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+            AlertDialog.Builder builder = new AlertDialog.Builder(
+                    new ContextThemeWrapper(getActivity(), R.style.Dialog)
+            )
                     .setTitle(R.string.event_dialog_repeating_event_conformation_title)
                     .setMessage(String.format(positiveButtonText, event.getTitle(), eventRepetions))
                     .setPositiveButton(R.string.event_dialog_save_all_instances, new DialogInterface.OnClickListener() {
@@ -360,7 +367,7 @@ public class EventDetailsFragment extends DialogFragment {
                 colorizedIcon = getResources().getDrawable(R.drawable.ic_state_ignore);
         }
 
-        int color = getResources().getColor(R.color.icon_tint);
+        int color = getResources().getColor(R.color.dialog_icon_tint);
         if (event.getRingerType() == ringerType) {
             color = getResources().getColor(R.color.accent);
         }

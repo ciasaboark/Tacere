@@ -16,14 +16,20 @@
     <item name="header_text_color" type="color">@color/windowBackground</item>
 
     <!--<item name="button_ongoing" type="color">#00bfa5</item>-->
-    <item name="text_button_positive" type="color">@color/accent_alt_light</item>
-    <item name="text_button_negative" type="color">@color/accent_alt_light</item>
-    <item name="dialog_background" type="color">@color/accent_alt_dark</item>
+    <item name="text_button_positive" type="color">#00E5FF</item>
+    <item name="text_button_negative" type="color">#ff009cae</item>
+    <item name="text_button_disabled" type="color">#B2EBF2</item>
+
+    <!-- Dialogs -->
+    <item name="dialog_background" type="color">#ffd7d7d7</item>
+    <item name="dialog_button_bar_background" type="color">#ff454545</item>
+    <item name="dialog_icon_tint" type="color">@color/icon_tint</item>
 
     <!--<item name="accent" type="color">#40c4ff</item>-->
-    <item name="accent" type="color">#ffff3c2f</item>
-    <item name="accent_alt_light" type="color">#ffff6054</item>
-    <item name="accent_alt_dark" type="color">#ff99201b</item>
+    <item name="accent" type="color">#00E5FF</item>
+    <item name="accent_alt_light" type="color">#18FFFF</item>
+    <item name="accent_alt_dark" type="color">#00B8D4</item>
+
 
     <!--<item name="accent" type="color">#8bc34a</item>-->
     <!--<item name="accent_alt_light" type="color">#9ccc65</item>-->
@@ -46,12 +52,13 @@
     <item name="menu_background" type="color">#ffffff</item>
     <item name="menu_text" type="color">#ffffff</item>
     <item name="icon_tint" type="color">#ff142938</item>
+    <item name="icon_tint_inverse" type="color">#ffefefef</item>
     <item name="section_background" type="color">#ffcecece</item>
     <item name="section_text_color" type="color">#607d8b</item>
     <item name="warning_background" type="color">#e51c23</item>
     <item name="icon_enabled" type="color">@color/primary</item>
     <item name="icon_disabled" type="color">#546e7a</item>
-    <item name="link_color" type="color">@color/icon_tint</item>
+    <item name="link_color" type="color">@color/accent_alt_dark</item>
 
     <!-- Select calendars activity -->
     <item name="calendar_list_selected" type="color">#ffd4f1da</item>

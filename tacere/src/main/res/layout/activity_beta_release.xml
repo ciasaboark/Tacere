@@ -1,0 +1,123 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="org.ciasaboark.tacere.activity.BetaReleaseActivity"
+    >
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:scrollbarStyle="outsideInset">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/bea_release_header"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/beta_release_intro1"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <TextView
+                android:id="@+id/beta_release_intro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="16dp"
+                android:text="@string/beta_release_intro2"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/imageView10"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="16dp"
+                    android:src="@drawable/google_plus"
+                    android:tint="@color/icon_tint"/>
+
+                <TextView
+                    android:id="@+id/beta_release_step1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="16dp"
+                    android:layout_toRightOf="@+id/imageView10"
+                    android:text="@string/beta_release_step1"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColorLink="@color/link_color"
+                    android:textIsSelectable="false"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/imageView11"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="16dp"
+                    android:src="@drawable/tacere_mono"
+                    android:tint="@color/icon_tint"/>
+
+                <TextView
+                    android:id="@+id/beta_release_step2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="16dp"
+                    android:layout_toRightOf="@+id/imageView11"
+                    android:text="@string/beta_release_step2"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColorLink="@color/link_color"/>
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/beta_release_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/beta_release_step2"
+                android:layout_marginBottom="16dp"
+                android:text="@string/beta_release_final"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            <TextView
+                android:id="@+id/beta_release_git_option"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/beta_release_end"
+                android:text="@string/beta_release_git"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColorLink="@color/link_color"/>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

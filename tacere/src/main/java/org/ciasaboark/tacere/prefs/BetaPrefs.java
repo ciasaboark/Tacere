@@ -12,8 +12,8 @@ import android.content.SharedPreferences;
  * Created by Jonathan Nelson on 11/14/14.
  */
 public class BetaPrefs {
+    public static final String PREFS_FILE = "beta_prefs";
     private static final String TAG = "BetaPrefs";
-    private static final String PREFS_FILE = "beta_prefs";
     private SharedPreferences betaPrefs;
     private SharedPreferences.Editor editor;
     private Context context;

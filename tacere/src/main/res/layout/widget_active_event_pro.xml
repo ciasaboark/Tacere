@@ -115,6 +115,7 @@
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentRight="true"
                             android:text="Upgrade"
+                            android:textAllCaps="true"
                             android:textColor="@color/text_button_positive"/>
                     </RelativeLayout>
 

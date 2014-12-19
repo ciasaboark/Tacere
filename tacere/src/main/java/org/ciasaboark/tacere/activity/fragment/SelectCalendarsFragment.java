@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -318,7 +319,9 @@ public class SelectCalendarsFragment extends Fragment {
                             //nothing to do here
                         }
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(
+                                new ContextThemeWrapper(context, R.style.Dialog)
+                        );
                         builder.setTitle("Configure calendar");
                         builder.setSingleChoiceItems(options, selectedRinger, new DialogInterface.OnClickListener() {
                             @Override

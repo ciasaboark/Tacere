@@ -137,6 +137,8 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
         </LinearLayout>
 
+        <View style="@style/Divider"/>
+
         <LinearLayout
             android:id="@+id/advanced_settings_buffer_box"
             android:layout_width="fill_parent"
@@ -188,6 +190,59 @@
         </LinearLayout>
 
         <View style="@style/Divider"/>
+
+        <TextView
+            android:id="@+id/advances_settings_section_reports"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/section_background"
+            android:padding="16dp"
+            android:text="@string/advanced_settings_section_reports_title"
+            android:textColor="@color/section_text_color"/>
+
+        <RelativeLayout
+            android:id="@+id/advanced_settings_reports_box"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/advanced_settings_reports_text_boxes"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="false"
+                android:focusableInTouchMode="false"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/advanced_settings_reports_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/advanced_settings_section_reports_text"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <TextView
+                    android:id="@+id/advanced_settings_reports_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/advanced_settings_reports_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="false"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:clickable="false"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/beta_settings_box"

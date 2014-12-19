@@ -420,6 +420,16 @@ public class MainActivity extends ActionBarActivity {
                 addEventIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(addEventIntent);
                 return true;
+            case R.id.action_beta:
+                Intent betaActivityIntent = new Intent(this, BetaReleaseActivity.class);
+                betaActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(betaActivityIntent);
+                return true;
+            case R.id.action_bug_report:
+                Intent reportBugActivity = new Intent(this, BugReportActivity.class);
+                reportBugActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(reportBugActivity);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -8,7 +8,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/windowBackground"
                 android:orientation="vertical">
 
     <LinearLayout
@@ -30,7 +29,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/calendar_instance"
-                android:tint="@color/icon_tint"/>
+                android:tint="@color/dialog_icon_tint"/>
 
             <TextView
                 android:id="@+id/event_title"
@@ -55,7 +54,7 @@
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/history"
-                android:tint="@color/icon_tint"/>
+                android:tint="@color/dialog_icon_tint"/>
 
             <TextView
                 android:id="@+id/event_details_repetition_text"
@@ -78,7 +77,7 @@
                 android:layout_height="24dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/calendar_calendar"
-                android:tint="@color/icon_tint"/>
+                android:tint="@color/dialog_icon_tint"/>
 
             <TextView
                 android:id="@+id/calendar_title"
@@ -102,7 +101,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/calendar_calendar"
-                android:tint="@color/icon_tint"/>
+                android:tint="@color/dialog_icon_tint"/>
 
             <TextView
                 android:id="@+id/event_extend_text"
@@ -151,16 +150,14 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="6dp"
-                android:src="@drawable/ic_state_silent"
-                />
+                android:src="@drawable/ic_state_silent"/>
 
             <ImageView
                 android:id="@+id/imageButtonIgnore"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="6dp"
-                android:src="@drawable/ic_state_ignore"
-                />
+                android:src="@drawable/ic_state_ignore"/>
 
         </LinearLayout>
 

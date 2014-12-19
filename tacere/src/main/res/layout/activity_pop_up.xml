@@ -149,7 +149,7 @@
             android:layout_alignParentEnd="true"
             android:layout_gravity="right"
             android:text="Close"
-            android:textColor="@color/text_button_positive"/>
+            android:textColor="@color/text_button_negative"/>
     </RelativeLayout>
 
 </LinearLayout>

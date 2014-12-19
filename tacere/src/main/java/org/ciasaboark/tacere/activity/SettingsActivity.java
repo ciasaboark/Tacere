@@ -92,31 +92,23 @@ public class SettingsActivity extends ActionBarActivity implements MainSettingsF
     private void drawFragments() {
 
         if (findViewById(id.settings_fragment_main) != null) {
-            MainSettingsFragment mainSettingsFragment = (MainSettingsFragment) getSupportFragmentManager().findFragmentByTag(MainSettingsFragment.TAG);
-            if (mainSettingsFragment == null) {
-                //the main settings fragment should only show a link to advanced settings if that
-                //fragment will not be attached to this activity
-                boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
-                mainSettingsFragment = MainSettingsFragment.newInstance(showAdvancedSettingsLink);
-                getSupportFragmentManager().beginTransaction()
-                        .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
-            } else {
-                //fragment has already been attached, ask it to update its view
-                mainSettingsFragment.drawAllWidgets();
-            }
+            MainSettingsFragment mainSettingsFragment = (MainSettingsFragment)
+                    getSupportFragmentManager().findFragmentByTag(MainSettingsFragment.TAG);
+            //the main settings fragment should only show a link to advanced settings if that
+            //fragment will not be attached to this activity
+            boolean showAdvancedSettingsLink = findViewById(id.settings_fragment_advanced) == null;
+            mainSettingsFragment = MainSettingsFragment.newInstance(showAdvancedSettingsLink);
+            getSupportFragmentManager().beginTransaction()
+                    .add(id.settings_fragment_main, mainSettingsFragment, MainSettingsFragment.TAG).commit();
         }
 
         if (findViewById(id.settings_fragment_advanced) != null) {
-            AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment) getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
-            if (advancedSettingsFragment == null) {
-                advancedSettingsFragment = new AdvancedSettingsFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(id.settings_fragment_advanced, advancedSettingsFragment,
-                                AdvancedSettingsFragment.TAG).commit();
-            } else {
-                //advanced settings fragment has already been attached, ask it to update its view
-                advancedSettingsFragment.drawAllWidgets();
-            }
+            AdvancedSettingsFragment advancedSettingsFragment = (AdvancedSettingsFragment)
+                    getSupportFragmentManager().findFragmentByTag(AdvancedSettingsFragment.TAG);
+            advancedSettingsFragment = new AdvancedSettingsFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(id.settings_fragment_advanced, advancedSettingsFragment,
+                            AdvancedSettingsFragment.TAG).commit();
         }
 
 
@@ -144,7 +136,8 @@ public class SettingsActivity extends ActionBarActivity implements MainSettingsF
                 //restore settings to default values then navigate to the main activity
                 restoreDefaults();
                 //navigate back to the main screen
-                Toast.makeText(getApplicationContext(), R.string.settings_restored, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.settings_restored,
+                        Toast.LENGTH_SHORT).show();
                 return true;
             case android.R.id.home:
                 // This ID represents the Home or Up button. In the case of this

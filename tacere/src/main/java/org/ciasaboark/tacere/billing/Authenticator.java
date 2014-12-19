@@ -11,8 +11,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.view.ContextThemeWrapper;
 
 import org.ciasaboark.tacere.BuildConfig;
+import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.ProUpgradeActivity;
 
 public class Authenticator {
@@ -73,7 +75,9 @@ public class Authenticator {
     }
 
     public void showUpgradeDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(context, R.style.Dialog)
+        );
         builder.setTitle("Upgrade to Pro");
         builder.setMessage("This feature is available in the pro version of Tacere");
         builder.setPositiveButton("Tell Me More", new DialogInterface.OnClickListener() {

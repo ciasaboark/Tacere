@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<resources>
+    <string-array name="report_types">
+        <item>Bug</item>
+        <item>Wishlist</item>
+    </string-array>
+</resources>

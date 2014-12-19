@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.ciasaboark.tacere.R;
+import org.ciasaboark.tacere.bug.CrashReportManager;
 import org.ciasaboark.tacere.event.ringer.Intervals;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.prefs.BetaPrefs;
@@ -72,6 +74,7 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         drawEventBufferWidgets();
         drawLookaheadWidgets();
         drawQuickSilenceWidget();
+        drawReportsWidget();
         drawBetaWidgets();
     }
 
@@ -179,7 +182,9 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         bufferBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        new ContextThemeWrapper(context, R.style.Dialog)
+                );
                 builder.setTitle("Buffer Minutes");
                 final NumberPicker number = new NumberPicker(context);
                 String[] nums = new String[32];
@@ -225,7 +230,9 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             @Override
             public void onClick(View v) {
                 final String[] intervals = Intervals.names();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        new ContextThemeWrapper(context, R.style.Dialog)
+                );
                 builder.setTitle(R.string.advanced_settings_section_intervals_lookahead);
 
                 builder.setSingleChoiceItems(intervals, -1, new DialogInterface.OnClickListener() {
@@ -256,6 +263,27 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
         lookaheadTV.setText(String.format(lookaheadText, prefs.getLookaheadDays().injectString));
     }
 
+    private void drawReportsWidget() {
+        final CheckBox sendReportsCheckbox = (CheckBox) rootView.findViewById(R.id.advanced_settings_reports_checkbox);
+        final CrashReportManager crashReportManager = new CrashReportManager(getActivity());
+
+        sendReportsCheckbox.setChecked(crashReportManager.isReportsEnabled());
+        TextView sendReportsDescription = (TextView) rootView.findViewById(R.id.advanced_settings_reports_description);
+        sendReportsDescription.setText(crashReportManager.isReportsDisabled() ?
+                R.string.advanced_settings_section_reports_description_disabled :
+                R.string.advanced_settings_section_reports_description_enabled);
+        RelativeLayout reportsBox = (RelativeLayout) rootView.findViewById(R.id.advanced_settings_reports_box);
+        reportsBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendReportsCheckbox.performClick();
+                boolean willSendReports = sendReportsCheckbox.isChecked();
+                crashReportManager.setReportsEnabled(willSendReports);
+                drawReportsWidget();
+            }
+        });
+    }
+
     private void drawQuickSilenceWidget() {
         LinearLayout quicksilenceBox = (LinearLayout) rootView.findViewById(R.id.advanced_settings_quicksilence_box);
         quicksilenceBox.setOnClickListener(new View.OnClickListener() {
@@ -263,7 +291,9 @@ public class AdvancedSettingsFragment extends android.support.v4.app.Fragment {
             public void onClick(View v) {
                 LayoutInflater inflater = LayoutInflater.from(v.getContext());
                 View dialogView = inflater.inflate(R.layout.dialog_quicksilent, null);
-                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(
+                        new ContextThemeWrapper(context, R.style.Dialog)
+                );
                 builder.setTitle(R.string.notification_quicksilence_title);
                 builder.setView(dialogView);
 

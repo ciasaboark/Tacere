@@ -7,7 +7,6 @@ package org.ciasaboark.tacere.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 
 import org.ciasaboark.tacere.R;
@@ -22,14 +21,6 @@ public class SelectCalendarsActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_calendars);
-
-        //this activity might be displayed as a dialog, so there might not be an actionbar
-        try {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
-        }
 
         if (findViewById(R.id.select_calendars_fragment) != null) {
             if (savedInstanceState == null) {

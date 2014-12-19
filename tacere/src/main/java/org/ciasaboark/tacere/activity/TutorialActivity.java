@@ -11,11 +11,11 @@ package org.ciasaboark.tacere.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,27 +31,24 @@ import org.ciasaboark.tacere.activity.fragment.TutorialWelcomeFragment;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.service.RequestTypes;
 
-public class TutorialActivity extends FragmentActivity {
+public class TutorialActivity extends ActionBarActivity {
+    private static final String TAG = "TutorialActivity";
     private static final int TOTAL_PAGES = 5;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
     private int currentPage = 0;
 
     @Override
-    public void onBackPressed() {
-        if (viewPager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            Log.w(TAG, "could not get reference to actionbar, can not hide.");
+        } else {
+            actionBar.hide();
+        }
+
         setContentView(R.layout.activity_tutorial);
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -98,41 +95,6 @@ public class TutorialActivity extends FragmentActivity {
                         skipButton.setVisibility(View.GONE);
                     }
                 }
-
-//                final View tutorialBackground = findViewById(R.id.tutorial_background);
-//                int colorFrom = ((ColorDrawable)tutorialBackground.getBackground()).getColor();
-//                int colorTo;
-//                switch (pageSelected) {
-//                    case 0:
-//                        colorTo = getResources().getColor(R.color.tutorial_welcome_background);
-//                        break;
-//                    case 1:
-//                        colorTo = getResources().getColor(R.color.tutorial_event_list_background);
-//                        break;
-//                    case 2:
-//                        colorTo = getResources().getColor(R.color.tutorial_ringer_priorities_background);
-//                        break;
-//                    case 3:
-//                        colorTo = getResources().getColor(R.color.tutorial_pro_background);
-//                        break;
-//                    case 4:
-//                        colorTo = getResources().getColor(R.color.tutorial_report_background);
-//                        break;
-//                    default:
-//                        colorTo = getResources().getColor(R.color.primary);
-//                }
-//
-//                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-//                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        tutorialBackground.setBackgroundColor((Integer)animator.getAnimatedValue());
-//                    }
-//
-//                });
-//                colorAnimation.setDuration(1000);
-//                colorAnimation.start();
             }
 
             @Override
@@ -151,6 +113,25 @@ public class TutorialActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
+        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (viewPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         currentPage = viewPager.getCurrentItem();
@@ -160,13 +141,6 @@ public class TutorialActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         viewPager.setCurrentItem(currentPage);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
-        alarmManagerWrapper.scheduleImmediateAlarm(RequestTypes.NORMAL);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

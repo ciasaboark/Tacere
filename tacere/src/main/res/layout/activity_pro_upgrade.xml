@@ -88,7 +88,7 @@
                             android:layout_height="48dp"
                             android:layout_margin="16dp"
                             android:src="@drawable/thumbs_up"
-                            android:tint="@color/accent"/>
+                            android:tint="@color/dialog_icon_tint"/>
 
                         <TextView
                             android:id="@+id/textView5"
@@ -116,7 +116,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
-                    android:background="@color/tutorial_frame_background"
+                    android:background="@color/dialog_button_bar_background"
                     android:elevation="30dp"
                     android:orientation="horizontal"
                     android:paddingBottom="4dp"
@@ -135,6 +135,7 @@
                         android:layout_gravity="right"
                         android:padding="16dp"
                         android:text="@string/close"
+                        android:textAllCaps="true"
                         android:textColor="@color/text_button_positive"/>
                 </RelativeLayout>
             </LinearLayout>
@@ -165,7 +166,7 @@
                             android:layout_height="48dp"
                             android:layout_margin="16dp"
                             android:src="@drawable/thumbs_up"
-                            android:tint="@color/accent"/>
+                            android:tint="@color/dialog_icon_tint"/>
 
                         <TextView
                             android:id="@+id/textView7"
@@ -192,7 +193,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
-                    android:background="@color/tutorial_frame_background"
+                    android:background="@color/dialog_button_bar_background"
                     android:elevation="30dp"
                     android:orientation="horizontal"
                     android:paddingBottom="4dp"
@@ -211,6 +212,7 @@
                         android:layout_gravity="right"
                         android:padding="16dp"
                         android:text="@string/close"
+                        android:textAllCaps="true"
                         android:textColor="@color/text_button_positive"/>
                 </RelativeLayout>
             </LinearLayout>
@@ -241,7 +243,7 @@
                             android:layout_height="48dp"
                             android:layout_margin="16dp"
                             android:src="@drawable/frown"
-                            android:tint="@color/accent"/>
+                            android:tint="@color/dialog_icon_tint"/>
 
                         <TextView
                             android:id="@+id/textView9"
@@ -268,7 +270,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
-                    android:background="@color/tutorial_frame_background"
+                    android:background="@color/dialog_button_bar_background"
                     android:elevation="30dp"
                     android:orientation="horizontal"
                     android:paddingBottom="4dp"
@@ -287,6 +289,7 @@
                         android:layout_gravity="right"
                         android:padding="16dp"
                         android:text="@string/close"
+                        android:textAllCaps="true"
                         android:textColor="@color/text_button_positive"/>
                 </RelativeLayout>
 
@@ -348,7 +351,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="• choose which calendars to sync"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <TextView
                         android:id="@+id/pro_upgrade_feature2"
@@ -359,7 +362,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="• set different defaults for each calendar"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <TextView
                         android:id="@+id/pro_upgrade_feature3"
@@ -370,7 +373,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="• share settings among repeating events"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <TextView
                         android:id="@+id/pro_upgrade_feature4"
@@ -381,7 +384,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="• unlock homescreen widgets"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <TextView
                         android:id="@+id/pro_upgrade_feature5"
@@ -392,7 +395,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="• easily extend silencing period from notifications"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <TextView
                         android:id="@+id/pro_upgrade_feature_more"
@@ -403,7 +406,7 @@
                         android:paddingRight="16dp"
                         android:singleLine="false"
                         android:text="more comming..."
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
                 </LinearLayout>
 
                 <RelativeLayout
@@ -413,7 +416,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
-                    android:background="@color/tutorial_frame_background"
+                    android:background="@color/dialog_button_bar_background"
                     android:elevation="30dp"
                     android:orientation="horizontal"
                     android:paddingBottom="4dp"

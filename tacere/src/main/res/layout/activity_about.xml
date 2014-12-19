@@ -4,29 +4,30 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="0dp"
-    android:paddingLeft="0dp"
-    android:paddingRight="0dp"
-    android:paddingTop="0dp"
-    tools:context=".AboutActivity" >
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="0dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:paddingTop="0dp"
+                tools:context=".AboutActivity">
 
 
     <RelativeLayout
-            android:id="@+id/about_header"
-            android:layout_width="fill_parent"
-            android:layout_height="96dp"
-            android:background="@color/header_background"
-            android:elevation="@dimen/header_elevation"
+        android:id="@+id/about_header"
+        android:layout_width="fill_parent"
+        android:layout_height="96dp"
+        android:background="@color/header_background"
+        android:elevation="@dimen/header_elevation"
         >
 
         <FrameLayout
             android:id="@+id/about_header_beta_settings"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:backgroundTint="@color/accent"
+            android:layout_alignParentEnd="false"
+            android:backgroundTint="@color/accent_alt_dark"
             android:clickable="false"
             android:descendantFocusability="blocksDescendants"
             android:foreground="?android:selectableItemBackground"
@@ -174,7 +175,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/about_source"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColorLink="@color/icon_tint"/>
+                    android:textColorLink="@color/link_color"/>
             </LinearLayout>
 
             <LinearLayout
@@ -199,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/about_bugs"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColorLink="@color/icon_tint"/>
+                    android:textColorLink="@color/link_color"/>
 
             </LinearLayout>
 
@@ -226,7 +227,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/about_comments"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColorLink="@color/icon_tint"/>
+                    android:textColorLink="@color/link_color"/>
             </LinearLayout>
 
         </LinearLayout>
