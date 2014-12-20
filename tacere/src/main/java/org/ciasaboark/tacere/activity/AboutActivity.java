@@ -78,6 +78,8 @@ public class AboutActivity extends ActionBarActivity {
         TextView versionText = (TextView) findViewById(id.about_version_number);
         String formattedVersion = String.format(getString(R.string.about_version), Versioning.getVersionCode());
         versionText.setText(formattedVersion);
+        //textview using marquee scrolling, but this only works if the textview is selected
+        versionText.setSelected(true);
 
         TextView basicOrPro = (TextView) findViewById(id.about_version_pro);
         String type;

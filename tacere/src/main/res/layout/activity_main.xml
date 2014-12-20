@@ -75,7 +75,8 @@
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp"
-            android:background="@drawable/calendar_icon"/>
+            android:src="@drawable/calendar_icon"
+            android:tint="@color/icon_tint"/>
 
         <TextView
             android:id="@+id/event_list_error"
