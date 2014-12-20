@@ -107,6 +107,8 @@
                         android:id="@+id/textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:lines="1"
+                        android:singleLine="true"
                         android:text="@string/app_name"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="@color/header_text_color"
@@ -114,15 +116,19 @@
 
                     <TextView
                         android:id="@+id/about_version_number"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
                         android:text="@string/placeholder"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/header_text_color"/>
 
                     <TextView
                         android:id="@+id/about_version_pro"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/placeholder"
                         android:textAppearance="?android:attr/textAppearanceSmall"

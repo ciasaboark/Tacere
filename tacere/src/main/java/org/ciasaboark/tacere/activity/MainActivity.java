@@ -24,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -279,16 +278,6 @@ public class MainActivity extends ActionBarActivity {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void drawError() {
         LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
-        ImageView calendarIcon = (ImageView) findViewById(R.id.calendar_icon);
-        Drawable d = calendarIcon.getBackground();
-        Drawable mutable = d.mutate();
-        mutable.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.MULTIPLY);
-        int apiLevelAvailable = android.os.Build.VERSION.SDK_INT;
-        if (apiLevelAvailable >= 16) {
-            calendarIcon.setBackground(mutable);
-        } else {
-            calendarIcon.setBackgroundDrawable(mutable);
-        }
         errorBox.setVisibility(View.VISIBLE);
     }
 
