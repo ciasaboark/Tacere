@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2014 Jonathan Nelson
- * Released under the BSD license.  For details see the COPYING file.
- */
-
 /**
  * Automatically generated file. DO NOT MODIFY
  */
