@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -17,7 +17,7 @@
     <RelativeLayout
         android:id="@+id/about_header"
         android:layout_width="fill_parent"
-        android:layout_height="96dp"
+        android:layout_height="wrap_content"
         android:background="@color/header_background"
         android:elevation="@dimen/header_elevation"
         >
@@ -25,7 +25,7 @@
         <FrameLayout
             android:id="@+id/about_header_beta_settings"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="false"
             android:backgroundTint="@color/accent_alt_dark"
             android:clickable="false"
@@ -86,7 +86,7 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/header_background"
                 android:orientation="horizontal"
                 android:padding="16dp">

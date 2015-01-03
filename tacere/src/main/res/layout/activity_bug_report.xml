@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -23,16 +23,6 @@
             android:orientation="vertical"
             >
 
-            <TextView
-                android:id="@+id/bug_report_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="16dp"
-                android:layout_marginBottom="16dp"
-                android:text="@string/bug_report_title"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
-
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -42,10 +32,22 @@
                 android:paddingRight="16dp">
 
                 <TextView
+                    android:id="@+id/bug_report_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/bug_report_title"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <TextView
                     android:id="@+id/bug_report_intro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
                     android:text="@string/bug_report_intro"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -74,7 +76,10 @@
 
                 <RelativeLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp">
 
                     <TextView
                         android:id="@+id/textView19"
@@ -102,6 +107,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
                     android:text="@string/bug_report_additional_information"
                     android:textAppearance="?android:attr/textAppearanceSmall"/>
 
@@ -110,7 +117,7 @@
             <RelativeLayout
                 android:id="@+id/bug_report_button_bar"
                 android:layout_width="fill_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_gravity="bottom"
                 android:background="@color/dialog_button_bar_background"

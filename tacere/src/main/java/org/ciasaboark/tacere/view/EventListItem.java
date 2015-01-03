@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -90,11 +91,8 @@ public class EventListItem extends LinearLayout {
 
     private void findChildren() {
         sidebarImageView = (ImageView) view.findViewById(R.id.event_sidebar_image);
-        ;
         eventImageView = (ImageView) view.findViewById(R.id.ringerState);
-        ;
         ringerSourceImageView = (ImageView) view.findViewById(R.id.ringerSource);
-        ;
         embeddedLetter = (TextView) view.findViewById(R.id.embedded_letter);
         titleTextView = (TextView) view.findViewById(R.id.event_title);
         dateTimeField1 = (TextView) view.findViewById(R.id.event_date_time_field1);
@@ -230,13 +228,17 @@ public class EventListItem extends LinearLayout {
     }
 
     private void drawSidebar() {
-        Drawable sidebarDrawable = sidebarImageView.getDrawable();
+        Drawable sidebarDrawable = getResources().getDrawable(R.drawable.sidebar);
         int displayColor = event.getDisplayColor();
         if (isFutureEvent()) {
             displayColor = desaturateColor(displayColor, DESATURATE_RATIO);
         }
         sidebarDrawable.mutate().setColorFilter(displayColor, PorterDuff.Mode.MULTIPLY);
-        sidebarImageView.setImageDrawable(sidebarDrawable);
+        if (Build.VERSION.SDK_INT >= 16) {
+            sidebarImageView.setBackground(sidebarDrawable);
+        } else {
+            sidebarImageView.setBackgroundDrawable(sidebarDrawable);
+        }
     }
 
     private void drawRingerIcons() {

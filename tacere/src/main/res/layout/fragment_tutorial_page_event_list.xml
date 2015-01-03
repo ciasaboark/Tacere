@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -11,19 +11,16 @@
               android:background="@null"
               android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:padding="16dp"
-        android:visibility="visible">
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/linearLayout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/textView22"
@@ -34,44 +31,32 @@
                 android:text="@string/tutorial_event_list_title"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <ScrollView
-                android:id="@+id/scrollView"
+            <TextView
+                android:id="@+id/textView20"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="16dp"
+                android:text="@string/tutorial_event_list_item_description"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical">
+            <org.ciasaboark.tacere.view.EventListItem
+                android:id="@+id/default_event"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
 
-                    <TextView
-                        android:id="@+id/textView20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:paddingBottom="16dp"
-                        android:text="@string/tutorial_event_list_item_description"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <org.ciasaboark.tacere.view.EventListItem
+                android:id="@+id/active_event"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
 
-                    <org.ciasaboark.tacere.view.EventListItem
-                        android:id="@+id/default_event"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <org.ciasaboark.tacere.view.EventListItem
-                        android:id="@+id/active_event"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <org.ciasaboark.tacere.view.EventListItem
-                        android:id="@+id/future_event"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/primary"/>
+            <org.ciasaboark.tacere.view.EventListItem
+                android:id="@+id/future_event"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary"/>
 
 
-                </LinearLayout>
-            </ScrollView>
         </LinearLayout>
-    </RelativeLayout>
+    </ScrollView>
 </LinearLayout>

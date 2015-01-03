@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -11,101 +11,83 @@
               android:background="@null"
               android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:visibility="visible">
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_margin="16dp"
                 android:text="@string/tutorial_welcome_title"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <ScrollView
-                android:id="@+id/scrollView2"
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
+                <TextView
+                    android:id="@+id/quote_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Small Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="16dp">
+                <TextView
+                    android:id="@+id/quote_author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/quote_text"
+                    android:layout_toLeftOf="@+id/quote_source"
+                    android:text="Small Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-                        <TextView
-                            android:id="@+id/quote_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Small Text"
-                            android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/quote_source"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/quote_text"
+                    android:layout_gravity="right"
+                    android:layout_marginLeft="6dp"
+                    android:text="Small Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="italic"/>
+            </RelativeLayout>
 
-                        <TextView
-                            android:id="@+id/quote_author"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/quote_text"
-                            android:layout_toLeftOf="@+id/quote_source"
-                            android:text="Small Text"
-                            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/tutorial_welcome_intro"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                        <TextView
-                            android:id="@+id/quote_source"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_below="@id/quote_text"
-                            android:layout_gravity="right"
-                            android:layout_marginLeft="6dp"
-                            android:text="Small Text"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textStyle="italic"/>
-                    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/tutorial_welcome_details"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                    <TextView
-                        android:id="@+id/textView1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="8dp"
-                        android:text="@string/tutorial_welcome_intro"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="8dp"
-                        android:text="@string/tutorial_welcome_details"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                    <TextView
-                        android:id="@+id/long_text_test1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="8dp"
-                        android:text="@string/tutorial_welcome_skip"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                </LinearLayout>
-            </ScrollView>
+            <TextView
+                android:id="@+id/long_text_test1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/tutorial_welcome_skip"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </LinearLayout>
-    </RelativeLayout>
+    </ScrollView>
 </LinearLayout>

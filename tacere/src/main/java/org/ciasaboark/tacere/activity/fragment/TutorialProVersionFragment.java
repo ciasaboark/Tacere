@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.ProUpgradeActivity;
@@ -27,8 +26,8 @@ public class TutorialProVersionFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = (ViewGroup) inflater.inflate(
                 layout, container, false);
-        RelativeLayout thankYouPage = (RelativeLayout) rootView.findViewById(R.id.tutorial_pro_page_thanks);
-        RelativeLayout upgradePage = (RelativeLayout) rootView.findViewById(R.id.tutorial_pro_page_upgrade);
+        View thankYouPage = rootView.findViewById(R.id.tutorial_pro_page_thanks);
+        View upgradePage = rootView.findViewById(R.id.tutorial_pro_page_upgrade);
         Authenticator authenticator = new Authenticator(getActivity());
         if (authenticator.isAuthenticated()) {
             thankYouPage.setVisibility(View.VISIBLE);

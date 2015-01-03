@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -102,6 +102,12 @@ public class ShowUpdatesActivity extends Activity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        updates.hideChangelogForCurrentAppVersion();
     }
 
 

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -112,7 +112,7 @@
                 <RelativeLayout
                     android:id="@+id/tutorial_button_bar1"
                     android:layout_width="fill_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
@@ -189,7 +189,7 @@
                 <RelativeLayout
                     android:id="@+id/tutorial_button_bar"
                     android:layout_width="fill_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
@@ -266,7 +266,7 @@
                 <RelativeLayout
                     android:id="@+id/tutorial_button_bar2"
                     android:layout_width="fill_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
@@ -412,7 +412,7 @@
                 <RelativeLayout
                     android:id="@+id/tutorial_button_bar3"
                     android:layout_width="wrap_content"
-                    android:layout_height="56dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="16dp"
