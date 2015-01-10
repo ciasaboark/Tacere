@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
-    <WebView
-        android:id="@+id/updatesWebView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:layout_below="@+id/updates_title"
-        android:layout_gravity="fill_horizontal"/>
 
     <TextView
         android:id="@+id/updates_title"
@@ -27,20 +18,43 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
 
-    <Button
-        android:id="@+id/updatesButton"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/updates_button_bar"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@color/dialog_button_bar_background"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        >
+
+        <Button
+            android:id="@+id/updatesButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="false"
+            android:padding="16dp"
+            android:text="@string/close"
+            android:textAllCaps="false"
+            android:textColor="@color/text_button_negative"/>
+    </RelativeLayout>
+
+
+    <WebView
+        android:id="@+id/updatesWebView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/updates_button_bar"
         android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="false"
-        android:layout_below="@id/updatesWebView"
-        android:layout_margin="16dp"
-        android:padding="16dp"
-        android:text="@string/close"
-        android:textAllCaps="false"
-        android:textColor="@color/text_button_negative"/>
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/updates_title"
+        android:layout_gravity="fill_horizontal"/>
 
 </RelativeLayout>
