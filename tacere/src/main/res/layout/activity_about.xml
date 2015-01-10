@@ -18,7 +18,7 @@
         android:id="@+id/about_header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/header_background"
+        android:background="@color/accent_alt_dark"
         android:elevation="@dimen/header_elevation"
         >
 
@@ -27,7 +27,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="false"
-            android:backgroundTint="@color/accent_alt_dark"
+            android:layout_centerVertical="true"
             android:clickable="false"
             android:descendantFocusability="blocksDescendants"
             android:foreground="?android:selectableItemBackground"

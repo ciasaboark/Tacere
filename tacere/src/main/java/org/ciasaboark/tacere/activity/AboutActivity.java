@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -213,7 +213,7 @@ public class AboutActivity extends ActionBarActivity {
 
     private void toggleVisibilitySimple(View view) {
         if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
+            view.setVisibility(View.INVISIBLE);
         } else {
             view.setVisibility(View.VISIBLE);
         }
