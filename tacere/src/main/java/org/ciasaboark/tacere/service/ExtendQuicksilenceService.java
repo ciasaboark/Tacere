@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -41,7 +41,7 @@ public class ExtendQuicksilenceService extends IntentService {
                 double newDurationMinutesUnrounded = (double) newDurationMs / (double) EventInstance.MILLISECONDS_IN_MINUTE;
                 int newDurationMinutes = (int) Math.round(newDurationMinutesUnrounded);
                 Intent i = new Intent(this, EventSilencerService.class);
-                i.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE);
+                i.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE.value);
                 i.putExtra(EventSilencerService.QUICKSILENCE_DURATION, newDurationMinutes);
                 this.startService(i);
             }

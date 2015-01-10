@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import junit.framework.Assert;
 
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
@@ -41,9 +43,7 @@ public class AlarmManagerWrapper {
 
     private void scheduleAlarmAt(long time, RequestTypes type, Bundle additionalArgs) {
         Log.d(TAG, "alarm scheduled at " + time + " for " + type);
-        if (null == type) {
-            throw new IllegalArgumentException("unknown type: " + type);
-        }
+        Assert.assertNotNull(type);
 
         Intent i = new Intent(context, EventSilencerService.class);
         Bundle bundle;
@@ -53,7 +53,7 @@ public class AlarmManagerWrapper {
             bundle = new Bundle();
         }
 
-        bundle.putSerializable(EventSilencerService.WAKE_REASON, type);
+        bundle.putInt(EventSilencerService.WAKE_REASON, type.value);
         i.putExtras(bundle);
 
         // note that the android alarm manager allows multiple pending intents to be scheduled per

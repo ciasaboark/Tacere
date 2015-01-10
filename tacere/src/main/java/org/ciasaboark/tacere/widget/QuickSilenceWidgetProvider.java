@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -55,7 +55,7 @@ public class QuickSilenceWidgetProvider extends AppWidgetProvider {
                             "Silencing until " + formattedDate);
                     Intent intent = new Intent(context, EventSilencerService.class);
                     intent.putExtra(EventSilencerService.WAKE_REASON,
-                            RequestTypes.CANCEL_QUICKSILENCE);
+                            RequestTypes.CANCEL_QUICKSILENCE.value);
                     PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent,
                             PendingIntent.FLAG_UPDATE_CURRENT);
                     remoteViews.setOnClickPendingIntent(R.id.widget_quicksilence_fab, pendingIntent);
@@ -63,7 +63,7 @@ public class QuickSilenceWidgetProvider extends AppWidgetProvider {
                     remoteViews = new RemoteViews(context.getPackageName(),
                             R.layout.widget_quicksilence_inactive);
                     Intent intent = new Intent(context, EventSilencerService.class);
-                    intent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE);
+                    intent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.QUICKSILENCE.value);
                     Prefs prefs = new Prefs(context);
                     int duration = 60 * prefs.getQuickSilenceHours() + prefs.getQuicksilenceMinutes();
                     intent.putExtra(EventSilencerService.QUICKSILENCE_DURATION, duration);

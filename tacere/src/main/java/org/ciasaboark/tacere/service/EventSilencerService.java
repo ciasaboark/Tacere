@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -67,9 +67,13 @@ public class EventSilencerService extends IntentService {
 
         // pull extra info (if any) from the incoming intent
         RequestTypes requestType = RequestTypes.NORMAL;
-        if (intent.getExtras() != null) {
-            requestType = (RequestTypes) intent.getSerializableExtra(WAKE_REASON);
+        try {
+            int requestTypeValue = intent.getIntExtra(WAKE_REASON, -1);
+            requestType = RequestTypes.getTypeForInt(requestTypeValue);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "unknown request type, using " + RequestTypes.NORMAL + " instead");
         }
+
         Log.d(TAG, "waking for request type: " + requestType.toString());
 
         switch (requestType) {

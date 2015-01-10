@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -63,7 +63,8 @@ public class NotificationManagerWrapper {
             // the intent attached to the notification should only cancel the quick silence request, but
             // not launch the app
             Intent notificationIntent = new Intent(context, EventSilencerService.class);
-            notificationIntent.putExtra(EventSilencerService.WAKE_REASON, RequestTypes.CANCEL_QUICKSILENCE);
+            notificationIntent.putExtra(EventSilencerService.WAKE_REASON,
+                    RequestTypes.CANCEL_QUICKSILENCE.value);
             long endTime = System.currentTimeMillis() + (long) quicksilenceDurationMinutes
                     * EventInstance.MILLISECONDS_IN_MINUTE;
 
