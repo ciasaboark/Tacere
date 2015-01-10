@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -36,13 +36,14 @@ public class DatabaseInterface {
             Instances.BEGIN,
             Instances.END,
             Instances.DESCRIPTION,
-            Instances.DISPLAY_COLOR,    //TODO this column does not exists in API < 16
             Instances.ALL_DAY,
             Instances.AVAILABILITY,
             Instances._ID,
             Instances.CALENDAR_ID,
             Instances.EVENT_ID,
-            Instances.EVENT_LOCATION
+            Instances.EVENT_LOCATION,
+            Instances.CALENDAR_COLOR,
+            Instances.EVENT_COLOR
     };
     private static final String[] LOCAL_DB_PROJECTION = new String[]{
             Columns._ID,
@@ -74,7 +75,6 @@ public class DatabaseInterface {
     private static final int LOCAL_DB_PROJECTION_RINGER = 11;
     private static final int LOCAL_DB_PROJECTION_EXTEND_MINUTES = 12;
     private static final int LOCAL_DB_PROJECTION_ORIGINAL_END = 13;
-
     private static final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
     private static DatabaseInterface instance;
     private static Context context = null;
@@ -83,13 +83,14 @@ public class DatabaseInterface {
     private final int SYSTEM_DB_PROJECTION_BEGIN = 1;
     private final int SYSTEM_DB_PROJECTION_END = 2;
     private final int SYSTEM_DB_PROJECTION_DESCRIPTION = 3;
-    private final int SYSTEM_DB_PROJECTION_COLOR = 4;
-    private final int SYSTEM_DB_PROJECTION_ALL_DAY = 5;
-    private final int SYSTEM_DB_PROJECTION_AVAILABLE = 6;
-    private final int SYSTEM_DB_PROJECTION_ID = 7;
-    private final int SYSTEM_DB_PROJECTION_CAL_ID = 8;
-    private final int SYSTEM_DB_PROJECTION_EVENT_ID = 9;
-    private final int SYSTEM_DB_PROJECTION_LOCATION = 10;
+    private final int SYSTEM_DB_PROJECTION_ALL_DAY = 4;
+    private final int SYSTEM_DB_PROJECTION_AVAILABLE = 5;
+    private final int SYSTEM_DB_PROJECTION_ID = 6;
+    private final int SYSTEM_DB_PROJECTION_CAL_ID = 7;
+    private final int SYSTEM_DB_PROJECTION_EVENT_ID = 8;
+    private final int SYSTEM_DB_PROJECTION_LOCATION = 9;
+    private final int SYSTEM_DB_PROJECTION_CALENDAR_COLOR = 10;
+    private final int SYSTEM_DB_PROJECTION_EVENT_COLOR = 11;
     private final SQLiteDatabase eventsDB;
 
 
@@ -371,7 +372,13 @@ public class DatabaseInterface {
                 long event_begin = calendarCursor.getLong(SYSTEM_DB_PROJECTION_BEGIN);
                 long event_end = calendarCursor.getLong(SYSTEM_DB_PROJECTION_END);
                 String event_description = calendarCursor.getString(SYSTEM_DB_PROJECTION_DESCRIPTION);
-                int event_displayColor = calendarCursor.getInt(SYSTEM_DB_PROJECTION_COLOR);
+                int event_displayColor; //use the event color if possible, else use calendar color
+                String eventColorString = calendarCursor.getString(SYSTEM_DB_PROJECTION_EVENT_COLOR);
+                if (eventColorString != null) {
+                    event_displayColor = calendarCursor.getInt(SYSTEM_DB_PROJECTION_EVENT_COLOR);
+                } else {
+                    event_displayColor = calendarCursor.getInt(SYSTEM_DB_PROJECTION_CALENDAR_COLOR);
+                }
                 int event_allDay = calendarCursor.getInt(SYSTEM_DB_PROJECTION_ALL_DAY);
                 int event_availability = calendarCursor.getInt(SYSTEM_DB_PROJECTION_AVAILABLE);
                 long id = calendarCursor.getLong(SYSTEM_DB_PROJECTION_ID);
