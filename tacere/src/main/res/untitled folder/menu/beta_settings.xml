@@ -1,9 +1,0 @@
-<!--
-  ~ Copyright (c) 2014 Jonathan Nelson
-  ~ Released under the BSD license.  For details see the COPYING file.
-  -->
-
-<menu
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.ciasaboark.tacere.activity.BetaSettingsActivity">
-</menu>
