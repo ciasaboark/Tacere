@@ -228,17 +228,13 @@ public class EventListItem extends LinearLayout {
     }
 
     private void drawSidebar() {
-        Drawable sidebarDrawable = getResources().getDrawable(R.drawable.sidebar);
+        Drawable sidebarDrawable = sidebarImageView.getDrawable();
         int displayColor = event.getDisplayColor();
         if (isFutureEvent()) {
             displayColor = desaturateColor(displayColor, DESATURATE_RATIO);
         }
         sidebarDrawable.mutate().setColorFilter(displayColor, PorterDuff.Mode.MULTIPLY);
-        if (Build.VERSION.SDK_INT >= 16) {
-            sidebarImageView.setBackground(sidebarDrawable);
-        } else {
-            sidebarImageView.setBackgroundDrawable(sidebarDrawable);
-        }
+        sidebarImageView.setImageDrawable(sidebarDrawable);
     }
 
     private void drawRingerIcons() {
@@ -246,8 +242,6 @@ public class EventListItem extends LinearLayout {
         if (eventImageView != null) {
             Drawable ringerIcon = getRingerIcon();
             eventImageView.setImageDrawable(ringerIcon);
-            eventImageView.setContentDescription(context.getString(
-                    R.string.icon_alt_text_normal));
         }
 
         if (ringerSourceImageView != null) {

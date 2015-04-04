@@ -47,14 +47,21 @@
     </RelativeLayout>
 
 
-    <WebView
-        android:id="@+id/updatesWebView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/updates_button_bar"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:id="@+id/updatesWebViewWrapper"
         android:layout_below="@+id/updates_title"
-        android:layout_gravity="fill_horizontal"/>
+        android:layout_above="@+id/updates_button_bar">
+
+        <WebView
+            android:id="@+id/updatesWebView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_gravity="fill_horizontal"
+            />
+    </RelativeLayout>
 
 </RelativeLayout>
