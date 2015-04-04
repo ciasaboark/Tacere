@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<resources>
+    <!-- Basic theme colors -->
+    <item name="primary_dark" type="color">#1E88E5</item>
+    <item name="primary" type="color">#2196F3</item>
+    <item name="primary_alt_light" type="color">#64B5F6</item>
+    <item name="primary_alt_dark" type="color">#1976D2</item>
+    <!--<item name="primary" type="color">#37474f</item>-->
+    <item name="header_background" type="color">#616161</item>
+    <item name="header_text_color" type="color">@color/windowBackground</item>
+
+    <!--<item name="button_ongoing" type="color">#00bfa5</item>-->
+    <item name="text_button_positive" type="color">@color/accent_alt_light</item>
+    <item name="text_button_negative" type="color">@color/primary_alt_light</item>
+    <item name="dialog_background" type="color">@color/primary_alt_dark</item>
+
+    <item name="accent" type="color">#40c4ff</item>
+    <item name="accent_alt_light" type="color">#ff6cd1ff</item>
+    <item name="accent_alt_dark" type="color">#ff1191d4</item>
+
+    <!--<item name="accent" type="color">#8bc34a</item>-->
+    <!--<item name="accent_alt_light" type="color">#9ccc65</item>-->
+    <!--<item name="accent_alt_dark" type="color">#7cb342</item>-->
+
+    <!--<item name="accent" type="color">#ff3d00</item>-->
+    <!--<item name="accent_alt_light" type="color">#ff6e40</item>-->
+    <!--<item name="accent_alt_dark" type="color">#dd2c00</item>-->
+
+    <!--<item name="icon_accent" type="color">#b0bec5</item>-->
+    <!--<item name="icon_accent_custom" type="color">#00bfa5</item>-->
+
+    <item name="text_color" type="color">#de000000</item>
+    <item name="text_color_alt" type="color">#deffffff</item>
+    <item name="text_color_primary" type="color">#d9000000</item>
+    <item name="text_color_disabled" type="color">#7f000000</item>
+    <item name="text_color_heading" type="color">#ff555555</item>
+    <item name="text_color_menu" type="color">#ffffffff</item>
+    <item name="windowBackground" type="color">#fff7f7f7</item>
+    <item name="menu_background" type="color">#ffffff</item>
+    <item name="menu_text" type="color">#ffffff</item>
+    <item name="icon_tint" type="color">#ff142938</item>
+    <item name="section_background" type="color">#ffcecece</item>
+    <item name="section_text_color" type="color">#607d8b</item>
+    <item name="warning_background" type="color">#e51c23</item>
+    <item name="icon_enabled" type="color">@color/primary</item>
+    <item name="icon_disabled" type="color">#546e7a</item>
+    <item name="link_color" type="color">@color/icon_tint</item>
+
+    <!-- Select calendars activity -->
+    <item name="calendar_list_selected" type="color">#ffd4f1da</item>
+    <item name="calendar_list_unselected" type="color">#ffcccccc</item>
+
+    <!-- Main view event list -->
+    <item name="event_list_item_background" type="color">#ffffff</item>
+    <item name="event_list_item_future_background" type="color">#ffdbdbdb</item>
+    <item name="event_list_item_active_event" type="color">#ffd4f1da</item>
+    <item name="event_list_background" type="color">@color/windowBackground</item>
+
+    <!-- Floating action button colors -->
+    <item name="fab_quicksilence_normal" type="color">#ff887c</item>
+    <item name="fab_quicksilence_pressed" type="color">#ffffaa99</item>
+    <item name="fab_quicksilence_icon_tint" type="color">#FFFFFF</item>
+    <item name="fab_stop_normal" type="color">@color/primary</item>
+    <item name="fab_stop_pressed" type="color">@color/primary_alt_light</item>
+    <item name="fab_stop_icon_tint" type="color">#FFFFFF</item>
+
+    <!-- ringer icon colors -->
+    <item name="ringer_default" type="color">#ffc0c0c0</item>
+    <item name="ringer_calendar" type="color">@color/primary</item>
+    <item name="ringer_series" type="color">@color/primary</item>
+    <item name="ringer_instance" type="color">@color/primary</item>
+    <item name="ringer_source" type="color">@color/primary</item>
+
+    <!-- Tutorial Activity -->
+    <item name="tutorial_background" type="color">#ffe1ebef</item>
+    <item name="tutorial_frame_background" type="color">@color/header_background</item>
+    <item name="tutorial_next_button_background" type="color">#ff3650fc</item>
+    <item name="tutorial_buttons_background" type="color">#92929292</item>
+    <item name="tutorial_button_skip_color" type="color">#b2ebf2</item>
+    <item name="tutorial_event_default" type="color">#fad165</item>
+    <item name="tutorial_event_active" type="color">#ff887c</item>
+    <item name="tutorial_event_future" type="color">#57d7de</item>
+    <item name="tutorial_icon_tint" type="color">@color/accent_alt_light</item>
+    <item name="tutorial_text_button" type="color">@color/primary_alt_dark</item>
+    <item name="tutorial_welcome_background" type="color">#ffd0deff</item>
+    <item name="tutorial_event_list_background" type="color">#ffffffd1</item>
+    <item name="tutorial_ringer_priorities_background" type="color">#ffe4d1d5</item>
+    <item name="tutorial_pro_background" type="color">#ffdaefff</item>
+    <item name="tutorial_report_background" type="color">#ffede3ff</item>
+</resources>

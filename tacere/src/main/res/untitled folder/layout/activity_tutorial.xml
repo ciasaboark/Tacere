@@ -1,0 +1,75 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<RelativeLayout
+    android:id="@+id/tutorial_background"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@null">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="56dp"
+        android:layout_weight="1"
+        android:background="@null"/>
+
+    <RelativeLayout
+        android:id="@+id/tutorial_button_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@color/tutorial_frame_background"
+        android:elevation="30dp"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:theme="@style/AppTheme"
+        android:visibility="visible">
+
+        <com.viewpagerindicator.CirclePageIndicator
+            android:id="@+id/indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_centerInParent="true"
+            android:clickable="false"
+            android:padding="4dp"
+            app:radius="6dp"
+            app:snap="true"/>
+
+        <Button
+            android:id="@+id/tutorial_button_skip"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center|left"
+            android:clickable="true"
+            android:enabled="true"
+            android:text="@string/tutorial_button_skip"
+            android:textColor="@color/text_button_negative"/>
+
+        <Button
+            android:id="@+id/tutorial_button_next"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text=">"
+            android:textColor="@color/text_button_positive"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+</RelativeLayout>

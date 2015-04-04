@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_about_tutorial"
+        android:icon="@drawable/question"
+        android:orderInCategory="100"
+        android:title="@string/about_action_tutorial"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_about_license"
+        android:icon="@drawable/copyright"
+        android:orderInCategory="100"
+        android:title="@string/about_action_license"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_about_updates"
+        android:icon="@drawable/code_history"
+        android:orderInCategory="100"
+        android:title="@string/settings_action_updates"
+        app:showAsAction="ifRoom"/>
+</menu>

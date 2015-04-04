@@ -1,0 +1,65 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<LinearLayout
+    android:id="@+id/linearlayout5"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/settings_serviceBox"
+        style="@style/Header_Switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:elevation="@dimen/header_elevation"
+        android:padding="16dp"
+        android:theme="@style/Header_Switch">
+
+        <TextView
+            android:id="@+id/activateServiceDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/settings_section_service_toggle"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/header_text_color"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/activateServiceSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center|right"
+            android:checked="true"
+            android:clickable="false"/>
+
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbarStyle="outsideOverlay">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/settings_fragment_main"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"></FrameLayout>
+        </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,91 @@
+<!--
+  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarWidgetTheme">@style/AppTheme</item>
+        <item name="android:actionMenuTextColor">@color/text_color_menu</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
+
+    <style name="MyActionBar"
+           parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/primary</item>
+        <item name="android:textColor">@color/text_color_menu</item>
+        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
+        <item name="android:actionMenuTextColor">@color/text_color_menu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+    </style>
+
+    <style name="PopupMenu" parent="android:style/Widget.PopupMenu">
+        <item name="android:popupBackground">@color/windowBackground</item>
+    </style>
+
+    <!-- ActionBar title text -->
+    <style name="MyActionBarTitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/text_color_menu</item>
+    </style>
+
+    <style name="Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:textColor">@color/text_color_alt</item>
+    </style>
+
+    <style name="Dialog.Light" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style name="DialogNoTitle" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <!--<item name="android:windowBackground">@color/dialog_background</item>-->
+        <!--<item name="android:textColor">@color/text_color_alt</item>-->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="Header" parent="AppTheme">
+        <item name="android:colorBackground">@color/windowBackground</item>
+    </style>
+
+    <style name="Header_Switch" parent="AppTheme">
+        <item name="android:background">@color/header_background</item>
+        <item name="android:textColor">@color/header_text_color</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <!-- Transparent style used for tutorial activity -->
+    <style name="Tutorial" parent="Theme.AppCompat">
+        <item name="android:windowIsTranslucent">true</item>
+        <!--<item name="android:windowBackground">@color/tutorial_background</item>-->
+        <!--<item name="android:textColor">@color/text_color</item>-->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="WhiteText" parent="AppTheme">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="DialogOnLargeDisplay" parent="AppTheme"/>
+
+    <style name="CustomAlertDialog" parent="@android:style/Theme.Dialog"/>
+
+
+</resources>
