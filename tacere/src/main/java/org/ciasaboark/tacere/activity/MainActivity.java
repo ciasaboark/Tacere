@@ -39,7 +39,7 @@ import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
 import org.ciasaboark.tacere.manager.ServiceStateManager;
 import org.ciasaboark.tacere.prefs.Prefs;
 import org.ciasaboark.tacere.prefs.Updates;
-import org.ciasaboark.tacere.service.EventSilencerService;
+import org.ciasaboark.tacere.service.EventSilencerService
 import org.ciasaboark.tacere.service.RequestTypes;
 
 public class MainActivity extends ActionBarActivity {
