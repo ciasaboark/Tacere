@@ -18,6 +18,6 @@
         android:top="0dp"/>
     <size
         android:width="8dp"
-        android:height="200dp"/>
+        android:height="90dp"/>
     <solid android:color="#ffffff"/>
 </shape>
