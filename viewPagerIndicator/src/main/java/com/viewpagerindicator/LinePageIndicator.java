@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 package com.viewpagerindicator;
@@ -16,7 +16,6 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -27,9 +26,9 @@ import android.view.ViewConfiguration;
  */
 public class LinePageIndicator extends View implements PageIndicator {
     private static final int INVALID_POINTER = -1;
-    private int mActivePointerId = INVALID_POINTER;
     private final Paint mPaintUnselected = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mPaintSelected = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int mActivePointerId = INVALID_POINTER;
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mListener;
     private int mCurrentPage;
@@ -139,43 +138,6 @@ public class LinePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (mViewPager == null) {
-            return;
-        }
-        final int count = mViewPager.getAdapter().getCount();
-        if (count == 0) {
-            return;
-        }
-
-        if (mCurrentPage >= count) {
-            setCurrentItem(count - 1);
-            return;
-        }
-
-        final float lineWidthAndGap = mLineWidth + mGapWidth;
-        final float indicatorWidth = (count * lineWidthAndGap) - mGapWidth;
-        final float paddingTop = getPaddingTop();
-        final float paddingLeft = getPaddingLeft();
-        final float paddingRight = getPaddingRight();
-
-        float verticalOffset = paddingTop + ((getHeight() - paddingTop - getPaddingBottom()) / 2.0f);
-        float horizontalOffset = paddingLeft;
-        if (mCentered) {
-            horizontalOffset += ((getWidth() - paddingLeft - paddingRight) / 2.0f) - (indicatorWidth / 2.0f);
-        }
-
-        //Draw stroked circles
-        for (int i = 0; i < count; i++) {
-            float dx1 = horizontalOffset + (i * lineWidthAndGap);
-            float dx2 = dx1 + mLineWidth;
-            canvas.drawLine(dx1, verticalOffset, dx2, verticalOffset, (i == mCurrentPage) ? mPaintSelected : mPaintUnselected);
-        }
-    }
-
     public boolean onTouchEvent(android.view.MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
@@ -260,6 +222,51 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if (mViewPager == null) {
+            return;
+        }
+        final int count = mViewPager.getAdapter().getCount();
+        if (count == 0) {
+            return;
+        }
+
+        if (mCurrentPage >= count) {
+            setCurrentItem(count - 1);
+            return;
+        }
+
+        final float lineWidthAndGap = mLineWidth + mGapWidth;
+        final float indicatorWidth = (count * lineWidthAndGap) - mGapWidth;
+        final float paddingTop = getPaddingTop();
+        final float paddingLeft = getPaddingLeft();
+        final float paddingRight = getPaddingRight();
+
+        float verticalOffset = paddingTop + ((getHeight() - paddingTop - getPaddingBottom()) / 2.0f);
+        float horizontalOffset = paddingLeft;
+        if (mCentered) {
+            horizontalOffset += ((getWidth() - paddingLeft - paddingRight) / 2.0f) - (indicatorWidth / 2.0f);
+        }
+
+        //Draw stroked circles
+        for (int i = 0; i < count; i++) {
+            float dx1 = horizontalOffset + (i * lineWidthAndGap);
+            float dx2 = dx1 + mLineWidth;
+            canvas.drawLine(dx1, verticalOffset, dx2, verticalOffset, (i == mCurrentPage) ? mPaintSelected : mPaintUnselected);
+        }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.currentPage = mCurrentPage;
+        return savedState;
+    }
+
+    @Override
     public void setViewPager(ViewPager viewPager) {
         if (mViewPager == viewPager) {
             return;
@@ -277,9 +284,22 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        mCurrentPage = savedState.currentPage;
+        requestLayout();
+    }
+
+    @Override
     public void setViewPager(ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
     }
 
     @Override
@@ -290,45 +310,6 @@ public class LinePageIndicator extends View implements PageIndicator {
         mViewPager.setCurrentItem(item);
         mCurrentPage = item;
         invalidate();
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        invalidate();
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(state);
-        }
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        if (mListener != null) {
-            mListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
-        }
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        mCurrentPage = position;
-        invalidate();
-
-        if (mListener != null) {
-            mListener.onPageSelected(position);
-        }
-    }
-
-    @Override
-    public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
-        mListener = listener;
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
     }
 
     /**
@@ -354,7 +335,12 @@ public class LinePageIndicator extends View implements PageIndicator {
                 result = Math.min(result, specSize);
             }
         }
-        return (int) FloatMath.ceil(result);
+        return (int) Math.ceil(result);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        invalidate();
     }
 
     /**
@@ -379,23 +365,36 @@ public class LinePageIndicator extends View implements PageIndicator {
                 result = Math.min(result, specSize);
             }
         }
-        return (int) FloatMath.ceil(result);
+        return (int) Math.ceil(result);
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState) state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        mCurrentPage = savedState.currentPage;
-        requestLayout();
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        if (mListener != null) {
+            mListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+        }
     }
 
     @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState savedState = new SavedState(superState);
-        savedState.currentPage = mCurrentPage;
-        return savedState;
+    public void onPageSelected(int position) {
+        mCurrentPage = position;
+        invalidate();
+
+        if (mListener != null) {
+            mListener.onPageSelected(position);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(state);
+        }
+    }
+
+    @Override
+    public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
+        mListener = listener;
     }
 
     static class SavedState extends BaseSavedState {
@@ -428,4 +427,6 @@ public class LinePageIndicator extends View implements PageIndicator {
             dest.writeInt(currentPage);
         }
     }
+
+
 }
