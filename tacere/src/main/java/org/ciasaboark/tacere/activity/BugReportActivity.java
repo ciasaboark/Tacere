@@ -23,7 +23,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.ciasaboark.tacere.R;
-import org.ciasaboark.tacere.billing.KeySet;
+import org.ciasaboark.tacere.keyset.GitHubKeySet;
 import org.ciasaboark.tacere.versioning.Versioning;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -99,14 +99,14 @@ public class BugReportActivity extends ActionBarActivity {
                     public void run() {
                         boolean reportSent = false;
                         GitHubClient client = new GitHubClient();
-                        client.setOAuth2Token(KeySet.GITHUB_OAUTH);
+                        client.setOAuth2Token(GitHubKeySet.GITHUB_OAUTH);
 
                         RepositoryService repositoryService = new RepositoryService(client);
                         try {
                             Repository repository = repositoryService.getRepository("ciasaboark", "Tacere");
 
                             IssueService issueService = new IssueService();
-                            issueService.getClient().setOAuth2Token(KeySet.GITHUB_OAUTH);
+                            issueService.getClient().setOAuth2Token(GitHubKeySet.GITHUB_OAUTH);
                             Issue issue = new Issue();
                             issue.setTitle("Tacere issue submit");
 
