@@ -229,7 +229,7 @@ public class NotificationManagerWrapper {
             d.mutate().setColorFilter(event.getDisplayColor(), PorterDuff.Mode.MULTIPLY);
             DatabaseInterface databaseInterface = DatabaseInterface.getInstance(context);
             String calendarTitle = databaseInterface.getCalendarNameForId(event.getCalendarId());
-            String c = ((Character) calendarTitle.charAt(0)).toString().toUpperCase();
+            String c = calendarTitle == null ? "" : ((Character) calendarTitle.charAt(0)).toString().toUpperCase();
 
 
 //            Bitmap largeIcon = createMarkerIcon(d, c, width, height);
