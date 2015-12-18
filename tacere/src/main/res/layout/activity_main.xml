@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 
@@ -67,7 +67,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="100dp"
         android:orientation="horizontal"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/calendar_icon"
@@ -79,7 +79,7 @@
             android:tint="@color/icon_tint"/>
 
         <TextView
-            android:id="@+id/event_list_error"
+            android:id="@+id/error_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -88,6 +88,54 @@
             android:visibility="visible"/>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/permissions_error_box"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="false"
+        android:layout_below="@+id/main_service_warning"
+        android:background="#267c6e"
+        android:clickable="true"
+        android:elevation="@dimen/header_elevation"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/permissions_warning_icon"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_above="@+id/permissions_warning_text"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:paddingBottom="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="16dp"
+            android:paddingTop="4dp"
+            android:src="@drawable/calendar_calendar"
+            android:tint="@color/primary_text_disabled_material_dark"/>
+
+        <TextView
+            android:id="@+id/permissions_warning_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:text="Tacere has not been granted access to read the system calendar."
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/abc_primary_text_material_dark"/>
+
+        <Button
+            android:id="@+id/grant_permissions_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/permissions_warning_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:text="Grant Permissions"
+            android:textColor="@color/primary_text_default_material_dark"/>
+    </RelativeLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/quickSilenceButton"
@@ -102,5 +150,6 @@
         android:src="@drawable/ic_state_silent"
         fab:fab_colorNormal="@color/fab_quicksilence_normal"
         fab:fab_colorPressed="@color/fab_quicksilence_pressed"
-        fab:fab_shadow="false"/>
+        fab:fab_shadow="false"
+        />
 </RelativeLayout>

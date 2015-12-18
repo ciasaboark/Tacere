@@ -1,21 +1,25 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
 package org.ciasaboark.tacere.activity;
 
-import android.annotation.TargetApi;
+import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -24,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +50,7 @@ import org.ciasaboark.tacere.service.RequestTypes;
 public class MainActivity extends ActionBarActivity {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
+    private static final int CALENDAR_PERMISSIONS_REQUEST_CODE = 1;
     private EventCursorAdapter cursorAdapter;
     private Cursor cursor;
     private DatabaseInterface databaseInterface;
@@ -83,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
                     drawEventList();
                 } else if (oldCursor.getCount() != 0 && newCursor.getCount() == 0) {
                     hideEventList();
-                    drawError();
+                    drawEmptyEventListError();
                 }
 
                 //save the old position
@@ -196,7 +202,12 @@ public class MainActivity extends ActionBarActivity {
     public void onStart() {
         super.onStart();
         setContentView(R.layout.activity_main);
+        initMainViews();
+    }
+
+    private void initMainViews() {
         drawEventListOrError();
+        drawPermissionsWarningBoxIfNeeded();
         setupAndDrawActionButtons();
         // start the background service
         AlarmManagerWrapper alarmManagerWrapper = new AlarmManagerWrapper(this);
@@ -227,13 +238,41 @@ public class MainActivity extends ActionBarActivity {
         setupListView();
         setupErrorMessage();
 
-        if (databaseInterface.isDatabaseEmpty()) {
+        if (!isCalendarAuthenticated()) {
             hideEventList();
-            drawError();
+            drawPermissionsError();
+        } else if (databaseInterface.isDatabaseEmpty()) {
+            hideEventList();
+            drawEmptyEventListError();
         } else {
             hideError();
             drawEventList();
         }
+    }
+
+    private void drawPermissionsWarningBoxIfNeeded() {
+        View warningBox = findViewById(R.id.permissions_error_box);
+        if (isCalendarAuthenticated()) {
+            warningBox.setVisibility(View.GONE);
+        } else {
+            warningBox.setVisibility(View.VISIBLE);
+            Button permissionsButton = (Button) warningBox.findViewById(R.id.grant_permissions_button);
+
+            final Activity ctx = this;
+            permissionsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "user requesting permissions change");
+//                    if (ActivityCompat.shouldShowRequestPermissionRationale(ctx,
+//                            Manifest.permission.READ_CALENDAR)) {
+//                    } else {
+                    String[] permissions = {Manifest.permission.READ_CALENDAR};
+                    ActivityCompat.requestPermissions(ctx, permissions, CALENDAR_PERMISSIONS_REQUEST_CODE);
+//                    }
+                }
+            });
+        }
+
     }
 
     private void setupAndDrawActionButtons() {
@@ -251,7 +290,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void setupErrorMessage() {
-        TextView noEventsTv = (TextView) findViewById(R.id.event_list_error);
+        TextView noEventsTv = (TextView) findViewById(R.id.error_text);
         String errorText = "";
 
         //TODO move to members?
@@ -266,6 +305,11 @@ public class MainActivity extends ActionBarActivity {
         noEventsTv.setText(errorText);
     }
 
+    private boolean isCalendarAuthenticated() {
+        int permissions = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CALENDAR);
+        return permissions == PackageManager.PERMISSION_GRANTED;
+    }
+
     private void hideEventList() {
         ListView listview = (ListView) findViewById(R.id.eventListView);
         listview.setVisibility(View.GONE);
@@ -275,10 +319,14 @@ public class MainActivity extends ActionBarActivity {
         warningBox.setVisibility(View.GONE);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void drawError() {
-        LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
-        errorBox.setVisibility(View.VISIBLE);
+    private void drawPermissionsError() {
+        showErrorBox();
+        setErrorText(R.string.main_error_no_permissions);
+    }
+
+    private void drawEmptyEventListError() {
+        showErrorBox();
+        setErrorText(R.string.main_error_no_events);
     }
 
     private void hideError() {
@@ -330,6 +378,16 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void showErrorBox() {
+        LinearLayout errorBox = (LinearLayout) findViewById(R.id.error_box);
+        errorBox.setVisibility(View.VISIBLE);
+    }
+
+    private void setErrorText(int stringRes) {
+        TextView errorText = (TextView) findViewById(R.id.error_text);
+        errorText.setText(stringRes);
+    }
+
     private void drawServiceWarningBoxIfNeeded() {
         LinearLayout warningBox = (LinearLayout) findViewById(R.id.main_service_warning);
         if (!prefs.isServiceActivated()) {
@@ -369,6 +427,23 @@ public class MainActivity extends ActionBarActivity {
         quicksilenceDrawable.mutate().setColorFilter(getResources()
                 .getColor(R.color.fab_stop_icon_tint), PorterDuff.Mode.MULTIPLY);
         quickSilenceImageButton.setImageDrawable(quicksilenceDrawable);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case CALENDAR_PERMISSIONS_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initMainViews();
+                } else {
+                    //TODO
+                    //permissions were denied.
+                }
+                return;
+            }
+        }
     }
 
     @Override

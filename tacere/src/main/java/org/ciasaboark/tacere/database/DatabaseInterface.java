@@ -9,12 +9,14 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Instances;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.acra.ACRA;
@@ -23,7 +25,6 @@ import org.ciasaboark.tacere.event.EventInstance;
 import org.ciasaboark.tacere.event.ringer.RingerType;
 import org.ciasaboark.tacere.prefs.Prefs;
 
-import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -96,13 +97,6 @@ public class DatabaseInterface {
     private final int SYSTEM_DB_PROJECTION_EVENT_COLOR = 11;
     private final SQLiteDatabase eventsDB;
 
-
-    private DatabaseInterface(Context context) {
-        DatabaseInterface.context = context;
-        EventDatabaseOpenHelper dbHelper = new EventDatabaseOpenHelper(context);
-        this.eventsDB = dbHelper.getWritableDatabase();
-    }
-
     public static DatabaseInterface getInstance(Context ctx) {
         if (ctx == null) {
             throw new IllegalArgumentException("Context can not be null");
@@ -116,6 +110,12 @@ public class DatabaseInterface {
         }
 
         return instance;
+    }
+
+    private DatabaseInterface(Context context) {
+        DatabaseInterface.context = context;
+        EventDatabaseOpenHelper dbHelper = new EventDatabaseOpenHelper(context);
+        this.eventsDB = dbHelper.getWritableDatabase();
     }
 
     private Cursor getEventCursor(long begin, long end) {
@@ -355,16 +355,28 @@ public class DatabaseInterface {
      * Sync the internal database with the system calendar database. Forward syncing is limited to
      * the period specified in preferences. Old events are pruned.
      */
-    public void syncCalendarDb() {
-        // update(n) will also remove all events not found in the next n days, so we
-        // + need to keep this in sync with the users preferences.
-        int lookaheadDays = prefs.getLookaheadDays().value;
-        update(lookaheadDays);
-        pruneEventsEndBefore(System.currentTimeMillis() - EventInstance.MILLISECONDS_IN_MINUTE
-                * (long) prefs.getBufferMinutes());
-        pruneEventsBeginAfter(System.currentTimeMillis() + (lookaheadDays * EventInstance.MILLISECONDS_IN_DAY));
-        pruneEventsFromRemovedCalendars();
-        pruneEventsRemovedFromSystemCalendar();
+    public void syncCalendarDb() throws SecurityException {
+        if (!isCalendarPermissionGranted()) {
+            //user has not yet given access to calendar
+            Log.e(TAG, "no permission to read system calendar, database sync aborted");
+            return;
+        } else {
+            // update(n) will also remove all events not found in the next n days, so we
+            // + need to keep this in sync with the users preferences.
+            int lookaheadDays = prefs.getLookaheadDays().value;
+            update(lookaheadDays);
+            pruneEventsEndBefore(System.currentTimeMillis() - EventInstance.MILLISECONDS_IN_MINUTE
+                    * (long) prefs.getBufferMinutes());
+            pruneEventsBeginAfter(System.currentTimeMillis() +
+                    (lookaheadDays * EventInstance.MILLISECONDS_IN_DAY));
+            pruneEventsFromRemovedCalendars();
+            pruneEventsRemovedFromSystemCalendar();
+        }
+    }
+
+    private boolean isCalendarPermissionGranted() {
+        return ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CALENDAR)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     // sync the calendar and the local database for the given number of days
@@ -566,67 +578,78 @@ public class DatabaseInterface {
 
     public String getCalendarNameForId(long id) {
         String calendarName = "";
-        final String[] projection = {
-                Calendars._ID,
-                Calendars.NAME
-        };
-        final int projection_id = 0;
-        final int projection_name = 1;
-        Cursor cursor;
-        ContentResolver cr = context.getContentResolver();
-        cursor = cr.query(Calendars.CONTENT_URI, projection, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                long calendarId = cursor.getLong(projection_id);
-                if (calendarId == id) {
-                    calendarName = cursor.getString(projection_name);
-                    break;
-                }
-            } while (cursor.moveToNext());
+        if (isCalendarPermissionGranted()) {
+            final String[] projection = {
+                    Calendars._ID,
+                    Calendars.NAME,
+                    Calendars.CALENDAR_DISPLAY_NAME
+            };
+            final int projection_id = 0;
+            final int projection_name = 1;
+            final int projection_display_name = 2;
+
+            Cursor cursor;
+            ContentResolver cr = context.getContentResolver();
+            cursor = cr.query(Calendars.CONTENT_URI, projection, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    long calendarId = cursor.getLong(projection_id);
+                    if (calendarId == id) {
+                        calendarName = cursor.getString(projection_name);
+                        if (calendarName == null || calendarName == "") {
+                            calendarName = cursor.getString(projection_display_name);
+                            if (calendarName == null) calendarName = "";
+                        }
+                        break;
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
         return calendarName;
     }
 
     public List<Calendar> getCalendarIdList() {
         List<Calendar> calendarIds = new ArrayList<Calendar>();
-        final String[] projection = {
-                Calendars._ID,
-                Calendars.ACCOUNT_NAME,
-                Calendars.CALENDAR_DISPLAY_NAME,
-                Calendars.OWNER_ACCOUNT,
-                Calendars.CALENDAR_COLOR
-        };
-        final int projection_id = 0;
-        final int projection_accountName = 1;
-        final int projection_displayname = 2;
-        final int projection_owner = 3;
-        final int projection_color = 4;
-        Cursor cursor;
-        ContentResolver cr = context.getContentResolver();
-        //TODO wrap in try/catch/finally close
-        cursor = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                long id = cursor.getLong(projection_id);
-                String accountName = cursor.getString(projection_accountName);
-                String displayName = cursor.getString(projection_displayname);
-                String owner = cursor.getString(projection_owner);
-                int color = cursor.getInt(projection_color);
-                try {
-                    Calendar c = new Calendar(id, accountName, displayName, owner, color);
-                    calendarIds.add(c);
-                } catch (IllegalArgumentException e) {
-                    Log.w(TAG, "android database supplied bad values calendar info for id " + id +
-                            ", accountName:" + accountName + "displayName:" + displayName +
-                            " owner:" + owner);
-                    Log.w(TAG, e.getMessage());
-                }
-            } while (cursor.moveToNext());
-        } else {
-            Log.d(TAG, "no calendars installed");
+        if (isCalendarPermissionGranted()) {
+            final String[] projection = {
+                    Calendars._ID,
+                    Calendars.ACCOUNT_NAME,
+                    Calendars.CALENDAR_DISPLAY_NAME,
+                    Calendars.OWNER_ACCOUNT,
+                    Calendars.CALENDAR_COLOR
+            };
+            final int projection_id = 0;
+            final int projection_accountName = 1;
+            final int projection_displayname = 2;
+            final int projection_owner = 3;
+            final int projection_color = 4;
+            Cursor cursor;
+            ContentResolver cr = context.getContentResolver();
+            //TODO wrap in try/catch/finally close
+            cursor = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    long id = cursor.getLong(projection_id);
+                    String accountName = cursor.getString(projection_accountName);
+                    String displayName = cursor.getString(projection_displayname);
+                    String owner = cursor.getString(projection_owner);
+                    int color = cursor.getInt(projection_color);
+                    try {
+                        Calendar c = new Calendar(id, accountName, displayName, owner, color);
+                        calendarIds.add(c);
+                    } catch (IllegalArgumentException e) {
+                        Log.w(TAG, "android database supplied bad values calendar info for id " + id +
+                                ", accountName:" + accountName + "displayName:" + displayName +
+                                " owner:" + owner);
+                        Log.w(TAG, e.getMessage());
+                    }
+                } while (cursor.moveToNext());
+            } else {
+                Log.d(TAG, "no calendars installed");
+            }
+            cursor.close();
         }
-        cursor.close();
 
         return calendarIds;
     }
