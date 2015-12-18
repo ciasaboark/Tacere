@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014 Jonathan Nelson
+  ~ Copyright (c) 2015 Jonathan Nelson
   ~ Released under the BSD license.  For details see the COPYING file.
   -->
 <resources>
@@ -16,6 +16,7 @@
     <string name="main_error_service_disabled">Automatic silencing disabled in settings</string>
     <string name="main_error_no_events">No calendar events found for the next %1$s.</string>
     <string name="list_error_no_calendars">No calendars have been selected to be synced.</string>
+    <string name="main_error_no_permissions">Tacere has not been given permission to read your system calendar.  Please enable permissions below.</string>
 
     <!-- About Activity -->
     <string name="about_title">About</string>

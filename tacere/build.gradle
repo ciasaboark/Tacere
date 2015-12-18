@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -7,14 +7,14 @@ apply plugin: 'com.android.application'
 
 def APP_VERSION_MAJOR = "2";
 def APP_VERSION_MINOR = "1";
-def APP_VERSION_RELEASE = "2";
+def APP_VERSION_RELEASE = "3";
 
 def dateTime = new Date()
 def DATE_STRING = dateTime.getDateString()
 
 def APP_VERSION_NAME = APP_VERSION_MAJOR + "." + APP_VERSION_MINOR + "." + APP_VERSION_RELEASE
 def DEBUG_VERSION_NAME = "beta"
-def VERSION_CODE = 25
+def VERSION_CODE = 26
 
 android {
     compileSdkVersion 23

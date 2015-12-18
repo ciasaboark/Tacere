@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -25,7 +25,7 @@ import com.viewpagerindicator.CirclePageIndicator;
 import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.fragment.TutorialCrashReporterFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialEventListFragment;
-import org.ciasaboark.tacere.activity.fragment.TutorialProVersionFragment;
+import org.ciasaboark.tacere.activity.fragment.TutorialExtraFeaturesFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialRingerPriorityFragment;
 import org.ciasaboark.tacere.activity.fragment.TutorialWelcomeFragment;
 import org.ciasaboark.tacere.manager.AlarmManagerWrapper;
@@ -162,7 +162,7 @@ public class TutorialActivity extends ActionBarActivity {
                     pageFragment = new TutorialRingerPriorityFragment();
                     break;
                 case 3:
-                    pageFragment = new TutorialProVersionFragment();
+                    pageFragment = new TutorialExtraFeaturesFragment();
                     break;
                 case 4:
                     pageFragment = new TutorialCrashReporterFragment();

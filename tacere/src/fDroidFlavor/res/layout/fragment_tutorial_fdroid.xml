@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2015 Jonathan Nelson
+  ~ Released under the BSD license.  For details see the COPYING file.
+  -->
+
+<RelativeLayout
+    android:id="@+id/relativeLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:visibility="visible">
+
+    <RelativeLayout
+        android:id="@+id/tutorial_pro_page_upgrade"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/tutorial_pro_upgrade_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="false"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="16dp"
+            android:text="@string/tutorial_pro_button_upgrade"
+            android:textAllCaps="true"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textColor="@color/text_button_positive"
+            android:theme="?android:attr/borderlessButtonStyle"/>
+
+        <ScrollView
+            android:id="@+id/tutorial_pro_upgrade_scrollview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/tutorial_pro_upgrade_button"
+            android:layout_alignParentTop="false"
+            >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tutorial_pro_upgrade_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingBottom="16dp"
+                    android:text="@string/tutorial_pro_title"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/tutorial_pro_default_description"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/tutorial_icon_ringer_default"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/calendar_calendar"
+                        android:tint="@color/tutorial_icon_tint"/>
+
+                    <TextView
+                        android:id="@+id/textView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:text="@string/tutorial_pro_feature_calendar"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/calendar_series"
+                        android:tint="@color/tutorial_icon_tint"/>
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:text="@string/tutorial_pro_feature_series"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:text="@string/tutorial_pro_feature_future"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/tutorial_pro_page_thanks"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tutorial_pro_thanks_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="16dp"
+            android:text="Thanks"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/thumbs_up"
+                android:tint="@color/tutorial_icon_tint"/>
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:text="Thank you for purchasing the Pro version upgrade.  Your support is greately appreciated."
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

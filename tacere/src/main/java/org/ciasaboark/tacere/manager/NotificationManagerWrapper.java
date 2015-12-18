@@ -229,11 +229,14 @@ public class NotificationManagerWrapper {
             d.mutate().setColorFilter(event.getDisplayColor(), PorterDuff.Mode.MULTIPLY);
             DatabaseInterface databaseInterface = DatabaseInterface.getInstance(context);
             String calendarTitle = databaseInterface.getCalendarNameForId(event.getCalendarId());
-            String c = calendarTitle == null ? "" : ((Character) calendarTitle.charAt(0)).toString().toUpperCase();
+            String c = "";
+            if (calendarTitle != null && calendarTitle != "") {
+                c = ((Character) calendarTitle.charAt(0)).toString().toUpperCase();
+            }
 
 
-//            Bitmap largeIcon = createMarkerIcon(d, c, width, height);
-            Bitmap largeIcon = combineDrawablesToBitmap(d, getRingerIconForEvent(event), width, height);
+            Bitmap largeIcon = createMarkerIcon(d, c, width, height);
+//            Bitmap largeIcon = combineDrawablesToBitmap(d, getRingerIconForEvent(event), width, height);
             notBuilder.setLargeIcon(largeIcon);
         }
 
@@ -303,6 +306,43 @@ public class NotificationManagerWrapper {
         return notBuilder;
     }
 
+    private Bitmap createMarkerIcon(Drawable backgroundImage, String text, int width, int height) {
+
+        Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
+                Bitmap.Config.ARGB_8888);
+        // Create a canvas, that will draw on to canvasBitmap.
+        Canvas imageCanvas = new Canvas(canvasBitmap);
+
+        // Draw the image to our canvas
+        backgroundImage.draw(imageCanvas);
+
+        // Set up the paint for use with our Canvas
+        TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG | TextPaint.LINEAR_TEXT_FLAG);
+        textPaint.setTextAlign(TextPaint.Align.CENTER);
+        textPaint.setTypeface(Typeface.DEFAULT);
+        textPaint.setTextSize(100f);
+        textPaint.setColor(context.getResources().getColor(android.R.color.white));
+
+        int xPos = (imageCanvas.getWidth() / 2);
+        int yPos = (int) ((imageCanvas.getHeight() / 2) - ((textPaint.descent() +
+                textPaint.ascent()) / 2));
+        Rect r = new Rect();
+        textPaint.getTextBounds(text, 0, text.length(), r);
+//        yPos += (Math.abs(r.height()))/2;
+
+        // Draw the text on top of our image
+        imageCanvas.drawText(text, xPos, yPos, textPaint);
+
+
+        // Combine background and text to a LayerDrawable
+        LayerDrawable layerDrawable = new LayerDrawable(
+                new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        layerDrawable.setBounds(0, 0, width, height);
+        layerDrawable.draw(new Canvas(newBitmap));
+        return newBitmap;
+    }
+
     private Bitmap combineDrawablesToBitmap(final Drawable backgroundImage, final BitmapDrawable overlayImage, int width, int height) {
 
         Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
@@ -349,43 +389,6 @@ public class NotificationManagerWrapper {
                 break;
         }
         return (BitmapDrawable) d;
-    }
-
-    private Bitmap createMarkerIcon(Drawable backgroundImage, String text, int width, int height) {
-
-        Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
-                Bitmap.Config.ARGB_8888);
-        // Create a canvas, that will draw on to canvasBitmap.
-        Canvas imageCanvas = new Canvas(canvasBitmap);
-
-        // Draw the image to our canvas
-        backgroundImage.draw(imageCanvas);
-
-        // Set up the paint for use with our Canvas
-        TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG | TextPaint.LINEAR_TEXT_FLAG);
-        textPaint.setTextAlign(TextPaint.Align.CENTER);
-        textPaint.setTypeface(Typeface.DEFAULT);
-        textPaint.setTextSize(100f);
-        textPaint.setColor(context.getResources().getColor(android.R.color.white));
-
-        int xPos = (imageCanvas.getWidth() / 2);
-        int yPos = (int) ((imageCanvas.getHeight() / 2) - ((textPaint.descent() +
-                textPaint.ascent()) / 2));
-        Rect r = new Rect();
-        textPaint.getTextBounds(text, 0, text.length(), r);
-//        yPos += (Math.abs(r.height()))/2;
-
-        // Draw the text on top of our image
-        imageCanvas.drawText(text, xPos, yPos, textPaint);
-
-
-        // Combine background and text to a LayerDrawable
-        LayerDrawable layerDrawable = new LayerDrawable(
-                new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
-        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        layerDrawable.setBounds(0, 0, width, height);
-        layerDrawable.draw(new Canvas(newBitmap));
-        return newBitmap;
     }
 
     private class REQUEST_CODES {

@@ -17,7 +17,7 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.activity.ProUpgradeActivity;
 import org.ciasaboark.tacere.billing.Authenticator;
 
-public class TutorialProVersionFragment extends Fragment {
+public class TutorialExtraFeaturesFragment extends Fragment {
     private int layout = R.layout.fragment_tutorial_page_pro;
     private ViewGroup rootView;
 

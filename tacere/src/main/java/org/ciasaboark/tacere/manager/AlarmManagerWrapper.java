@@ -17,6 +17,9 @@ import junit.framework.Assert;
 import org.ciasaboark.tacere.service.EventSilencerService;
 import org.ciasaboark.tacere.service.RequestTypes;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class AlarmManagerWrapper {
     private static final String TAG = "AlarmManagerWrapper";
     // requestCodes for the different pending intents
@@ -42,7 +45,11 @@ public class AlarmManagerWrapper {
     }
 
     private void scheduleAlarmAt(long time, RequestTypes type, Bundle additionalArgs) {
-        Log.d(TAG, "alarm scheduled at " + time + " for " + type);
+        Date d = new Date(time);
+        DateFormat format = DateFormat.getDateTimeInstance();
+        String wakeTime = format.format(d);
+        String now = format.format(new Date(System.currentTimeMillis()));
+        Log.d(TAG, "alarm scheduled at " + wakeTime + ", (now " + now + ") for wake type " + type);
         Assert.assertNotNull(type);
 
         Intent i = new Intent(context, EventSilencerService.class);
@@ -71,7 +78,7 @@ public class AlarmManagerWrapper {
         PendingIntent pintent = PendingIntent.getService(context, requestCode, i,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarm.set(AlarmManager.RTC_WAKEUP, time, pintent);
+        alarm.setExact(AlarmManager.RTC_WAKEUP, time, pintent);
     }
 
     public void scheduleImmediateQuicksilenceForDuration(int duration) {

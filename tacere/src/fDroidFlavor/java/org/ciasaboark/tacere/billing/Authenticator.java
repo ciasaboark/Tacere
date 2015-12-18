@@ -19,4 +19,8 @@ public class Authenticator {
     public boolean isAuthenticated() {
         return true;
     }
+
+    public void showUpgradeDialog() {
+        //nothing to do here
+    }
 }
