@@ -8,6 +8,8 @@
       <root url="jar://$PROJECT_DIR$/tacere/build/intermediates/exploded-aar/com.melnykov/floatingactionbutton/1.0.3/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.melnykov/floatingactionbutton/1.0.3/22b8e93dbeb1b902781e4b313275bbcac75fa43b/floatingactionbutton-1.0.3-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
