@@ -1,20 +1,22 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.activity.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,25 +40,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BugReportActivity extends ActionBarActivity {
+public class BugReportDialogFragment extends DialogFragment {
     private static final String TAG = "BugReportActivity";
     private static final String REPORT_MESSAGE = "reportMessage";
     private static final String REPORT_EMAIL = "reportEmail";
+    private View rootView;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar == null) {
-            Log.w(TAG, "could not get reference to actionbar, can not hide.");
-        } else {
-            actionBar.hide();
-        }
-        setContentView(R.layout.activity_bug_report);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.activity_bug_report, container, false);
 
-        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        final Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.report_types, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -64,15 +61,15 @@ public class BugReportActivity extends ActionBarActivity {
         spinner.setAdapter(adapter);
 
 
-        Button closeButton = (Button) findViewById(R.id.bug_report_button_cancel);
+        Button closeButton = (Button) rootView.findViewById(R.id.bug_report_button_cancel);
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                BugReportDialogFragment.this.dismiss();
             }
         });
 
-        final Button sendButton = (Button) findViewById(R.id.bug_report_button_send);
+        final Button sendButton = (Button) rootView.findViewById(R.id.bug_report_button_send);
         sendButton.setEnabled(false);
         sendButton.setVisibility(View.INVISIBLE);
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -80,13 +77,13 @@ public class BugReportActivity extends ActionBarActivity {
             public void onClick(View v) {
                 sendButton.setEnabled(false);
 
-                final ProgressBar busySpinner = (ProgressBar) findViewById(R.id.bug_report_progressbar);
+                final ProgressBar busySpinner = (ProgressBar) rootView.findViewById(R.id.bug_report_progressbar);
                 busySpinner.setVisibility(View.VISIBLE);
 
-                EditText messageEditText = (EditText) findViewById(R.id.bug_report_message);
+                EditText messageEditText = (EditText) rootView.findViewById(R.id.bug_report_message);
                 final String messageText = messageEditText.getText().toString();
 
-                EditText emailEditText = (EditText) findViewById(R.id.bug_report_email);
+                EditText emailEditText = (EditText) rootView.findViewById(R.id.bug_report_email);
                 String emailText = emailEditText.getText().toString();
                 final String emailString = emailText.length() == 0 ? "no email address given" : emailText;
 
@@ -162,16 +159,17 @@ public class BugReportActivity extends ActionBarActivity {
 
 
                         if (reportSent) {
-                            BugReportActivity.this.runOnUiThread(new Runnable() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 public void run() {
-                                    Toast.makeText(BugReportActivity.this, R.string.bug_report_toast_sent, Toast.LENGTH_LONG).show();
-                                    finish();
+                                    Toast.makeText(getActivity(), R.string.bug_report_toast_sent, Toast.LENGTH_LONG).show();
+                                    BugReportDialogFragment.this.dismiss();
+
                                 }
                             });
                         } else {
-                            BugReportActivity.this.runOnUiThread(new Runnable() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 public void run() {
-                                    Toast.makeText(BugReportActivity.this, R.string.bug_report_toast_failed, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), R.string.bug_report_toast_failed, Toast.LENGTH_LONG).show();
                                     busySpinner.setVisibility(View.INVISIBLE);
                                     sendButton.setEnabled(true);
                                     sendButton.setVisibility(View.VISIBLE);
@@ -184,7 +182,7 @@ public class BugReportActivity extends ActionBarActivity {
             }
         });
 
-        EditText messageEditText = (EditText) findViewById(R.id.bug_report_message);
+        EditText messageEditText = (EditText) rootView.findViewById(R.id.bug_report_message);
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -207,14 +205,8 @@ public class BugReportActivity extends ActionBarActivity {
                 }
             }
         });
-    }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_bug_report, menu);
-        return true;
+        return rootView;
     }
 
     @Override
@@ -230,5 +222,11 @@ public class BugReportActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getActivity().getMenuInflater().inflate(R.menu.menu_bug_report, menu);
+        return true;
     }
 }

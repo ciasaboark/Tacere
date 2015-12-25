@@ -1,18 +1,23 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.activity.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -23,21 +28,39 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class AboutLicenseActivity extends ActionBarActivity {
+public class AboutLicenseFragment extends Fragment {
     private static final String TAG = "AboutLicenseActivity";
+    private View rootView;
+    private Context context;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about_activity_license);
-        // Show the Up button in the action bar.
-        setupActionBar();
+    public void onAttach(Context ctx) {
+        super.onAttach(context);
+        context = ctx;
+    }
 
-        WebView wv = (WebView) findViewById(R.id.webView1);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_about_license, container, false);
+        initViews();
+        return rootView;
+    }
+
+    private void initViews() {
+        // Show the Up button in the action bar.
+//        setupActionBar();
+
+        WebView wv = (WebView) rootView.findViewById(R.id.webView1);
 
         String htmlData = "";
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("license.html")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(context.getAssets().open("license.html")));
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -70,24 +93,24 @@ public class AboutLicenseActivity extends ActionBarActivity {
         wv.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
     }
 
-    /**
-     * Set up the {@link android.app.ActionBar}.
-     */
-    private void setupActionBar() {
-        try {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
-        }
-    }
+//    /**
+//     * Set up the {@link android.app.ActionBar}.
+//     */
+//    private void setupActionBar() {
+//        try {
+//            context.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//            getSupportActionBar().setHomeButtonEnabled(true);
+//        } catch (NullPointerException e) {
+//            Log.e(TAG, "unable to setup action bar");
+//        }
+//    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.about_activity_license, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        ((Activity)context).getMenuInflater().inflate(R.menu.fragment_about_license, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -100,7 +123,7 @@ public class AboutLicenseActivity extends ActionBarActivity {
                 //
                 // http://developer.android.com/design/patterns/navigation.html#up-vs-back
                 //
-                NavUtils.navigateUpFromSameTask(this);
+                NavUtils.navigateUpFromSameTask((Activity) context);
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -3,24 +3,22 @@
  * Released under the BSD license.  For details see the COPYING file.
  */
 
-package org.ciasaboark.tacere.activity;
+package org.ciasaboark.tacere.activity.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +26,16 @@ import org.ciasaboark.tacere.R;
 import org.ciasaboark.tacere.R.id;
 import org.ciasaboark.tacere.billing.Authenticator;
 import org.ciasaboark.tacere.prefs.BetaPrefs;
-import org.ciasaboark.tacere.prefs.Updates;
 import org.ciasaboark.tacere.versioning.Versioning;
 
-public class AboutActivity extends ActionBarActivity {
-    private static final String TAG = "AboutActivity";
+public class AboutFragment extends Fragment {
+    private static final String TAG = "AboutFragment";
+    private View rootView;
+    private Context context;
+    private int iconTouches = 0;
+    private Toast ongoingToast;
+    private Integer x;
+    private Integer y;
     View.OnTouchListener mOnTouch = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -48,10 +51,6 @@ public class AboutActivity extends ActionBarActivity {
             return false;
         }
     };
-    private int iconTouches = 0;
-    private Toast ongoingToast;
-    private Integer x;
-    private Integer y;
 
     private void recordCoordinates(int x, int y) {
         this.x = x;
@@ -59,41 +58,41 @@ public class AboutActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
 
-        ongoingToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+    }
 
-        // Show the Up button in the action bar.
-        setupActionBar();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_about, container, false);
+        context = getActivity();
 
-        TextView sourceText = (TextView) findViewById(id.about_source_text);
+        ongoingToast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
+
+        TextView sourceText = (TextView) rootView.findViewById(id.about_source_text);
         sourceText.setMovementMethod(LinkMovementMethod.getInstance());
-        TextView bugsText = (TextView) findViewById(id.about_bugs_text);
+        TextView bugsText = (TextView) rootView.findViewById(id.about_bugs_text);
         bugsText.setMovementMethod(LinkMovementMethod.getInstance());
-        TextView commentsText = (TextView) findViewById(id.about_comments_text);
+        TextView commentsText = (TextView) rootView.findViewById(id.about_comments_text);
         commentsText.setMovementMethod(LinkMovementMethod.getInstance());
 
-        TextView versionText = (TextView) findViewById(id.about_version_number);
+        TextView versionText = (TextView) rootView.findViewById(id.about_version_number);
         String formattedVersion = String.format(getString(R.string.about_version), Versioning.getVersionCode());
         versionText.setText(formattedVersion);
         //textview using marquee scrolling, but this only works if the textview is selected
         versionText.setSelected(true);
 
-        TextView basicOrPro = (TextView) findViewById(id.about_version_pro);
+        TextView versionType = (TextView) rootView.findViewById(id.about_version_type);
         String type;
-        Authenticator authenticator = new Authenticator(this);
-        if (authenticator.isAuthenticated()) {
-            type = "Pro version";
-        } else {
-            type = "Basic version";
-        }
-        basicOrPro.setText(type);
+        Authenticator authenticator = new Authenticator(context);
+        type = authenticator.getAuthenticatedTypeString() + " version";
+        versionType.setText(type);
 
-        final View betaSettingsHeaderContent = findViewById(id.about_header_beta_settings);
+        final View betaSettingsHeaderContent = rootView.findViewById(id.about_header_beta_settings);
         betaSettingsHeaderContent.setOnTouchListener(mOnTouch);
-        final View normalHeaderContent = findViewById(id.about_header_normal);
+        final View normalHeaderContent = rootView.findViewById(id.about_header_normal);
         normalHeaderContent.setOnTouchListener(mOnTouch);
         normalHeaderContent.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -110,10 +109,10 @@ public class AboutActivity extends ActionBarActivity {
             }
         });
 
-        final View betaSettingsClickArea = findViewById(id.about_header_beta_settings_clickarea);
+        final View betaSettingsClickArea = rootView.findViewById(id.about_header_beta_settings_clickarea);
         betaSettingsClickArea.setOnTouchListener(mOnTouch);
-        final SwitchCompat betaSettingsSwitch = (SwitchCompat) findViewById(id.about_header_beta_settings_switch);
-        final BetaPrefs betaPrefs = new BetaPrefs(this);
+        final SwitchCompat betaSettingsSwitch = (SwitchCompat) rootView.findViewById(id.about_header_beta_settings_switch);
+        final BetaPrefs betaPrefs = new BetaPrefs(context);
         betaSettingsSwitch.setChecked(betaPrefs.isBetaPrefsUnlocked());
         betaSettingsClickArea.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,18 +128,13 @@ public class AboutActivity extends ActionBarActivity {
                 return true;
             }
         });
+
+        return rootView;
     }
 
-    /**
-     * Set up the {@link android.app.ActionBar}.
-     */
-    private void setupActionBar() {
-        try {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "unable to setup action bar");
-        }
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     private void toggleVisibility(View view) {
@@ -219,47 +213,47 @@ public class AboutActivity extends ActionBarActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.about, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.fragment_about, menu);
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        boolean itemProcessedHere = false;
-        switch (item.getItemId()) {
-            case id.action_about_tutorial:
-                Intent tutorialIntent = new Intent(this, TutorialActivity.class);
-                startActivity(tutorialIntent);
-                itemProcessedHere = true;
-                break;
-            case R.id.action_about_license:
-                Intent licenseIntent = new Intent(this, org.ciasaboark.tacere.activity.AboutLicenseActivity.class);
-                licenseIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(licenseIntent);
-                itemProcessedHere = true;
-                break;
-            case android.R.id.home:
-                // This ID represents the Home or Up button. In the case of this
-                // activity, the Up button is shown. Use NavUtils to allow users
-                // to navigate up one level in the application structure. For
-                // more details, see the Navigation pattern on Android Design:
-                //
-                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-                //
-                NavUtils.navigateUpFromSameTask(this);
-                itemProcessedHere = true;
-                break;
-            case R.id.action_about_updates:
-                Updates updates = new Updates(this, this);
-                updates.showUpdatesDialog();
-                itemProcessedHere = true;
-                break;
-        }
-
-        return itemProcessedHere;
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        boolean itemProcessedHere = false;
+//        switch (item.getItemId()) {
+//            case id.action_about_tutorial:
+//                Intent tutorialIntent = new Intent(this, TutorialActivity.class);
+//                startActivity(tutorialIntent);
+//                itemProcessedHere = true;
+//                break;
+//            case R.id.action_about_license:
+//                Intent licenseIntent = new Intent(this, org.ciasaboark.tacere.activity.AboutLicenseActivity.class);
+//                licenseIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(licenseIntent);
+//                itemProcessedHere = true;
+//                break;
+//            case android.R.id.home:
+//                // This ID represents the Home or Up button. In the case of this
+//                // activity, the Up button is shown. Use NavUtils to allow users
+//                // to navigate up one level in the application structure. For
+//                // more details, see the Navigation pattern on Android Design:
+//                //
+//                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+//                //
+//                NavUtils.navigateUpFromSameTask(this);
+//                itemProcessedHere = true;
+//                break;
+//            case R.id.action_about_updates:
+//                Updates updates = new Updates(context, this);
+//                updates.showUpdatesDialog();
+//                itemProcessedHere = true;
+//                break;
+//        }
+//
+//        return itemProcessedHere;
+//    }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonathan Nelson
+ * Copyright (c) 2015 Jonathan Nelson
  * Released under the BSD license.  For details see the COPYING file.
  */
 
@@ -31,7 +31,7 @@ import org.ciasaboark.tacere.prefs.Prefs;
 
 import java.util.ArrayList;
 
-public class MainSettingsFragment extends android.support.v4.app.Fragment {
+public class SettingsFragment extends android.support.v4.app.Fragment {
     public static final String SHOW_ADVANCED_SETTINGS_LINK = "showAdvancedSettings";
     public static final String TAG = "MainSettingsFragment";
     private static final int layout = R.layout.fragment_main_settings;
@@ -41,16 +41,16 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
     private boolean showAdvancedSettingsLink = true;
     private OnSelectCalendarsListener mListener;
 
-    public MainSettingsFragment() {
-        // Required empty public constructor
-    }
-
-    public static MainSettingsFragment newInstance(boolean showAdvancedSettingsLink) {
-        MainSettingsFragment fragment = new MainSettingsFragment();
+    public static SettingsFragment newInstance(boolean showAdvancedSettingsLink) {
+        SettingsFragment fragment = new SettingsFragment();
         Bundle args = new Bundle();
         args.putBoolean(SHOW_ADVANCED_SETTINGS_LINK, showAdvancedSettingsLink);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public SettingsFragment() {
+        // Required empty public constructor
     }
 
     @Override
@@ -260,6 +260,6 @@ public class MainSettingsFragment extends android.support.v4.app.Fragment {
 
     public interface OnSelectCalendarsListener {
         // TODO: Update argument type and name
-        public void onSelectCalendarsSelectedListener();
+        void onSelectCalendarsSelectedListener();
     }
 }

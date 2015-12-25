@@ -23,4 +23,9 @@ public class Authenticator {
     public void showUpgradeDialog() {
         //nothing to do here
     }
+
+    public String getAuthenticatedTypeString() {
+        String type = "FDroid FOSS";
+        return type;
+    }
 }
